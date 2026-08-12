@@ -62,6 +62,14 @@ nav.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .badge-moved{font-size:.66rem;background:var(--warn-soft);color:var(--warn);border-radius:99px;padding:1px 8px;font-weight:600}
 .lrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 .lch{font-size:.7rem;font-weight:600;text-decoration:none;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:2px 9px}
+#regen{align-self:center;font-size:.7rem;border-radius:99px;padding:4px 11px;border:1px solid var(--line);color:var(--accent);background:var(--surface);cursor:pointer;font-weight:700}
+.pitem{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--pc,var(--muted));border-radius:9px;padding:7px 11px;margin:6px 0;display:flex;gap:9px;align-items:flex-start;font-size:.84rem}
+.pitem.done{opacity:.45}
+.pitem .pcx{margin-left:auto;font-size:.68rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.matgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:14px}
+.matgrid .mg{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px;cursor:pointer}
+.matgrid .mg b{font-family:Georgia,serif;font-size:.92rem;display:block;margin-bottom:6px}
+.lnkinput{width:100%;background:var(--surface2);border:1px dashed var(--line);border-radius:7px;color:var(--muted);padding:5px 9px;font-size:.72rem;margin:4px 0}
 .det{font-size:.84rem;color:var(--ink);margin-top:7px;display:none;border-top:1px dashed var(--line);padding-top:7px;white-space:pre-wrap}
 .card.open .det{display:block}
 .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
@@ -119,11 +127,13 @@ td input{width:64px;background:var(--surface);border:1px solid var(--line);borde
     <div class="stat"><b id="stDone">—</b><span>blocos feitos</span></div>
     <div class="stat"><b id="stPend">—</b><span>realocados</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
+    <button id="regen" title="Realoca tudo que ficou para trás, sem perder o que está feito">⟳ replanejar</button>
     <button id="syncpill" title="Estado da sincronização">—</button>
   </div>
   <nav class="tabs">
     <button data-tab="hoje" class="on">Hoje</button>
     <button data-tab="semana">Semana</button>
+    <button data-tab="mats">Matérias</button>
     <button data-tab="prog">Progresso</button>
     <button data-tab="juris">Juris</button>
     <button data-tab="aulas">Aulas</button>
@@ -209,6 +219,19 @@ document.getElementById("tokenSave").addEventListener("click",()=>{
 });
 document.getElementById("tokenSkip").addEventListener("click",()=>{hideSetup();setSync("off")});
 document.getElementById("syncpill").addEventListener("click",()=>{if(!token)showSetup();else pull()});
+document.getElementById("regen").addEventListener("click",()=>{
+  if(!confirm("Replanejar: tudo que ficou para trás (não ticado) será redistribuído nos próximos dias, sem perder nada feito. Continuar?"))return;
+  const hoje=todayStr();let n=0;
+  allBlocks.forEach(b=>{if(b.opt||isDone(b)||b.tipo==="SIM")return;if(effDate(b)>=hoje)return;
+    const cand=DATA.days.filter(d=>d.d>=hoje&&d.d<"2026-10-17"&&d.blocks.some(x=>x.mat===b.mat&&!x.opt));
+    let ok=false;
+    for(const d of cand){if(extraLoad(d.d)+b.min<=60){SET("mv:"+b.id,d.d);n++;ok=true;break}}
+    if(!ok)for(const d of DATA.days){if(d.d>=hoje&&d.d<"2026-10-17"&&extraLoad(d.d)+b.min<=60){SET("mv:"+b.id,d.d);n++;ok=true;break}}
+    if(!ok){SET("mv:"+b.id,"fila");n++}});
+  allBlocks.forEach(b=>{if(b.tipo!=="SIM"||isDone(b)||b.t.indexOf("PROVA")>=0)return;if(effDate(b)>=hoje)return;
+    const t=DATA.days.find(d=>d.d>=hoje&&new Date(d.d+"T12:00:00").getDay()===0&&d.d<"2026-10-18"&&!d.blocks.some(x=>x.tipo==="SIM"&&!isDone(x)&&effDate(x)===d.d));
+    if(t){SET("mv:"+b.id,t.d);n++}});
+  render();toast(n?n+" blocos replanejados — o plano voltou a ser executável a partir de hoje.":"Você está em dia: nada para replanejar.")});
 // ---------- índices ----------
 const dayIdx={};DATA.days.forEach((d,i)=>dayIdx[d.d]=i);
 const allBlocks=[];DATA.days.forEach(d=>d.blocks.forEach(b=>{b.day=d.d;b.wk=d.wk;b.fase=d.fase;allBlocks.push(b)}));
@@ -267,6 +290,12 @@ const LEIS=[
 ["DL3.365",/3\.365/, PL+"decreto-lei/del3365.htm","3.365"]
 ];
 const LEINUMS=new Set(LEIS.map(L=>L[3]));
+function jurl(ref){return "https://www.google.com/search?q="+encodeURIComponent('"'+ref+'" inteiro teor')}
+const MATMAPG={"Constitucional":"Direito Constitucional","Const. Tributário":"Direito Tributário","Const. Trabalho":"Direito Constitucional","Normas Const. Proc. Penal":"Direito Processual Penal","Civil":"Direito Civil","Proc. Civil":"Direito Processual Civil","Penal":"Direito Penal","Administrativo":"Direito Administrativo","Empresarial":"Direito Empresarial","Direitos Humanos":"Direitos Humanos","Humanística":"Humanística"};
+const EB2MAT={"constitucional":"Constitucional","civil-gerais":"Civil","civil-especificos":"Civil","consumidor":"Civil","proc-civil":"Proc. Civil","penal-geral":"Penal","penal-especial":"Penal","administrativo":"Administrativo","empresarial":"Empresarial","tributario":"Const. Tributário","trabalho":"Const. Trabalho","proc-penal":"Normas Const. Proc. Penal","dh":"Direitos Humanos","humanistica":"Humanística"};
+const MATLIST=["Constitucional","Civil","Proc. Civil","Penal","Administrativo","Empresarial","Direitos Humanos","Humanística","Const. Tributário","Const. Trabalho","Normas Const. Proc. Penal"];
+function prioColor(s){const st=[[178,34,52],[199,84,58],[209,131,66],[196,164,88],[150,172,146],[116,163,188],[152,192,219],[196,219,238]];const i=Math.max(0,Math.min(st.length-1,Math.round((1-s)*(st.length-1))));return "rgb("+st[i].join(",")+")"}
+function wkScore(wk){return Math.max(.05,(11-(wk||10))/10)}
 // intervalos [a,b]: união e cobertura
 function unionIv(iv){if(!iv.length)return[];iv=iv.slice().sort((x,y)=>x[0]-y[0]);const out=[[iv[0][0],iv[0][1]]];for(let i=1;i<iv.length;i++){const c=out[out.length-1];if(iv[i][0]<=c[1]+1)c[1]=Math.max(c[1],iv[i][1]);else out.push([iv[i][0],iv[i][1]])}return out}
 function unionLen(iv){return unionIv(iv).reduce((a,c)=>a+(c[1]-c[0]+1),0)}
@@ -307,8 +336,9 @@ function blockCard(b,showOrigin){
     for(const L of LEIS){if(lchips.length>=7)break;if(L[1].test(btxt))lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+L[2]+'">'+L[0]+' ↗</a>')}
     (btxt.match(/\b1?\d\.\d{3}\b/g)||[]).forEach(n=>{if(lchips.length>=8||LEINUMS.has(n))return;LEINUMS.add(n);lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://www.google.com/search?q='+encodeURIComponent("lei "+n+" planalto")+'">L'+n+' 🔎</a>')});
   }
-  if(b.eb&&EBK[b.eb])lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://drive.google.com/drive/search?q='+encodeURIComponent('"'+EBK[b.eb].nome+'"')+'">📄 e-book no Drive ↗</a>');
+  if(b.eb&&EBK[b.eb]){const dl=G("lnk:"+b.eb);lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+(dl||('https://drive.google.com/drive/search?q='+encodeURIComponent('"'+EBK[b.eb].nome+'"')))+'">📄 e-book'+(dl?"":" (busca)")+' no Drive ↗</a>')}
   (btxt.match(/[A-Z_]+_[a-z_]+\.pdf|EXECUTIVO_padrao_cebraspe\.pdf/g)||[]).forEach(f=>lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://drive.google.com/drive/search?q='+encodeURIComponent(f)+'">📄 '+f.slice(0,28)+' ↗</a>'));
+  if(b.tipo==="JURIS")lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://drive.google.com/drive/search?q='+encodeURIComponent("Juris-ENAM-"+((MATMAPG[b.mat]||b.mat).replace(/ /g,"-")))+'">📄 caderno DOCX no Drive ↗</a>');
   if(b.tipo==="QUEST")lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://www.tecconcursos.com.br/questoes/cadernos">abrir TEC ↗</a>');
   if(b.tipo==="AULA"||b.tipo==="INFO")lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://www.cpiuris.com.br/">abrir CPIuris ↗</a>');
   const lrow=lchips.length?'<div class="lrow">'+lchips.join("")+'</div>':"";
@@ -319,13 +349,13 @@ function blockCard(b,showOrigin){
       const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);
       const al=cur&&cur.aulas.find(x=>x.n===a.n);
       const k="au:"+a.c+":"+a.n;
-      return '<label style="display:flex;gap:8px;align-items:flex-start;margin:5px 0;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ck ckau" data-k="'+k+'" '+(G(k)?"checked":"")+'><span'+(G(k)?' style="text-decoration:line-through;opacity:.6"':'')+'><b>nº '+a.n+'</b> '+esc(al?al.nome:"")+' <span class="mmin">('+(al?al.min:"?")+'min)</span></span></label>';
+      return '<label style="display:flex;gap:8px;align-items:flex-start;margin:5px 0;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ck ckau" data-k="'+k+'" '+(G(k)?"checked":"")+'><span'+(G(k)?' style="text-decoration:line-through;opacity:.6"':'')+'><b>nº '+a.n+'</b> '+esc(al?al.nome:"")+' <span class="mmin">('+(al?al.min:"?")+'min · ~'+(al?Math.round(al.min/1.5):"?")+' a 1,5x)</span></span></label>';
     }).join("")+"</div>";
   }
   div.innerHTML='<div class="rowa">'+
     '<input type="checkbox" class="ck" '+(done?"checked":"")+' aria-label="Concluir bloco">'+
     '<div style="flex:1"><div class="bt">'+esc(b.t)+'</div>'+
-    '<div class="bmeta"><span class="tag">'+(TIPO_LABEL[b.tipo]||b.tipo)+'</span><span class="mmin">'+b.min+'min</span><span class="mat">· '+esc(b.mat)+'</span>'+
+    '<div class="bmeta"><span class="tag">'+(TIPO_LABEL[b.tipo]||b.tipo)+'</span><span class="mmin">'+b.min+'min'+(b.tipo==="AULA"?" · ~"+Math.round(b.min/1.5)+"min a 1,5x":"")+'</span><span class="mat">· '+esc(b.mat)+'</span>'+
     (b.opt?'<span class="badge-moved" style="background:var(--surface2);color:var(--muted)">opcional — não conta na carga</span>':"")+
     (moved&&showOrigin?'<span class="badge-moved">↻ de '+fmt(b.day)+'</span>':"")+
     (watched&&!done?'<span class="badge-moved" style="background:var(--done-soft);color:var(--done)">✓ aulas já assistidas — conclua o bloco</span>':"")+
@@ -351,7 +381,7 @@ function blockCard(b,showOrigin){
     const items=DATA.juris.map((j,i)=>({j,i})).filter(o=>o.j.mat===mm).sort((x,y)=>y.j.cit-x.j.cit);
     const dv=div.querySelector(".det");
     items.forEach(o=>{const el=document.createElement("div");el.className="jitem"+(G("js:"+o.i)?" done":"");
-      el.innerHTML='<input type="checkbox" class="ck" '+(G("js:"+o.i)?"checked":"")+' aria-label="Domino esta tese"><div><b>'+esc(o.j.ref)+'</b><br>'+esc(o.j.tese)+'</div><span class="cit">'+o.j.cit+'×</span>';
+      el.innerHTML='<input type="checkbox" class="ck" '+(G("js:"+o.i)?"checked":"")+' aria-label="Domino esta tese"><div><b>'+esc(o.j.ref)+'</b><br>'+esc(o.j.tese)+'<br><a class="lch" target="_blank" rel="noopener" href="'+jurl(o.j.ref)+'">inteiro teor ↗</a></div><span class="cit">'+o.j.cit+'×</span>';
       el.querySelector("input").addEventListener("change",e=>{SET("js:"+o.i,e.target.checked?1:null);el.classList.toggle("done",e.target.checked)});
       dv.appendChild(el)});
     const ex=div.querySelector(".exp");if(ex)ex.textContent="ver as "+items.length+" teses";
@@ -513,11 +543,94 @@ function renderJurisList(list){
     const j=o.j,i=o.i;
     const dn=!!G("js:"+i);
     const el=document.createElement("div");el.className="jitem"+(dn?" done":"");
-    el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Domino esta tese"><div><b>'+esc(j.ref)+'</b> <span class="mat">· '+esc(j.mat)+"</span><br>"+esc(j.tese)+'</div><span class="cit">'+j.cit+"×</span>";
+    el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Domino esta tese"><div><b>'+esc(j.ref)+'</b> <span class="mat">· '+esc(j.mat)+"</span><br>"+esc(j.tese)+'<br><a class="lch" target="_blank" rel="noopener" href="'+jurl(j.ref)+'">inteiro teor ↗</a></div><span class="cit">'+j.cit+"×</span>";
     el.querySelector("input").addEventListener("change",e=>{SET("js:"+i,e.target.checked?1:null);el.classList.toggle("done",e.target.checked)});
     list.appendChild(el);
   });
   if(!items.length)list.innerHTML='<div class="empty">Nada encontrado.</div>';
+}
+let matSel="";
+function pitem(key,titulo,extra,score,linkHtml,onTick){
+  const dn=!!G(key);
+  const el=document.createElement("div");el.className="pitem"+(dn?" done":"");
+  el.style.setProperty("--pc",prioColor(score));
+  el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+'><div style="flex:1">'+titulo+(linkHtml||"")+'</div><span class="pcx">'+extra+'</span>';
+  el.querySelector("input").addEventListener("change",e=>{SET(key,e.target.checked?(onTick||1):null);el.classList.toggle("done",e.target.checked)});
+  return el;
+}
+function ord(list){return list.sort((a,b)=>(a.dn?1:0)-(b.dn?1:0)||b.s-a.s)}
+function vMats(root){
+  if(!matSel){
+    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Tudo de cada matéria em blocos priorizados: <b style="color:rgb(178,34,52)">vermelho = alta prioridade</b> → <b style="color:rgb(152,192,219)">azul claro = baixa</b>. Feitos e capítulos já cobertos por vídeo caem para o fim.</div>');
+    const g=document.createElement("div");g.className="matgrid";
+    MATLIST.forEach(m=>{
+      const bl=allBlocks.filter(b=>b.mat===m&&!b.opt);
+      const dn=bl.filter(b=>isDone(b)).length;
+      const el=document.createElement("div");el.className="mg";
+      el.innerHTML="<b>"+esc(m)+"</b><div class='bar'><i style='width:"+(bl.length?Math.round(dn/bl.length*100):0)+"%'></i></div><small class='mmin'>"+dn+"/"+bl.length+" blocos</small>";
+      el.addEventListener("click",()=>{matSel=m;render()});
+      g.appendChild(el);
+    });
+    root.appendChild(g);return;
+  }
+  const m=matSel;
+  const top=document.createElement("div");top.className="daynav";
+  top.innerHTML='<button id="volt">‹</button><div class="dlabel"><b>'+esc(m)+'</b><small>blocos por prioridade</small></div><button id="filtroQ" style="width:auto;padding:0 10px;font-size:.72rem">filtro TEC</button>';
+  root.appendChild(top);
+  top.querySelector("#volt").addEventListener("click",()=>{matSel="";render()});
+  top.querySelector("#filtroQ").addEventListener("click",()=>{
+    const pend=[],feitos=[];
+    allBlocks.filter(b=>b.mat===m&&b.tipo==="QUEST"&&!b.opt).sort((a,b)=>a.day<b.day?-1:1).forEach(b=>(isDone(b)?feitos:pend).push(b));
+    const src=pend.length?pend:feitos;const ass=[];
+    src.slice(0,3).forEach(b=>(b.tec||[]).forEach(a=>{if(ass.length<8&&ass.indexOf(a)<0)ass.push(a)}));
+    const txt="TEC — caderno-base: FGV + Cebraspe · área jurídica · 2021-2026\nAssuntos do momento ("+m+", conforme seu progresso):\n"+ass.map(a=>"• "+a).join("\n");
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast("Filtro copiado — cole no TEC ao montar o caderno."),()=>toast(txt));else toast(txt);
+  });
+  // e-books da matéria: cadastro de link direto
+  const ebs=Object.keys(EB2MAT).filter(k=>EB2MAT[k]===m&&EBK[k]);
+  ebs.forEach(k=>{
+    const inp=document.createElement("input");inp.className="lnkinput";
+    inp.placeholder="colar aqui o link do Drive do e-book “"+EBK[k].nome+"” (uma vez — vira link direto em todos os blocos)";
+    inp.value=G("lnk:"+k)||"";
+    inp.addEventListener("change",e=>{const v=e.target.value.trim();SET("lnk:"+k,v||null);toast(v?"Link direto salvo.":"Link removido.")});
+    root.appendChild(inp);
+  });
+  // 1) capítulos
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Leituras — capítulos dos e-books</h2>');
+  let items=[];
+  ebs.forEach(k=>{const bk=EBK[k];
+    bk.caps.forEach(c=>{
+      let wk=99;allBlocks.forEach(b=>{if((b.eb===k&&b.pg&&b.pg[0]<=c.pf&&b.pg[1]>=c.pi)||(b.pg2&&(b.eb2||b.eb)===k&&b.pg2[0]<=c.pf&&b.pg2[1]>=c.pi))wk=Math.min(wk,b.wk)});
+      let covered=false;allBlocks.forEach(b=>{if(b.eb===k&&b.alt&&b.alt.length&&b.pg&&b.pg[0]<=c.pf&&b.pg[1]>=c.pi&&b.alt.every(a=>G("au:"+a.c+":"+a.n)))covered=true});
+      const s=c.out?0.02:(covered?0.05:wkScore(wk===99?10:wk));
+      const dn=!!G("eb:"+k+":"+c.n)||rangeCovered(planIv(k,true),c.pi,c.pf);
+      items.push({s,dn,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
+    })});
+  ord(items).forEach(o=>root.appendChild(o.el()));
+  // 2) artigos de lei (blocos de lei seca)
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Artigos de lei — blocos de leitura seca</h2>');
+  items=[];
+  allBlocks.filter(b=>b.mat===m&&b.tipo==="LEI"&&!b.opt).forEach(b=>{
+    items.push({s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:","")),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
+  });
+  ord(items).forEach(o=>root.appendChild(o.el()));
+  // 3) vídeos
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Vídeos — aulas CPIuris (1,5x entre parênteses)</h2>');
+  items=[];const seen={};
+  allBlocks.filter(b=>b.mat===m&&b.aulas).forEach(b=>b.aulas.forEach(a=>{
+    const key=a.c+":"+a.n;if(seen[key])return;seen[key]=1;
+    const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);
+    items.push({s:wkScore(b.wk),dn:!!G("au:"+key),el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
+  }));
+  ord(items).forEach(o=>root.appendChild(o.el()));
+  // 4) jurisprudência
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Jurisprudência — cada tese é um bloco</h2><div class="note">Caderno completo em DOCX: pasta “Cadernos-Juris-ENAM” no seu Drive.</div>');
+  const mm=MATMAPG[m]||m;const mx=Math.max.apply(null,DATA.juris.filter(j=>j.mat===mm).map(j=>j.cit).concat([1]));
+  items=[];
+  DATA.juris.forEach((j,i)=>{if(j.mat!==mm)return;
+    items.push({s:Math.max(.1,j.cit/mx),dn:!!G("js:"+i),el:()=>pitem("js:"+i,"<b>"+esc(j.ref)+"</b><br><span style='font-size:.8rem'>"+esc(j.tese)+"</span><br><a class='lch' target='_blank' rel='noopener' href='"+jurl(j.ref)+"'>inteiro teor ↗</a>",j.cit+"×",Math.max(.1,j.cit/mx))});
+  });
+  ord(items).forEach(o=>root.appendChild(o.el()));
 }
 function vAjustes(root){
   const tb=document.createElement("div");tb.className="toolbar";tb.style.marginTop="16px";
@@ -585,6 +698,7 @@ function render(){
   else if(curTab==="prog")vProg(root);
   else if(curTab==="juris")vJuris(root);
   else if(curTab==="aulas")vAulas(root);
+  else if(curTab==="mats")vMats(root);
   else vAjustes(root);
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{curTab=b.dataset.tab;render()}));
