@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Cronograma ENAM 2026.2 — Halison</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FAF7F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1618" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{
   --bg:#FAF7F4; --surface:#FFFFFF; --surface2:#F3EDE8; --ink:#26201E; --muted:#7A6E6A;
   --line:#E6DCD5; --accent:#7A2F3F; --accent-ink:#FFFFFF; --accent-soft:#F5E6EA;
-  --done:#2E7D4F; --done-soft:#E4F1E9; --warn:#B87514; --warn-soft:#F7ECDC; --danger:#B3383B;
+  --done:#2E7D4F; --done-soft:#E4F1E9; --warn:#8A5407; --warn-soft:#F7ECDC; --danger:#B3383B;
   --lei:#7A2F3F; --ebook:#1F5C7A; --aula:#8A5A10; --quest:#2E6B4F; --juris:#5B4A7A;
+  /* --warn escurecido p/ contraste AA sobre --warn-soft */
   --rev:#8A7E79; --sim:#B3383B; --ceb:#0F6B5C; --tq:#8A5A10; --setup:#8A7E79;
 }
 @media (prefers-color-scheme: dark){:root{
@@ -23,19 +29,21 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;margin:0;padding:0 0 80px}
 .wrap{max-width:760px;margin:0 auto;padding:0 14px}
-header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0 0}
+header.top{padding:10px 0 0}
 h1{font-family:Georgia,"Times New Roman",serif;font-size:1.25rem;margin:0;letter-spacing:.2px;text-wrap:balance}
 .sub{color:var(--muted);font-size:.8rem;margin:2px 0 8px}
 .statrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:stretch}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-variant-numeric:tabular-nums}
 .stat b{font-family:Georgia,serif;font-size:1.15rem;color:var(--accent);display:block;line-height:1.1}
-.stat span{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stat span{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 #syncpill{align-self:center;margin-left:auto;font-size:.7rem;border-radius:99px;padding:4px 11px;border:1px solid var(--line);color:var(--muted);background:var(--surface);cursor:pointer}
 #syncpill.ok{color:var(--done);border-color:var(--done)}
 #syncpill.err,#syncpill.badtoken{color:var(--danger);border-color:var(--danger)}
 #syncpill.sync{color:var(--warn);border-color:var(--warn)}
-nav.tabs{display:flex;gap:2px;margin:0 -14px;padding:0 14px;overflow-x:auto}
-nav.tabs button{flex:1;min-width:78px;background:none;border:none;border-bottom:3px solid transparent;color:var(--muted);padding:9px 4px;font:600 .85rem "Segoe UI",system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+nav.tabs{display:flex;gap:2px;margin:0 -14px;padding:0 14px;overflow-x:auto;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs.fade{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+nav.tabs button{flex:1;min-width:70px;background:none;border:none;border-bottom:3px solid transparent;color:var(--muted);padding:12px 4px;font:600 .85rem "Segoe UI",system-ui,sans-serif;cursor:pointer;white-space:nowrap}
 nav.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .daynav{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
 .daynav button{background:var(--surface);border:1px solid var(--line);border-radius:8px;color:var(--ink);width:38px;height:34px;font-size:1rem;cursor:pointer}
@@ -50,22 +58,23 @@ nav.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .card.done{opacity:.55}
 .card.done .bt{text-decoration:line-through}
 .card .rowa{display:flex;gap:10px;align-items:flex-start}
-.ck{appearance:none;width:22px;height:22px;min-width:22px;border:2px solid var(--line);border-radius:6px;cursor:pointer;margin-top:2px;position:relative;background:var(--surface)}
+.ck{appearance:none;width:28px;height:28px;min-width:28px;border:2px solid var(--line);border-radius:7px;cursor:pointer;margin-top:2px;position:relative;background:var(--surface)}
+.ck::before{content:"";position:absolute;inset:-9px}
 .ck:checked{background:var(--done);border-color:var(--done)}
-.ck:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;font-weight:700}
+.ck:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;font-weight:700}
 .ck:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .bt{font-weight:600;font-size:.92rem}
 .bmeta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:2px}
-.tag{font-size:.65rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--stripe,var(--muted))}
-.mmin{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.mat{font-size:.72rem;color:var(--muted)}
-.badge-moved{font-size:.66rem;background:var(--warn-soft);color:var(--warn);border-radius:99px;padding:1px 8px;font-weight:600}
+.tag{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--stripe,var(--muted))}
+.mmin{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.mat{font-size:.75rem;color:var(--muted)}
+.badge-moved{font-size:.72rem;background:var(--warn-soft);color:var(--warn);border-radius:99px;padding:1px 8px;font-weight:600}
 .lrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
-.lch{font-size:.7rem;font-weight:600;text-decoration:none;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:2px 9px}
+.lch{font-size:.74rem;font-weight:600;text-decoration:none;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:5px 11px;display:inline-block}
 #regen{align-self:center;font-size:.7rem;border-radius:99px;padding:4px 11px;border:1px solid var(--line);color:var(--accent);background:var(--surface);cursor:pointer;font-weight:700}
 .pitem{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--pc,var(--muted));border-radius:9px;padding:7px 11px;margin:6px 0;display:flex;gap:9px;align-items:flex-start;font-size:.84rem}
 .pitem.done{opacity:.45}
-.pitem .pcx{margin-left:auto;font-size:.68rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pitem .pcx{margin-left:auto;font-size:.72rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .matgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:14px}
 .matgrid .mg{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px;cursor:pointer}
 .matgrid .mg b{font-family:Georgia,serif;font-size:.92rem;display:block;margin-bottom:6px}
@@ -73,13 +82,13 @@ nav.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .det{font-size:.84rem;color:var(--ink);margin-top:7px;display:none;border-top:1px dashed var(--line);padding-top:7px;white-space:pre-wrap}
 .card.open .det{display:block}
 .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
-.actions button{background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:4px 10px;font-size:.75rem;cursor:pointer}
+.actions button{background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:7px 12px;font-size:.78rem;cursor:pointer}
 .actions button:hover{border-color:var(--accent)}
 .actions .pct{width:74px;background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:4px 8px;font-size:.78rem;font-variant-numeric:tabular-nums}
 .dayfoot{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.78rem;margin:10px 0 20px;font-variant-numeric:tabular-nums}
 .dayfoot button{background:none;border:1px solid var(--line);border-radius:7px;color:var(--muted);padding:4px 10px;font-size:.72rem;cursor:pointer}
 .backlog{background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:10px 12px;margin:12px 0;font-size:.85rem}
-h2.sec{font-family:Georgia,serif;font-size:1.02rem;margin:20px 0 4px}
+h2.sec{font-family:Georgia,serif;font-size:1.02rem;margin:20px 0 4px;scroll-margin-top:58px}
 table{width:100%;border-collapse:collapse;font-size:.84rem;font-variant-numeric:tabular-nums}
 .tablewrap{overflow-x:auto}
 th,td{border-bottom:1px solid var(--line);text-align:left;padding:6px 8px}
@@ -328,7 +337,13 @@ const MATMAPG={"Constitucional":"Direito Constitucional","Const. Tributário":"D
 const EB2MAT={"constitucional":"Constitucional","civil-gerais":"Civil","civil-especificos":"Civil","consumidor":"Civil","proc-civil":"Proc. Civil","penal-geral":"Penal","penal-especial":"Penal","administrativo":"Administrativo","empresarial":"Empresarial","tributario":"Const. Tributário","trabalho":"Const. Trabalho","proc-penal":"Normas Const. Proc. Penal","dh":"Direitos Humanos","humanistica":"Humanística"};
 const MATLIST=["Constitucional","Civil","Proc. Civil","Penal","Administrativo","Empresarial","Direitos Humanos","Humanística","Const. Tributário","Const. Trabalho","Normas Const. Proc. Penal"];
 const MATJURIS={};MATLIST.forEach(m=>MATJURIS[m]=[MATMAPG[m]||m]);MATJURIS["Civil"]=["Direito Civil","Direito do Consumidor","ECA"];
-function prioColor(s){const st=[[178,34,52],[199,84,58],[209,131,66],[196,164,88],[150,172,146],[116,163,188],[152,192,219],[196,219,238]];const i=Math.max(0,Math.min(st.length-1,Math.round((1-s)*(st.length-1))));return "rgb("+st[i].join(",")+")"}
+let darkMode=matchMedia("(prefers-color-scheme: dark)").matches;
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",e=>{darkMode=e.matches;render()});
+// no escuro a rampa precisa ser invertida em brilho: alta prioridade clara e quente (salta), baixa escura e fria (recua)
+const PRIO_LIGHT=[[178,34,52],[199,84,58],[209,131,66],[196,164,88],[150,172,146],[116,163,188],[152,192,219],[196,219,238]];
+const PRIO_DARK=[[242,108,120],[230,140,110],[214,166,100],[188,178,120],[140,170,150],[110,150,180],[95,130,160],[85,110,135]];
+function prioColor(s){const st=darkMode?PRIO_DARK:PRIO_LIGHT;const i=Math.max(0,Math.min(st.length-1,Math.round((1-s)*(st.length-1))));return "rgb("+st[i].join(",")+")"}
+function legendaPrio(){return darkMode?["rgb(242,108,120)","rgb(143,193,224)"]:["rgb(178,34,52)","rgb(46,107,143)"]}
 function wkScore(wk){return Math.max(.05,(11-(wk||10))/10)}
 // intervalos [a,b]: união e cobertura
 function unionIv(iv){if(!iv.length)return[];iv=iv.slice().sort((x,y)=>x[0]-y[0]);const out=[[iv[0][0],iv[0][1]]];for(let i=1;i<iv.length;i++){const c=out[out.length-1];if(iv[i][0]<=c[1]+1)c[1]=Math.max(c[1],iv[i][1]);else out.push([iv[i][0],iv[i][1]])}return out}
@@ -610,9 +625,21 @@ function pitem(key,titulo,extra,score,linkHtml,onTick){
   return el;
 }
 function ord(list){return list.sort((a,b)=>(a.dn?1:0)-(b.dn?1:0)||b.s-a.s)}
+function appendItems(root,items){
+  const arr=ord(items),pend=arr.filter(o=>!o.dn),fin=arr.filter(o=>o.dn);
+  pend.forEach(o=>root.appendChild(o.el()));
+  if(fin.length){
+    const det=document.createElement("details");
+    det.innerHTML='<summary style="cursor:pointer;color:var(--muted);font-size:.8rem;margin:6px 0;list-style:none">✓ mostrar '+fin.length+' concluído'+(fin.length>1?'s':'')+'</summary>';
+    fin.forEach(o=>det.appendChild(o.el()));
+    root.appendChild(det);
+  }
+  if(!pend.length&&!fin.length)root.insertAdjacentHTML("beforeend",'<div class="note">Nada aqui.</div>');
+}
 function vMats(root){
   if(!matSel){
-    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Tudo de cada matéria em blocos priorizados: <b style="color:rgb(178,34,52)">vermelho = alta prioridade</b> → <b style="color:rgb(152,192,219)">azul claro = baixa</b>. Feitos e capítulos já cobertos por vídeo caem para o fim.</div>');
+    const lg=legendaPrio();
+    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Tudo de cada matéria em blocos priorizados: <b style="color:'+lg[0]+'">vermelho = alta prioridade</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. Feitos e capítulos já cobertos por vídeo caem para o fim.</div>');
     const g=document.createElement("div");g.className="matgrid";
     MATLIST.forEach(m=>{
       const bl=allBlocks.filter(b=>b.mat===m&&!b.opt);
@@ -637,6 +664,14 @@ function vMats(root){
     const txt="TEC — caderno-base: FGV + Cebraspe · área jurídica · 2021-2026\nAssuntos do momento ("+m+", conforme seu progresso):\n"+ass.map(a=>"• "+a).join("\n");
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast("Filtro copiado — cole no TEC ao montar o caderno."),()=>toast(txt));else toast(txt);
   });
+  // atalhos de seção (a página é longa)
+  const anc=document.createElement("div");anc.className="filterchips";anc.style.margin="8px 0 2px";
+  [["📖 Leituras","Leituras"],["§ Lei seca","Artigos de lei"],["▶ Vídeos","Vídeos"],["⚖ Juris","Jurisprudência"]].forEach(p=>{
+    const btn=document.createElement("button");btn.textContent=p[0];
+    btn.addEventListener("click",()=>{const h=[...document.querySelectorAll("h2.sec")].find(x=>x.textContent.startsWith(p[1]));if(h)h.scrollIntoView({behavior:"smooth",block:"start"})});
+    anc.appendChild(btn);
+  });
+  root.appendChild(anc);
   // e-books da matéria: cadastro de link direto (só aparece se não houver links por capítulo)
   const ebs=Object.keys(EB2MAT).filter(k=>EB2MAT[k]===m&&EBK[k]);
   ebs.filter(k=>!CAPL[k]).forEach(k=>{
@@ -658,7 +693,7 @@ function vMats(root){
       const lk=capLink(k,c.n)||ebFallback(k);
       items.push({s,dn,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
     })});
-  ord(items).forEach(o=>root.appendChild(o.el()));
+  appendItems(root,items);
   // 2) artigos de lei (blocos de lei seca)
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Artigos de lei — blocos de leitura seca</h2>');
   items=[];
@@ -666,7 +701,7 @@ function vMats(root){
     let lu="";const btx=b.t+" "+(b.det||"");for(const L of LEIS){if(L[1].test(btx)){lu=L[2];break}}
     items.push({s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:",""))+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>abrir lei ↗</a>":""),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
   });
-  ord(items).forEach(o=>root.appendChild(o.el()));
+  appendItems(root,items);
   // 3) vídeos
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Vídeos — aulas CPIuris (1,5x entre parênteses)</h2>');
   items=[];const seen={};
@@ -675,7 +710,7 @@ function vMats(root){
     const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);
     items.push({s:wkScore(b.wk),dn:!!G("au:"+key),el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura"),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
   }));
-  ord(items).forEach(o=>root.appendChild(o.el()));
+  appendItems(root,items);
   // 4) jurisprudência
   const cadId=CADL[m];
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Jurisprudência — cada tese é um bloco</h2><div class="note">'+(cadId?'Caderno DOCX desta matéria (teses que NÃO estão nos seus Informativos 10x): <a class="lch" target="_blank" rel="noopener" href="'+dlink(cadId)+'">abrir no Drive ↗</a>':'As teses estão abaixo; 📘 marca as que também aparecem nos seus Informativos 10x.')+'</div>');
@@ -684,7 +719,7 @@ function vMats(root){
   DATA.juris.forEach((j,i)=>{if(mmsJ.indexOf(j.mat)<0)return;
     items.push({s:Math.max(.1,j.cit/mx),dn:!!G("js:"+i),el:()=>pitem("js:"+i,"<b>"+esc(j.ref)+"</b><br><span style='font-size:.8rem'>"+esc(j.tese)+"</span><br><a class='lch' target='_blank' rel='noopener' href='"+(j.url||jurl(j.ref))+"'>fonte oficial ↗</a>"+(j.inf?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 nos Informativos 10x</span>":""),j.cit+"×",Math.max(.1,j.cit/mx))});
   });
-  ord(items).forEach(o=>root.appendChild(o.el()));
+  appendItems(root,items);
 }
 function vAjustes(root){
   const tb=document.createElement("div");tb.className="toolbar";tb.style.marginTop="16px";
@@ -769,9 +804,15 @@ function render(){
   else vAjustes(root);
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{curTab=b.dataset.tab;render()}));
+// indicador de que há mais abas à direita
+const tnav=document.querySelector("nav.tabs");
+function tabsFade(){tnav.classList.toggle("fade",tnav.scrollWidth-tnav.scrollLeft-tnav.clientWidth>8)}
+tnav.addEventListener("scroll",tabsFade,{passive:true});addEventListener("resize",tabsFade);
 render();
+tabsFade();
 setSync(syncState);
 if(!token)showSetup();else pull();
+if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>
