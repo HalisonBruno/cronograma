@@ -235,9 +235,11 @@ document.getElementById("regen").addEventListener("click",()=>{
 // ---------- índices ----------
 const dayIdx={};DATA.days.forEach((d,i)=>dayIdx[d.d]=i);
 const allBlocks=[];DATA.days.forEach(d=>d.blocks.forEach(b=>{b.day=d.d;b.wk=d.wk;b.fase=d.fase;allBlocks.push(b)}));
-function isDone(b){return G("st:"+b.id)==="done"}
+function isDone(b){const s=G("st:"+b.id);return s==="done"||s==="done-auto"}
 function effDate(b){return G("mv:"+b.id)||b.day}
 function effMin(b){return b.tipo==="AULA"?Math.round(b.min/1.5):b.min}
+// valores de estado: 1/"done" = marcado por voce; "auto"/"done-auto" = marcado pela equivalencia
+function autoBadge(val,txt){return val==="auto"?' <span class="badge-moved" style="background:var(--surface2);color:var(--muted)">⚙ '+txt+'</span>':""}
 // ---------- equivalencia video <-> e-book (bidirecional) ----------
 // Regra: o campo alt de cada bloco EBOOK diz quais aulas cobrem o mesmo assunto.
 // Ler o trecho (bloco feito ou capitulos ticados) => aulas equivalentes ficam assistidas.
@@ -247,13 +249,16 @@ function syncEquiv(){
   for(let pass=0;pass<6;pass++){
     let ch=false;
     allBlocks.forEach(b=>{
-      if(b.tipo==="AULA"&&b.aulas&&b.aulas.length&&!isDone(b)&&b.aulas.every(a=>G("au:"+a.c+":"+a.n))){SET("st:"+b.id,"done");ch=true}
+      if(b.tipo==="AULA"&&b.aulas&&b.aulas.length&&!isDone(b)&&b.aulas.every(a=>G("au:"+a.c+":"+a.n))){SET("st:"+b.id,"done-auto");ch=true}
       if(b.eb&&b.pg&&EBK[b.eb]){
         const capsRead=rangeCovered(capsTicked(EBK[b.eb]),b.pg[0],b.pg[1]);
-        if(capsRead&&!isDone(b)){SET("st:"+b.id,"done");ch=true}
+        if(capsRead&&!isDone(b)){SET("st:"+b.id,"done-auto");ch=true}
         if(b.alt&&b.alt.length){
-          if(isDone(b)||capsRead)b.alt.forEach(a=>{const k="au:"+a.c+":"+a.n;if(!G(k)){SET(k,1);ch=true}});
-          if(!isDone(b)&&b.alt.every(a=>G("au:"+a.c+":"+a.n))){SET("st:"+b.id,"done");ch=true}
+          if(isDone(b)||capsRead)b.alt.forEach(a=>{const k="au:"+a.c+":"+a.n;if(!G(k)){SET(k,"auto");ch=true}});
+          if(!isDone(b)&&b.alt.every(a=>G("au:"+a.c+":"+a.n))){
+            SET("st:"+b.id,"done-auto");
+            capsIn(b.eb,b.pg).forEach(c=>{if(c.pi>=b.pg[0]&&c.pf<=b.pg[1]){const k2="eb:"+b.eb+":"+c.n;if(!G(k2))SET(k2,"auto")}});
+            ch=true}
         }
       }
     });
@@ -332,7 +337,7 @@ function rangeCovered(iv,a,b){let need=a;for(const seg of unionIv(iv)){if(seg[0]
 function capsTicked(bk){const iv=[];bk.caps.forEach(c=>{if(G("eb:"+bk.k+":"+c.n))iv.push([c.pi,c.pf])});return iv}
 function planIv(k,onlyDone){const iv=[];allBlocks.forEach(b=>{const ok=(!onlyDone||isDone(b));if(b.eb===k&&b.pg&&ok)iv.push(b.pg);if(b.pg2&&((b.eb2||b.eb)===k)&&ok)iv.push(b.pg2)});return iv}
 // ---------- realocação ----------
-function extraLoad(dstr){let m=0;for(const k in S.kv){if(!k.startsWith("mv:"))continue;const v=S.kv[k][0];if(v!==dstr)continue;const id=k.slice(3);if(G("st:"+id)!=="done"){const b=allBlocks.find(x=>x.id===id);if(b)m+=effMin(b)}}return m}
+function extraLoad(dstr){let m=0;for(const k in S.kv){if(!k.startsWith("mv:"))continue;const v=S.kv[k][0];if(v!==dstr)continue;const id=k.slice(3);const s=G("st:"+id);if(s!=="done"&&s!=="done-auto"){const b=allBlocks.find(x=>x.id===id);if(b)m+=effMin(b)}}return m}
 function adiar(b){
   const from=effDate(b);
   if(b.tipo==="SIM"){
@@ -384,20 +389,30 @@ function blockCard(b,showOrigin){
       const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);
       const al=cur&&cur.aulas.find(x=>x.n===a.n);
       const k="au:"+a.c+":"+a.n;
-      return '<label style="display:flex;gap:8px;align-items:flex-start;margin:5px 0;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ck ckau" data-k="'+k+'" '+(G(k)?"checked":"")+'><span'+(G(k)?' style="text-decoration:line-through;opacity:.6"':'')+'><b>nº '+a.n+'</b> '+esc(al?al.nome:"")+' <span class="mmin">('+(al?al.min:"?")+'min · ~'+(al?Math.round(al.min/1.5):"?")+' a 1,5x)</span></span></label>';
+      return '<label style="display:flex;gap:8px;align-items:flex-start;margin:5px 0;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ck ckau" data-k="'+k+'" '+(G(k)?"checked":"")+'><span'+(G(k)?' style="text-decoration:line-through;opacity:.6"':'')+'><b>nº '+a.n+'</b> '+esc(al?al.nome:"")+' <span class="mmin">('+(al?al.min:"?")+'min · ~'+(al?Math.round(al.min/1.5):"?")+' a 1,5x)</span>'+autoBadge(G(k),"pela leitura")+'</span></label>';
     }).join("")+"</div>";
+  }
+  let capsHtml="";
+  if(b.eb&&b.pg&&EBK[b.eb]){
+    const clist=capsIn(b.eb,b.pg);
+    if(clist.length){capsHtml='<div style="margin-top:7px;border-top:1px dashed var(--line);padding-top:7px">'+clist.map(c=>{
+      const k="eb:"+b.eb+":"+c.n;const val=G(k);
+      const rd=!!val||rangeCovered(planIv(b.eb,true),c.pi,c.pf);
+      return '<label style="display:flex;gap:8px;align-items:flex-start;margin:5px 0;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ck ckcap" data-k="'+k+'" '+(rd?"checked":"")+'><span'+(rd?' style="text-decoration:line-through;opacity:.6"':'')+'><b>Cap. '+c.n+'</b> '+esc(c.t)+' <span class="mmin">(p. '+c.pi+'-'+c.pf+')</span>'+autoBadge(val,"pela aula")+'</span></label>';
+    }).join("")+"</div>"}
   }
   div.innerHTML='<div class="rowa">'+
     '<input type="checkbox" class="ck" '+(done?"checked":"")+' aria-label="Concluir bloco">'+
     '<div style="flex:1"><div class="bt">'+esc(b.t)+'</div>'+
     '<div class="bmeta"><span class="tag">'+(TIPO_LABEL[b.tipo]||b.tipo)+'</span><span class="mmin">'+b.min+'min'+(b.tipo==="AULA"?" · ~"+Math.round(b.min/1.5)+"min a 1,5x":"")+'</span><span class="mat">· '+esc(b.mat)+'</span>'+
     (b.opt?'<span class="badge-moved" style="background:var(--surface2);color:var(--muted)">opcional — não conta na carga</span>':"")+
+    (G("st:"+b.id)==="done-auto"?'<span class="badge-moved" style="background:var(--done-soft);color:var(--done)">⚙ concluído automaticamente</span>':"")+
     (moved&&showOrigin?'<span class="badge-moved">↻ de '+fmt(b.day)+'</span>':"")+
     (watched&&!done?'<span class="badge-moved" style="background:var(--done-soft);color:var(--done)">✓ aulas já assistidas — conclua o bloco</span>':"")+
     (altWatched&&!done?'<span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ vídeo já visto — pule ou vire revisão</span>':"")+
     (b.eb&&b.pg&&!done&&EBK[b.eb]&&rangeCovered(capsTicked(EBK[b.eb]),b.pg[0],b.pg[1])?'<span class="badge-moved" style="background:var(--done-soft);color:var(--done)">📖 trecho já lido</span>':"")+
     (b.aulas&&b.aulas.length?'<span class="mmin" style="font-weight:700;color:'+(wn===b.aulas.length?"var(--done)":wn?"var(--warn)":"var(--muted)")+'">▶ '+wn+'/'+b.aulas.length+' assistidas</span>':"")+'</div>'+lrow+
-    '<div class="det">'+esc(b.det||"")+aulasHtml+'</div>'+
+    '<div class="det">'+esc(b.det||"")+capsHtml+aulasHtml+'</div>'+
     '<div class="actions"><button class="exp">detalhes</button>'+
     (done?"":'<button class="adi">não consegui → realocar</button>')+
     (b.tipo==="QUEST"?'<input class="pct" type="number" min="0" max="100" placeholder="% acerto" value="'+(pctVal==null?"":pctVal)+'" aria-label="Percentual de acerto">':"")+
@@ -410,6 +425,7 @@ function blockCard(b,showOrigin){
   const adi=div.querySelector(".adi");if(adi)adi.addEventListener("click",()=>adiar(b));
   const pct=div.querySelector(".pct");if(pct)pct.addEventListener("change",e=>{SET("pct:"+b.id,+e.target.value);updateStats()});
   div.querySelectorAll(".ckau").forEach(cb=>cb.addEventListener("change",e=>{SET(e.target.dataset.k,e.target.checked?1:null);render();}));
+  div.querySelectorAll(".ckcap").forEach(cb=>cb.addEventListener("change",e=>{SET(e.target.dataset.k,e.target.checked?1:null);render();}));
   if(b.tipo==="JURIS"){
     const MATMAP={"Constitucional":"Direito Constitucional","Const. Tributário":"Direito Tributário","Const. Trabalho":"Direito Constitucional","Normas Const. Proc. Penal":"Direito Processual Penal","Civil":"Direito Civil","Proc. Civil":"Direito Processual Civil","Penal":"Direito Penal","Administrativo":"Direito Administrativo","Empresarial":"Direito Empresarial","Direitos Humanos":"Direitos Humanos","Humanística":"Humanística"};
     const mms=MATJURIS[b.mat]||[MATMAP[b.mat]||b.mat];
@@ -511,7 +527,7 @@ function vProg(root){
       const k="eb:"+bk.k+":"+c.n;
       const dn=!!G(k);
       const el=document.createElement("div");el.className="jitem"+(dn?" done":"");
-      el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Li este capítulo"><div><b>Cap. '+c.n+"</b> "+esc(c.t)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':(c.part?' <span class="badge-moved" style="background:var(--surface2);color:var(--muted)">parcial no plano</span>':""))+'</div><span class="cit">p. '+c.pi+"-"+c.pf+"</span>";
+      el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Li este capítulo"><div><b>Cap. '+c.n+"</b> "+esc(c.t)+autoBadge(G(k),"pela aula")+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':(c.part?' <span class="badge-moved" style="background:var(--surface2);color:var(--muted)">parcial no plano</span>':""))+'</div><span class="cit">p. '+c.pi+"-"+c.pf+"</span>";
       el.querySelector("input").addEventListener("change",e=>{SET(k,e.target.checked?1:null);el.classList.toggle("done",e.target.checked)});
       inner.appendChild(el);
     });
@@ -550,7 +566,7 @@ function vAulas(root){
       const k="au:"+c.curso+":"+a.n;
       const dn2=!!G(k);
       const el=document.createElement("div");el.className="jitem"+(dn2?" done":"");
-      el.innerHTML='<input type="checkbox" class="ck" '+(dn2?"checked":"")+' aria-label="Assisti esta aula"><div><b>nº '+a.n+"</b> "+esc(a.nome)+'</div><span class="cit">'+a.min+"min</span>";
+      el.innerHTML='<input type="checkbox" class="ck" '+(dn2?"checked":"")+' aria-label="Assisti esta aula"><div><b>nº '+a.n+"</b> "+esc(a.nome)+autoBadge(G(k),"pela leitura")+'</div><span class="cit">'+a.min+"min</span>";
       el.querySelector("input").addEventListener("change",e=>{SET(k,e.target.checked?1:null);el.classList.toggle("done",e.target.checked)});
       root.appendChild(el);
     });
@@ -640,7 +656,7 @@ function vMats(root){
       const s=c.out?0.02:(covered?0.05:wkScore(wk===99?10:wk));
       const dn=!!G("eb:"+k+":"+c.n)||rangeCovered(planIv(k,true),c.pi,c.pf);
       const lk=capLink(k,c.n)||ebFallback(k);
-      items.push({s,dn,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
+      items.push({s,dn,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
     })});
   ord(items).forEach(o=>root.appendChild(o.el()));
   // 2) artigos de lei (blocos de lei seca)
@@ -657,7 +673,7 @@ function vMats(root){
   allBlocks.filter(b=>b.mat===m&&b.aulas).forEach(b=>b.aulas.forEach(a=>{
     const key=a.c+":"+a.n;if(seen[key])return;seen[key]=1;
     const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);
-    items.push({s:wkScore(b.wk),dn:!!G("au:"+key),el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
+    items.push({s:wkScore(b.wk),dn:!!G("au:"+key),el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura"),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
   }));
   ord(items).forEach(o=>root.appendChild(o.el()));
   // 4) jurisprudência
@@ -714,19 +730,29 @@ function updateStats(){
   const t=todayStr();
   const prova=new Date("2026-10-18T12:00:00"),now=new Date(t+"T12:00:00");
   document.getElementById("stDays").textContent=Math.max(0,Math.round((prova-now)/86400000));
-  let done=0,moved=0;
-  allBlocks.forEach(b=>{if(!b.opt&&G("st:"+b.id)==="done")done++});
+  const BLKIDX={};allBlocks.forEach(b=>BLKIDX[b.id]=b);
+  // progresso por UNIDADE atomica: cada aula, cada capitulo, cada tese e cada bloco de lei/questoes/revisao
+  let done=0,total=0;
+  const planAulas=new Set();
+  allBlocks.forEach(b=>{(b.aulas||[]).forEach(a=>planAulas.add(a.c+":"+a.n));(b.alt||[]).forEach(a=>planAulas.add(a.c+":"+a.n))});
+  planAulas.forEach(k2=>{total++;if(G("au:"+k2))done++});
+  (DATA.ebooks||[]).forEach(bk=>{const cov=planIv(bk.k,true);bk.caps.forEach(c=>{if(c.out)return;total++;if(G("eb:"+bk.k+":"+c.n)||rangeCovered(cov,c.pi,c.pf))done++})});
+  DATA.juris.forEach((j,i)=>{total++;if(G("js:"+i))done++});
+  allBlocks.forEach(b=>{if(b.tipo==="EBOOK"||b.tipo==="AULA")return;total++;if(isDone(b))done++});
+  document.getElementById("stDone").textContent=done+"/"+total;
+  let moved=0;
   for(const k in S.kv){const v=S.kv[k][0];
-    if(k.startsWith("mv:")&&v!=null){const id=k.slice(3);if(G("st:"+id)!=="done")moved++}}
-  document.getElementById("stDone").textContent=done+"/"+allBlocks.filter(b=>!b.opt).length;
+    if(k.startsWith("mv:")&&v!=null){const id=k.slice(3);const b=BLKIDX[id];if(!b||!isDone(b))moved++}}
   document.getElementById("stPend").textContent=moved;
   const t0=new Date();t0.setHours(0,0,0,0);const ts0=t0.getTime();let minH=0;
-  const BLKIDX={};allBlocks.forEach(b=>BLKIDX[b.id]=b);
   const counted=new Set();
   for(const k in S.kv){const e=S.kv[k];if(!e||e[1]<ts0||e[0]==null)continue;
-    if(k.startsWith("st:")&&e[0]==="done"){const b=BLKIDX[k.slice(3)];if(b&&!b.opt){minH+=effMin(b);(b.aulas||[]).concat(b.alt||[]).forEach(a=>counted.add(a.c+":"+a.n))}}}
+    if(k.startsWith("st:")&&(e[0]==="done"||e[0]==="done-auto")){const b=BLKIDX[k.slice(3)];if(!b||b.opt)continue;
+      const viaAulas=e[0]==="done-auto"&&b.alt&&b.alt.length&&b.alt.every(a=>G("au:"+a.c+":"+a.n)===1);
+      const aulasProprias=e[0]==="done-auto"&&b.tipo==="AULA";
+      if(!viaAulas&&!aulasProprias){minH+=effMin(b);(b.aulas||[]).concat(b.alt||[]).forEach(a=>counted.add(a.c+":"+a.n))}}}
   for(const k in S.kv){const e=S.kv[k];if(!e||e[1]<ts0||e[0]==null)continue;
-    if(k.startsWith("au:")&&!counted.has(k.slice(3))){const m=AUMIN[k.slice(3)];if(m)minH+=Math.round(m/1.5)}}
+    if(k.startsWith("au:")&&e[0]===1&&!counted.has(k.slice(3))){const m=AUMIN[k.slice(3)];if(m)minH+=Math.round(m/1.5)}}
   document.getElementById("stHoje").textContent=minH;
 }
 function render(){
