@@ -233,15 +233,18 @@ document.getElementById("regen").addEventListener("click",()=>{
   if(!confirm("Replanejar: tudo que ficou para trás (não ticado) será redistribuído nos próximos dias, sem perder nada feito. Continuar?"))return;
   const hoje=todayStr();let n=0;
   allBlocks.forEach(b=>{if(b.opt||isDone(b)||b.tipo==="SIM")return;if(effDate(b)>=hoje)return;
+    // so o que falta pesa: atividades ja feitas do bloco nao entram na carga realocada
+    const pend=unitsOf(b).filter(u=>!unitDone(u));if(!pend.length)return;
+    const pm=pend.reduce((a,u)=>a+u.min,0);
     const cand=DATA.days.filter(d=>d.d>=hoje&&d.d<"2026-10-17"&&d.blocks.some(x=>x.mat===b.mat&&!x.opt));
     let ok=false;
-    for(const d of cand){if(extraLoad(d.d)+effMin(b)<=60){SET("mv:"+b.id,d.d);n++;ok=true;break}}
-    if(!ok)for(const d of DATA.days){if(d.d>=hoje&&d.d<"2026-10-17"&&extraLoad(d.d)+effMin(b)<=60){SET("mv:"+b.id,d.d);n++;ok=true;break}}
-    if(!ok){SET("mv:"+b.id,"fila");n++}});
+    for(const d of cand){if(extraLoad(d.d)+pm<=60){SET("mv:"+b.id,d.d);n+=pend.length;ok=true;break}}
+    if(!ok)for(const d of DATA.days){if(d.d>=hoje&&d.d<"2026-10-17"&&extraLoad(d.d)+pm<=60){SET("mv:"+b.id,d.d);n+=pend.length;ok=true;break}}
+    if(!ok){SET("mv:"+b.id,"fila");n+=pend.length}});
   allBlocks.forEach(b=>{if(b.tipo!=="SIM"||isDone(b)||b.t.indexOf("PROVA")>=0)return;if(effDate(b)>=hoje)return;
     const t=DATA.days.find(d=>d.d>=hoje&&new Date(d.d+"T12:00:00").getDay()===0&&d.d<"2026-10-18"&&!d.blocks.some(x=>x.tipo==="SIM"&&!isDone(x)&&effDate(x)===d.d));
     if(t){SET("mv:"+b.id,t.d);n++}});
-  render();toast(n?n+" blocos replanejados — o plano voltou a ser executável a partir de hoje.":"Você está em dia: nada para replanejar.")});
+  render();toast(n?n+" atividades replanejadas — o plano voltou a ser executável a partir de hoje.":"Você está em dia: nada para replanejar.")});
 // ---------- índices ----------
 const dayIdx={};DATA.days.forEach((d,i)=>dayIdx[d.d]=i);
 const allBlocks=[];DATA.days.forEach(d=>d.blocks.forEach(b=>{b.day=d.d;b.wk=d.wk;b.fase=d.fase;allBlocks.push(b)}));
@@ -382,7 +385,7 @@ function rangeCovered(iv,a,b){let need=a;for(const seg of unionIv(iv)){if(seg[0]
 function capsTicked(bk){const iv=[];bk.caps.forEach(c=>{if(G("eb:"+bk.k+":"+c.n))iv.push([c.pi,c.pf])});return iv}
 function planIv(k,onlyDone){const iv=[];allBlocks.forEach(b=>{const ok=(!onlyDone||isDone(b));if(b.eb===k&&b.pg&&ok)iv.push(b.pg);if(b.pg2&&((b.eb2||b.eb)===k)&&ok)iv.push(b.pg2)});return iv}
 // ---------- realocação ----------
-function extraLoad(dstr){let m=0;for(const k in S.kv){if(!k.startsWith("mv:"))continue;const v=S.kv[k][0];if(v!==dstr)continue;const id=k.slice(3);const s=G("st:"+id);if(s!=="done"&&s!=="done-auto"){const b=allBlocks.find(x=>x.id===id);if(b)m+=effMin(b)}}return m}
+function extraLoad(dstr){let m=0;for(const k in S.kv){if(!k.startsWith("mv:"))continue;const v=S.kv[k][0];if(v!==dstr)continue;const id=k.slice(3);const b=allBlocks.find(x=>x.id===id);if(b&&!isDone(b))m+=unitsOf(b).filter(u=>!unitDone(u)).reduce((a,u)=>a+u.min,0)}return m}
 function adiar(b){
   const from=effDate(b);
   if(b.tipo==="SIM"){
@@ -391,9 +394,10 @@ function adiar(b){
     else toast("Sem domingo livre antes da prova.");
     return;
   }
+  const pm=unitsOf(b).filter(u=>!unitDone(u)).reduce((a,u)=>a+u.min,0);
   const cand=DATA.days.filter(d=>d.d>from&&d.d<"2026-10-17");
-  for(const d of cand){if(extraLoad(d.d)+effMin(b)<=50){SET("mv:"+b.id,d.d);render();toast("Bloco realocado para "+wdName(d.d)+" "+fmt(d.d));return}}
-  SET("mv:"+b.id,"fila");render();toast("Semanas cheias — bloco na fila (topo da aba Hoje).");
+  for(const d of cand){if(extraLoad(d.d)+pm<=50){SET("mv:"+b.id,d.d);render();toast("Atividades pendentes realocadas para "+wdName(d.d)+" "+fmt(d.d)+" (as feitas ficam onde estão)");return}}
+  SET("mv:"+b.id,"fila");render();toast("Semanas cheias — atividades na fila (topo da aba Hoje).");
 }
 function toast(msg){const t=document.createElement("div");t.textContent=msg;t.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-size:.82rem;z-index:99;max-width:90%";document.body.appendChild(t);setTimeout(()=>t.remove(),2800)}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
@@ -465,49 +469,91 @@ function blockCard(b,showOrigin){
   }
   return div;
 }
-// ---------- sub-blocos do dia: cada capitulo, aula e grupo de artigos e um bloco proprio ----------
-function subCards(b){
-  const out=[];
-  const mk=(key,titulo,meta,chips)=>{
-    const val=G(key);
-    const el=document.createElement("div");el.className="pitem sub"+(val?" done":"");
-    el.style.setProperty("--pc","var("+(TIPO_VAR[b.tipo]||"--rev")+")");
-    el.innerHTML='<input type="checkbox" class="ck" '+(val?"checked":"")+'><div style="flex:1">'+titulo+(chips||"")+'</div><span class="pcx">'+(meta||"")+'</span>';
-    el.querySelector("input").addEventListener("change",e=>{SET(key,e.target.checked?1:null);render()});
-    out.push(el);
-  };
-  if(b.tipo==="EBOOK"&&b.eb&&b.pg){
-    const rng=(k2,pg)=>capsIn(k2,pg).forEach(c=>{const k="eb:"+k2+":"+c.n;const u=capLink(k2,c.n);
-      mk(k,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G(k),"pela aula"),"p. "+Math.max(c.pi,pg[0])+"-"+Math.min(c.pf,pg[1]),u?' <a class="lch" target="_blank" rel="noopener" href="'+u+'">abrir ↗</a>':"")});
-    rng(b.eb,b.pg);
-    if(b.pg2)rng(b.eb2||b.eb,b.pg2);
+// ---------- ATIVIDADES: a unica unidade do app ----------
+// unitsOf(b) devolve as atividades de um bloco do plano: cada capitulo, cada aula, cada grupo de artigos,
+// ou o proprio bloco quando ele ja e atomico (questoes, revisao, simulado, juris, informativos).
+// Cada atividade tem: key (estado), title, meta, chips (html de links), min (carga efetiva), done, val (procedencia)
+function unitsOf(b){
+  const U=[];
+  const push=(key,title,meta,chips,min,doneExtra)=>{const val=G(key);U.push({key,title,meta,chips:chips||"",min,val,done:!!val||!!doneExtra,b})};
+  if(b.tipo==="EBOOK"&&b.eb&&b.pg&&EBK[b.eb]){
+    const rng=(k2,pg)=>{const cs=capsIn(k2,pg);const per=cs.length?Math.round(b.min/cs.length):b.min;
+      cs.forEach(c=>{const k="eb:"+k2+":"+c.n;const u=capLink(k2,c.n)||ebFallback(k2);
+        push(k,"<b>Cap. "+c.n+"</b> "+esc(c.t),"p. "+Math.max(c.pi,pg[0])+"-"+Math.min(c.pf,pg[1]),'<a class="lch" target="_blank" rel="noopener" href="'+u+'">📖 abrir na p. '+Math.max(c.pi,pg[0])+' ↗</a>',per,rangeCovered(planIv(k2,true),c.pi,c.pf))})};
+    rng(b.eb,b.pg);if(b.pg2)rng(b.eb2||b.eb,b.pg2);
+    if(!U.length)push("st:"+b.id,esc(b.t),"",'<a class="lch" target="_blank" rel="noopener" href="'+ebFallback(b.eb)+'">📄 e-book ↗</a>',b.min);
+    return U;
   }
-  if(b.tipo==="AULA"&&b.aulas){
-    b.aulas.forEach(a=>{const k="au:"+a.c+":"+a.n;const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);
-      mk(k,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G(k),"pela leitura"),(al?al.min:"?")+"min · ~"+(al?Math.round(al.min/1.5):"?")+" a 1,5x")});
+  if(b.tipo==="AULA"&&b.aulas&&b.aulas.length){
+    b.aulas.forEach(a=>{const k="au:"+a.c+":"+a.n;const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);const m=al?al.min:Math.round(b.min/b.aulas.length);
+      push(k,"<b>▶ Aula "+a.n+"</b> "+esc(al?al.nome:a.c),m+"min · ~"+Math.round(m/1.5)+" a 1,5x",'<a class="lch" target="_blank" rel="noopener" href="https://www.cpiuris.com.br/">CPIuris ↗</a>',Math.round(m/1.5))});
+    return U;
   }
-  if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length>1){
-    LG[b.id].forEach((g2,i)=>{const k="lg:"+b.id+":"+i;
-      const chips=(g2.u?' <a class="lch" target="_blank" rel="noopener" href="'+g2.u+'">abrir lei ↗</a>':"")+(LDOC[b.id]?' <a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 DOCX ↗</a>':"");
-      mk(k,"<b>§</b> "+esc(g2.r)+autoBadge(G(k),"pela equivalência"),g2.a&&g2.a.length?g2.a.length+" arts.":"",chips)});
+  if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length){
+    const gs=LG[b.id];const per=Math.round(b.min/gs.length);
+    gs.forEach((g2,i)=>{const k=gs.length>1?"lg:"+b.id+":"+i:"st:"+b.id;
+      const chips=(g2.u?'<a class="lch" target="_blank" rel="noopener" href="'+g2.u+'">abrir lei ↗</a>':"")+(LDOC[b.id]?'<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 DOCX ↗</a>':"");
+      push(k,"<b>§</b> "+esc(g2.r),(g2.a&&g2.a.length?g2.a.length+" arts.":""),chips,per)});
+    return U;
   }
-  return out;
+  // bloco atomico
+  push("st:"+b.id,esc(b.t),"",null,effMin(b));
+  return U;
 }
-function dayUnits(blocks){
-  let t=0,d=0;
-  blocks.forEach(b=>{
-    if(b.opt)return;
-    if(b.tipo==="EBOOK"&&b.eb&&b.pg){
-      const cs=capsIn(b.eb,b.pg).map(c=>["eb:"+b.eb+":"+c.n]).concat(b.pg2?capsIn(b.eb2||b.eb,b.pg2).map(c=>["eb:"+(b.eb2||b.eb)+":"+c.n]):[]);
-      cs.forEach(k=>{t++;if(G(k[0])||isDone(b))d++});
-      if(!cs.length){t++;if(isDone(b))d++}
-    }else if(b.tipo==="AULA"&&b.aulas&&b.aulas.length){
-      b.aulas.forEach(a=>{t++;if(G("au:"+a.c+":"+a.n)||isDone(b))d++});
-    }else if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length>1){
-      LG[b.id].forEach((g2,i)=>{t++;if(G("lg:"+b.id+":"+i)||isDone(b))d++});
-    }else{t++;if(isDone(b))d++}
-  });
-  return [d,t];
+function unitDone(u){return u.done||isDone(u.b)}
+function unitsCount(blocks){let t=0,d=0;blocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{t++;if(unitDone(u))d++})});return [d,t]}
+function unitProv(u){const v=u.val;if(v==="auto")return "pela equivalência";if(v==="grupo")return "pelo bloco";if(!v&&isDone(u.b))return G("st:"+u.b.id)==="done-auto"?"pela equivalência":"pelo bloco";return ""}
+// card de uma atividade no dia
+function unitCard(u,showOrigin){
+  const b=u.b,dn=unitDone(u);
+  const div=document.createElement("div");div.className="card"+(dn?" done":"");
+  div.style.setProperty("--stripe","var("+(TIPO_VAR[b.tipo]||"--rev")+")");
+  const mv=G("mv:"+b.id),moved=mv&&mv!==b.day;
+  const prov=dn?unitProv(u):"";
+  const isBlock=u.key==="st:"+b.id;
+  const pctVal=G("pct:"+b.id);
+  const chips=isBlock?blockChips(b):u.chips;
+  div.innerHTML='<div class="rowa"><input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Concluir atividade">'+
+    '<div style="flex:1"><div class="bt">'+u.title+'</div>'+
+    '<div class="bmeta"><span class="tag">'+(TIPO_LABEL[b.tipo]||b.tipo)+'</span>'+(u.meta?'<span class="mmin">'+u.meta+'</span>':'<span class="mmin">'+u.min+'min</span>')+'<span class="mat">· '+esc(b.mat)+'</span>'+
+    (prov?'<span class="badge-moved" style="background:var(--surface2);color:var(--muted)">⚙ '+prov+'</span>':"")+
+    (moved&&showOrigin?'<span class="badge-moved">↻ de '+fmt(b.day)+'</span>':"")+'</div>'+
+    (chips?'<div class="lrow">'+chips+'</div>':"")+
+    (isBlock&&b.det?'<div class="det">'+esc(b.det)+'</div>':"")+
+    '<div class="actions">'+(isBlock&&b.det?'<button class="exp">detalhes</button>':"")+
+    (dn?"":'<button class="adi">não consegui → realocar</button>')+
+    (isBlock&&b.tipo==="QUEST"?'<input class="pct" type="number" min="0" max="100" placeholder="% acerto" value="'+(pctVal==null?"":pctVal)+'" aria-label="Percentual de acerto">':"")+
+    '</div></div></div>';
+  div.querySelector(".ck").addEventListener("change",e=>{
+    if(isBlock){SET("st:"+b.id,e.target.checked?"done":null)}
+    else{SET(u.key,e.target.checked?1:null);if(!e.target.checked&&isDone(b))SET("st:"+b.id,null)}
+    render()});
+  const ex=div.querySelector(".exp");if(ex)ex.addEventListener("click",()=>div.classList.toggle("open"));
+  const adi=div.querySelector(".adi");if(adi)adi.addEventListener("click",()=>adiar(b));
+  const pct=div.querySelector(".pct");if(pct)pct.addEventListener("change",e=>{SET("pct:"+b.id,+e.target.value);updateStats()});
+  if(isBlock&&b.tipo==="JURIS"){
+    const mms=MATJURIS[b.mat]||[MATMAPG[b.mat]||b.mat];
+    const items=DATA.juris.map((j,i)=>({j,i})).filter(o=>mms.indexOf(o.j.mat)>=0).sort((x,y)=>y.j.cit-x.j.cit);
+    const dv=div.querySelector(".det");
+    if(dv){items.forEach(o=>{const el=document.createElement("div");el.className="jitem"+(G("js:"+o.i)?" done":"");
+      el.innerHTML='<input type="checkbox" class="ck" '+(G("js:"+o.i)?"checked":"")+' aria-label="Domino esta tese"><div><b>'+esc(o.j.ref)+'</b><br>'+esc(o.j.tese)+'<br><a class="lch" target="_blank" rel="noopener" href="'+(o.j.url||jurl(o.j.ref))+'">fonte oficial ↗</a>'+(o.j.inf?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">📘 está nos seus Informativos 10x</span>':"")+'</div><span class="cit">'+o.j.cit+'×</span>';
+      el.querySelector("input").addEventListener("change",e=>{SET("js:"+o.i,e.target.checked?1:null);el.classList.toggle("done",e.target.checked)});
+      dv.appendChild(el)});
+      if(ex)ex.textContent="ver as "+items.length+" teses"}
+  }
+  return div;
+}
+function blockChips(b){
+  const lchips=[];const btxt=b.t+" "+(b.det||"");
+  if(b.tipo==="LEI"&&LDOC[b.id])lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 caderno da lei (DOCX) ↗</a>');
+  if(b.tipo==="LEI"||b.tipo==="SETUP"||b.tipo==="JURIS"||b.tipo==="REV"){
+    for(const L of LEIS){if(lchips.length>=7)break;if(L[1].test(btxt))lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+L[2]+'">'+L[0]+' ↗</a>')}
+  }
+  if(b.tipo==="JURIS"){const cid=CADL[b.mat];if(cid)lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+dlink(cid)+'">📄 caderno DOCX (teses fora dos Informativos) ↗</a>')}
+  if(b.tipo==="QUEST")lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://www.tecconcursos.com.br/questoes/cadernos">abrir TEC ↗</a>');
+  if(b.tipo==="INFO"){if(INFL.length)INFL.forEach(f=>{if(lchips.length<10)lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+dlink(f.id)+'">📘 '+f.nome+' ↗</a>')})}
+  (btxt.match(/[A-Z_]+_[a-z_]+\.pdf|EXECUTIVO_padrao_cebraspe\.pdf/g)||[]).forEach(f=>lchips.push('<a class="lch" target="_blank" rel="noopener" href="https://drive.google.com/drive/search?q='+encodeURIComponent(f)+'">📄 '+f.slice(0,28)+' ↗</a>'));
+  return lchips.join("");
 }
 // ---------- views ----------
 function vHoje(root){
@@ -516,7 +562,7 @@ function vHoje(root){
     const bl=document.createElement("div");bl.className="backlog";
     bl.innerHTML="<b>Fila ("+fila.length+" bloco"+(fila.length>1?"s":"")+" sem dia):</b> toque em realocar de novo quando abrir espaço.";
     root.appendChild(bl);
-    fila.forEach(b=>root.appendChild(blockCard(b,true)));
+    fila.forEach(b=>unitsOf(b).forEach(u=>root.appendChild(unitCard(u,true))));
   }
   const di=dayIdx[curDate];
   const day=DATA.days[di];
@@ -530,11 +576,11 @@ function vHoje(root){
   const blocks=allBlocks.filter(b=>effDate(b)===curDate);
   if(!blocks.length){root.insertAdjacentHTML("beforeend",'<div class="empty">Dia livre. Descanse — faz parte do plano.</div>');return}
   let mins=0;const core=blocks.filter(b=>!b.opt);
-  blocks.forEach(b=>{if(!b.opt)mins+=effMin(b);root.appendChild(blockCard(b,true));subCards(b).forEach(el=>root.appendChild(el))});
-  const du=dayUnits(blocks);
+  blocks.forEach(b=>{if(!b.opt)mins+=effMin(b);unitsOf(b).forEach(u=>root.appendChild(unitCard(u,true)))});
+  const du=unitsCount(blocks);
   const foot=document.createElement("div");foot.className="dayfoot";
-  foot.innerHTML="<span>"+du[0]+"/"+du[1]+" blocos · "+(Math.round(mins/60*10)/10)+"h planejadas (aulas a 1,5x)</span><button id=\"allok\">marcar dia como feito</button>";
-  foot.querySelector("#allok").addEventListener("click",()=>{core.forEach(b=>SET("st:"+b.id,"done"));render()});
+  foot.innerHTML="<span>"+du[0]+"/"+du[1]+" atividades · "+(Math.round(mins/60*10)/10)+"h planejadas (aulas a 1,5x)</span><button id=\"allok\">marcar dia como feito</button>";
+  foot.querySelector("#allok").addEventListener("click",()=>{core.forEach(b=>unitsOf(b).forEach(u=>{if(!unitDone(u))SET(u.key,u.key.startsWith("st:")?"done":1)}));render()});
   root.appendChild(foot);
 }
 function vSemana(root){
@@ -548,11 +594,11 @@ function vSemana(root){
   const grid=document.createElement("div");grid.className="weekgrid";
   DATA.days.filter(d=>d.wk===wk).forEach(d=>{
     const blocks=allBlocks.filter(b=>effDate(b)===d.d&&!b.opt);
-    const dn=blocks.filter(b=>isDone(b)).length;
+    const uc=unitsCount(blocks),dn=uc[0],tt=uc[1];
     const mats=[...new Set(blocks.map(b=>b.mat))].slice(0,4).join(" · ");
     const el=document.createElement("div");el.className="wd";
     el.innerHTML='<div class="l"><b>'+wdName(d.d)+" "+fmt(d.d)+'</b><small>'+esc(mats||"livre")+'</small></div>'+
-      '<div style="text-align:right"><span class="mmin">'+dn+"/"+blocks.length+'</span><div class="bar" style="width:70px"><i style="width:'+(blocks.length?Math.round(dn/blocks.length*100):0)+'%"></i></div></div>';
+      '<div style="text-align:right"><span class="mmin">'+dn+"/"+tt+'</span><div class="bar" style="width:70px"><i style="width:'+(tt?Math.round(dn/tt*100):0)+'%"></i></div></div>';
     el.addEventListener("click",()=>{curDate=d.d;curTab="hoje";render()});
     grid.appendChild(el);
   });
@@ -574,8 +620,8 @@ function vProg(root){
   tw.appendChild(tb);root.appendChild(tw);
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Progresso por matéria</h2>');
   const mats={};
-  allBlocks.forEach(b=>{if(!mats[b.mat])mats[b.mat]={t:0,d:0,pct:[],min:0};const m=mats[b.mat];m.t++;m.min+=b.min;
-    if(isDone(b))m.d++;
+  allBlocks.forEach(b=>{if(!mats[b.mat])mats[b.mat]={t:0,d:0,pct:[],min:0};const m=mats[b.mat];m.min+=b.min;
+    unitsOf(b).forEach(u=>{m.t++;if(unitDone(u))m.d++});
     if(b.tipo==="QUEST"){const p=G("pct:"+b.id);if(p!=null)m.pct.push(p)}});
   Object.entries(mats).sort((a,b)=>b[1].min-a[1].min).forEach(en=>{
     const m=en[0],v=en[1];
@@ -690,13 +736,13 @@ function appendItems(root,items){
 function vMats(root){
   if(!matSel){
     const lg=legendaPrio();
-    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Tudo de cada matéria em blocos priorizados: <b style="color:'+lg[0]+'">vermelho = alta prioridade</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. Feitos e capítulos já cobertos por vídeo caem para o fim.</div>');
+    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. Feitas e capítulos já cobertos por vídeo caem para o fim.</div>');
     const g=document.createElement("div");g.className="matgrid";
     MATLIST.forEach(m=>{
       const bl=allBlocks.filter(b=>b.mat===m&&!b.opt);
-      const dn=bl.filter(b=>isDone(b)).length;
+      const uc=unitsCount(bl),dn=uc[0],tt=uc[1];
       const el=document.createElement("div");el.className="mg";
-      el.innerHTML="<b>"+esc(m)+"</b><div class='bar'><i style='width:"+(bl.length?Math.round(dn/bl.length*100):0)+"%'></i></div><small class='mmin'>"+dn+"/"+bl.length+" blocos</small>";
+      el.innerHTML="<b>"+esc(m)+"</b><div class='bar'><i style='width:"+(tt?Math.round(dn/tt*100):0)+"%'></i></div><small class='mmin'>"+dn+"/"+tt+" atividades</small>";
       el.addEventListener("click",()=>{matSel=m;render()});
       g.appendChild(el);
     });
@@ -827,16 +873,9 @@ function updateStats(){
   document.getElementById("stDays").textContent=Math.max(0,Math.round((prova-now)/86400000));
   const BLKIDX={};allBlocks.forEach(b=>BLKIDX[b.id]=b);
   // progresso por UNIDADE atomica: cada aula, cada capitulo, cada tese e cada bloco de lei/questoes/revisao
-  let done=0,total=0;
-  const planAulas=new Set();
-  allBlocks.forEach(b=>{(b.aulas||[]).forEach(a=>planAulas.add(a.c+":"+a.n));(b.alt||[]).forEach(a=>planAulas.add(a.c+":"+a.n))});
-  planAulas.forEach(k2=>{total++;if(G("au:"+k2))done++});
-  (DATA.ebooks||[]).forEach(bk=>{const cov=planIv(bk.k,true);bk.caps.forEach(c=>{if(c.out)return;total++;if(G("eb:"+bk.k+":"+c.n)||rangeCovered(cov,c.pi,c.pf))done++})});
+  // fonte unica: as mesmas atividades que aparecem no dia, na semana e nas materias + as teses
+  const uc=unitsCount(allBlocks);let done=uc[0],total=uc[1];
   DATA.juris.forEach((j,i)=>{total++;if(G("js:"+i))done++});
-  allBlocks.forEach(b=>{
-    if(b.tipo==="EBOOK"||b.tipo==="AULA")return;
-    if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length>1){LG[b.id].forEach((g2,i)=>{total++;if(G("lg:"+b.id+":"+i)||isDone(b))done++});return}
-    total++;if(isDone(b))done++});
   document.getElementById("stDone").textContent=done+"/"+total;
   let moved=0;
   for(const k in S.kv){const v=S.kv[k][0];
