@@ -490,11 +490,26 @@ let curDate=(()=>{const t=todayStr();if(dayIdx[t]!=null)return t;const f=DATA.da
 let curTab="hoje",jurFilter="",jurQ="",cursoFilter="";
 const EBK={};(DATA.ebooks||[]).forEach(e=>EBK[e.k]=e);
 const CAPL=DATA.caplinks||{},EBL=DATA.eblinks||{},INFL=DATA.inflinks||[],CADL=DATA.cadernos||{},LG=DATA.leigroups||{},LDOC=DATA.leidocs||{};
+// Compatibilidade com a reconstrução v6 da lei seca: alguns recortes existem nos
+// arquivos integrais de leitura, mas ficaram fora do índice resumido usado pelas
+// páginas de matéria. Recolocamos esses blocos no fim da prioridade, sem duplicar.
+(function completaRecortesLei(){
+  const add=(bid,g,before)=>{const a=LG[bid]||(LG[bid]=[]);if(a.some(x=>x.id===g.id))return;const i=before?a.findIndex(x=>x.id===before):-1;i>=0?a.splice(i,0,g):a.push(g)};
+  const cf="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm";
+  const bidCf="2026-08-13-1",a=LG[bidCf]||(LG[bidCf]=[]);
+  const consulta=a.findIndex(x=>x.id==="bc668e");if(consulta>=0)a.splice(consulta,1);
+  add(bidCf,{id:"d48066",r:"Direitos e deveres individuais e coletivos",sub:"CF · art. 5 (1/4: caput e I–XXIV)",u:cf,a:["5"],m:30,d:25,dir:1,fa:"5"},"b31290");
+  add(bidCf,{id:"1dd748",r:"Direitos e deveres individuais e coletivos",sub:"CF · art. 5 (2/4: XXV–XLV)",u:cf,a:["5"],m:30,d:21,dir:1,fa:"5"},"b31290");
+  add(bidCf,{id:"f1524c",r:"Direitos e deveres individuais e coletivos",sub:"CF · art. 5 (3/4: XLVI–LXIV)",u:cf,a:["5"],m:30,d:19,dir:1,fa:"5"},"b31290");
+  add("2026-09-21-0",{id:"bd95f9",r:"Habeas corpus e seu processo",sub:"CPP · arts. 647–650",u:"https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm",a:["647","648","648-A","649","650"],m:15,d:5,dir:1});
+  add("2026-09-19-0",{id:"fd1758",r:"Lei Uniforme de Genebra — letras de câmbio e notas promissórias",sub:"LUG (Anexo I) · arts. 1–2, 11–17, 30–34, 38–40, 43–44, 70–71 e 75–78",u:"https://www.planalto.gov.br/ccivil_03/decreto/antigos/d57663.htm",a:["1","2","11","12","13","14","15","16","17","30","31","32","33","34","38","39","40","43","44","70","71","75","76","77","78"],m:45,d:25,dir:1});
+})();
 const LEI_ESCOPO_FIX={
   d85104:"Súmulas TST 331 e 425 — leitura integral",
-  "7198e2":"LUG (Anexo I) · arts. 1–2, 11–17, 30–34, 38–40, 43–44, 70–71 e 75–78"
+  "7198e2":"LUG (Anexo I) · arts. 1–2, 11–17, 30–34, 38–40, 43–44, 70–71 e 75–78",
+  "fd1758":"LUG (Anexo I) · arts. 1–2, 11–17, 30–34, 38–40, 43–44, 70–71 e 75–78"
 };
-const LEI_MIN_FIX={"7198e2":45};
+const LEI_MIN_FIX={"7198e2":45,"fd1758":45};
 const TECMAP=DATA.tecmap||{};   // key da atividade -> [assuntos TEC exatos]
 // ---------- EIXO 1: rendimento (questoes esperadas por hora) e nucleo (corte de 80% do peso) ----------
 const PESO=DATA.peso||{},REND=DATA.rend||{},HEAT=DATA.heat||{};

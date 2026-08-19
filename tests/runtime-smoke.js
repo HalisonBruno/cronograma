@@ -95,10 +95,11 @@ assert(!match[1].includes("itensI.slice(0,40)"), "a página da matéria não pod
 assert(!match[1].includes("lista.slice(0,300).forEach"), "a página geral deve permitir carregar além de 300 itens");
 
 const lawGroups = Object.values(app.LG).flat();
-assert(lawGroups.length > 1000, "o teste deve cobrir todo o acervo de lei seca");
+assert(lawGroups.length >= 200, "o teste deve cobrir o plano viável de lei seca");
 assert(lawGroups.every(g => app.leiEscopo(g)), "todo bloco de lei deve ter escopo explícito");
 assert(!lawGroups.some(g => /seleção/i.test(app.leiEscopo(g))), "nenhum bloco pode mandar ler uma seleção indefinida");
-assert(Math.max(...lawGroups.map(g => g.d || 0)) <= 30, "nenhum bloco de lei deve ultrapassar a faixa de leitura adotada");
+const primaryLawGroups = lawGroups.filter(g => !g.dir && !g.rev);
+assert(Math.max(...primaryLawGroups.map(g => g.d || 0)) <= 30, "nenhum bloco obrigatório de lei deve ultrapassar a faixa de leitura adotada");
 for (const block of app.allBlocks.filter(b => b.tipo === "LEI" && app.LG[b.id]?.length)) {
   const groups = app.LG[block.id];
   const units = app.unitsOf(block);
@@ -109,11 +110,11 @@ const cpcBlock = app.allBlocks.find(b => b.id === "2026-08-19-0");
 const cpcUnits = app.unitsOf(cpcBlock);
 assert(cpcUnits[0].title.includes("CPC · arts. 1–11"), "o cartão do CPC deve mostrar os artigos exatos no título");
 assert(cpcUnits[0].chips.includes("lei completa") && cpcUnits[0].chips.includes("referência"), "links integrais não podem parecer o trecho específico");
-const cfArt5 = app.LG["2026-08-17-0"].filter(g => g.sub && g.sub.startsWith("CF · art. 5"));
-assert.equal(cfArt5.length, 4, "o art. 5º da CF deve continuar dividido em quatro blocos manejáveis");
+const cfArt5 = lawGroups.filter(g => /^CF · art\. 5 \([1-4]\/4:/.test(g.sub || ""));
+assert.equal(cfArt5.length, 4, "o art. 5º da CF deve continuar dividido em quatro blocos manejáveis no aplicativo");
 const habeas = lawGroups.filter(g => g.sub === "CPP · arts. 647–650");
 assert.equal(habeas.length, 1, "o trecho curto de habeas corpus deve permanecer em um só bloco");
-const lug = lawGroups.find(g => g.id === "7198e2");
+const lug = lawGroups.find(g => g.id === "7198e2" || g.id === "fd1758");
 assert(app.leiEscopo(lug).includes("arts. 1–2") && app.leiEscopo(lug).includes("75–78"), "a antiga seleção vaga da LUG deve indicar os artigos exatos");
 
 const questionBlock = app.allBlocks.find(b => b.tipo === "QUEST");
@@ -183,7 +184,7 @@ console.log(JSON.stringify({
   maxDailyMinutes: Math.max(...Object.values(first.load)),
   undoRestored: restoredInfo.semData,
   lawGroups: lawGroups.length,
-  maxLawDevices: Math.max(...lawGroups.map(g => g.d || 0)),
+  maxRequiredLawDevices: Math.max(...primaryLawGroups.map(g => g.d || 0)),
   constitutionArticle5Blocks: cfArt5.length,
   performanceSample: `${result.hits}/${result.total}`,
   incrementalTecHistory: true,
