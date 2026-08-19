@@ -1,6 +1,6 @@
 // Cache-first com atualizacao em segundo plano: o app abre offline e
 // pega versao nova na proxima abertura. Chamadas de sync (Supabase) nao passam por aqui.
-const CACHE = "enam-v2-global-plan";
+const CACHE = "enam-v3-lei-seca-atomica";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icon-192.png"])));
   self.skipWaiting();
