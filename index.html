@@ -114,6 +114,12 @@ table.panel td,table.panel th{font-size:.76rem;padding:5px 6px}
 .actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
 .actions button{background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:7px 12px;font-size:.78rem;cursor:pointer}
 .actions button:hover{border-color:var(--accent)}
+.tecresult{width:100%;display:flex;gap:7px;align-items:end;flex-wrap:wrap;margin-top:7px;padding:8px;background:var(--surface2);border:1px solid var(--line);border-radius:9px}
+.tecresult label{font-size:.68rem;color:var(--muted);font-weight:600}
+.tecresult input{display:block;width:82px;margin-top:2px;background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:6px;font-size:.82rem}
+.tecresult .score{font-size:.82rem;font-weight:700;padding:6px 9px;border-radius:7px;background:var(--surface)}
+.techist{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin:6px 0;font-size:.8rem}
+.techist ul{margin:5px 0 0;padding-left:20px}.techist li{margin:3px 0}
 .actions .pct{width:74px;background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:4px 8px;font-size:.78rem;font-variant-numeric:tabular-nums}
 .dayfoot{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.78rem;margin:10px 0 20px;font-variant-numeric:tabular-nums}
 .dayfoot button{background:none;border:1px solid var(--line);border-radius:7px;color:var(--muted);padding:4px 10px;font-size:.72rem;cursor:pointer}
@@ -164,9 +170,9 @@ td input{width:64px;background:var(--surface);border:1px solid var(--line);borde
   <div class="statrow">
     <div class="stat"><b id="stDays">—</b><span>dias p/ prova</span></div>
     <div class="stat"><b id="stDone">—</b><span>blocos feitos</span></div>
-    <div class="stat"><b id="stPend">—</b><span>realocados</span></div>
+    <div class="stat"><b id="stPend">—</b><span>replanejados</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
-    <button id="regen" title="Realoca tudo que ficou para trás, sem perder o que está feito">⟳ replanejar</button>
+    <button id="regen" title="Reconstrói todas as atividades pendentes até a prova, sem perder o que está feito">⟳ replanejar</button>
     <button id="syncpill" title="Estado da sincronização">—</button>
   </div>
   <nav class="tabs">
@@ -241,6 +247,7 @@ function migrateV4(){
 function JG(i){return G(jkey(i))}
 function JSET(i,v){SET(jkey(i),v)}
 function SET(k,v){S.kv[k]=[v,Date.now()];saveLocal();schedulePush();}
+function SETM(vals){const now=Date.now();for(const k in vals)S.kv[k]=[vals[k],now];saveLocal();schedulePush()}
 function mergeKv(into,from){let ch=false;for(const k in from){const e=from[k];if(!Array.isArray(e)||e.length<2)continue;if(!into[k]||(e[1]||0)>(into[k][1]||0)){into[k]=e;ch=true}}return ch}
 // ---------- sincronização ----------
 let token=localStorage.getItem(TKEY)||"";
@@ -283,44 +290,65 @@ document.getElementById("tokenSkip").addEventListener("click",()=>{hideSetup();s
 document.getElementById("syncpill").addEventListener("click",()=>{if(!token)showSetup();else pull()});
 function planRegen(){
   const hoje=todayStr();
-  const days=DATA.days.map(d=>d.d).filter(d=>d>=hoje&&d<"2026-10-17");
+  const days=DATA.days.map(d=>d.d).filter(d=>d>=hoje&&d<DATA.prova);
   const dayOf=d=>DATA.days[dayIdx[d]];
-  const load={};days.forEach(d=>load[d]=dayLoad(d));
   const cap=capMin();
-  // desempenho por materia: ultimo % de acerto registrado
-  const perf={};allBlocks.filter(b=>b.tipo==="QUEST").sort((a,c)=>a.day<c.day?-1:1).forEach(b=>{const p=G("pct:"+b.id);if(p!=null)perf[b.mat]=p});
-  // 1) atividades vencidas (data < hoje) e pendentes; 2) juris sem dia
-  const pend=[];
-  allBlocks.forEach(b=>{if(b.opt||b.tipo==="SIM")return;unitsOf(b).forEach(u=>{if(unitDone(u))return;const d=unitDate(u);if(d<hoje&&d!=="fila")pend.push({u,mat:b.mat,age:d,pri:0});else if(d==="fila")pend.push({u,mat:b.mat,age:"0000",pri:0})})});
-  jurisSemBloco().forEach(o=>{const jk=jkey(o.i);if(JG(o.i))return;if(G("mvu:"+jk)&&G("mvu:"+jk)!=="fila")return;const j=DATA.juris[o.i];
-    pend.push({u:{key:jk,min:10,b:{id:"jsb:"+jk,mat:o.mat,tipo:"JURIS",day:"",t:j.ref}},mat:o.mat,age:"9999",pri:0,cit:j.cit||0,juris:true})});
-  extras().forEach(o=>{const u=extraUnit(o);if(u.done)return;const d=G("mvu:"+u.key)||o.day||"";if(d&&d>=hoje&&d!=="fila")return;pend.push({u,mat:o.mat||"Extra",age:d&&d<hoje?d:"9998",pri:0,cit:o.pri||0})});
-  // prioridade: materia com desempenho <70 primeiro; depois mais antiga; depois maior incidencia
-  pend.forEach(p=>{p.pri=(perf[p.mat]!=null&&perf[p.mat]<70?0:1)});
-  pend.sort((a,c)=>a.pri-c.pri||(a.age<c.age?-1:a.age>c.age?1:0)||((c.cit||0)-(a.cit||0)));
+  // desempenho por materia: acertos ponderados pelo numero real de questoes resolvidas
+  const perf=performanceMap();
+  // Reconstrucao GLOBAL: toda atividade pendente volta ao conjunto de decisao,
+  // inclusive as que ainda estavam em datas futuras. Concluidas e simulados ficam intocados.
+  const pend=[];const seen=new Set();
+  const add=(u,mat,orig,cit)=>{
+    if(!u||seen.has(u.key)||unitDone(u))return;
+    seen.add(u.key);
+    const tipo=tipoCarga(u),poor=perf[mat]!=null&&perf[mat]<70;
+    // Questoes e todos os Informativos 10x sao compromissos editoriais; depois vem o nucleo
+    // de maior rendimento. Video equivalente e alternativa ao texto, por isso fica por ultimo.
+    const altVideo=u.key.startsWith("au:")&&!!(AULA2CAPS[u.key.slice(3)]||[]).length;
+    const tier=tipo==="quest"?0:tipo==="info"?1:(isNucleo(u)&&poor?2:isNucleo(u)?3:(orig&&orig<hoje?4:5))+(altVideo?2:0);
+    pend.push({u,mat:mat||"Geral",orig:orig||"9999-12-31",tier,cit:cit||pesoOf(u)||0,rend:rendOf(u)||0,altVideo});
+  };
+  allBlocks.forEach(b=>{if(b.opt||b.tipo==="SIM"||b.tipo==="INFO")return;unitsOf(b).forEach(u=>add(u,b.mat,b.day,0))});
+  // Cada item dos cinco semestres e uma atividade real: entra na carga e recebe dia proprio.
+  INFOS.forEach(o=>add(infoUnit(o),o.mat,"9999-12-31",(o.pids||[]).length));
+  jurisSemBloco().forEach(o=>{const j=DATA.juris[o.i],jk=jkey(o.i);add({key:jk,min:10,b:{id:"jsb:"+jk,mat:o.mat,tipo:"JURIS",day:"",t:j.ref}},o.mat,"9999-12-31",j.cit||0)});
+  extras().forEach(o=>{const u=extraUnit(o);add(u,o.mat||"Extra",o.day||"9999-12-31",o.pri||0)});
+  pend.sort((a,c)=>a.tier-c.tier||c.rend-a.rend||c.cit-a.cit||(a.orig<c.orig?-1:a.orig>c.orig?1:0)||a.u.key.localeCompare(c.u.key));
+
+  // A carga inicial contem apenas compromissos fixos, principalmente simulados e repeticoes.
+  // Todas as atividades candidatas sao retiradas virtualmente antes da nova distribuicao.
+  const candidateKeys=new Set(pend.map(p=>p.u.key));
+  const load={};days.forEach(d=>load[d]=unitsOn(d).filter(u=>!unitDone(u)&&!candidateKeys.has(u.key)).reduce((a,u)=>a+minRestante(u),0));
   const moves=[];const fila=[];
   pend.forEach(p=>{
-    // preferencia: dias em que a materia esta no plano; fallback: qualquer dia; nunca acima do teto
-    const pref=days.filter(d=>dayOf(d).blocks.some(x=>x.mat===p.mat&&!x.opt));
-    let dst=pref.find(d=>load[d]+p.u.min<=cap)||days.find(d=>load[d]+p.u.min<=cap);
-    if(dst){load[dst]+=p.u.min;moves.push({key:p.u.key,to:dst,label:p.u.b.t||p.u.key,mat:p.mat,min:p.u.min})}
-    else fila.push({key:p.u.key,label:p.u.b.t||p.u.key,mat:p.mat});
+    // Preferencia por dia da mesma materia; dentro de cada grupo, ocupa primeiro o dia mais vazio.
+    const fit=d=>load[d]+minRestante(p.u)<=cap;
+    const pref=days.filter(d=>dayOf(d).blocks.some(x=>x.mat===p.mat&&!x.opt)&&fit(d)).sort((a,c)=>load[a]-load[c]||(a<c?-1:1));
+    const any=days.filter(fit).sort((a,c)=>load[a]-load[c]||(a<c?-1:1));
+    const dst=pref[0]||any[0];const mm=minRestante(p.u);
+    const item={key:p.u.key,label:p.u.b.t||p.u.title||p.u.key,mat:p.mat,min:mm,tipo:tipoCarga(p.u),altVideo:p.altVideo};
+    if(dst){load[dst]+=mm;moves.push({...item,to:dst})}
+    else fila.push(item);
   });
-  return {moves,fila,cap,perf};
+  return {moves,fila,cap,perf,load,total:pend.length};
 }
 function applyRegen(plan){
-  const snap={};
-  plan.moves.forEach(m=>{const k="mvu:"+m.key;snap[k]=G(k);SET(k,m.to)});
-  plan.fila.forEach(m=>{const k="mvu:"+m.key;snap[k]=G(k);SET(k,"fila")});
+  const snap={},next={};
+  plan.moves.forEach(m=>{const k="mvu:"+m.key;snap[k]=G(k);next[k]=m.to});
+  plan.fila.forEach(m=>{const k="mvu:"+m.key;snap[k]=G(k);next[k]="fila"});
+  snap["regen:global"]=G("regen:global");next["regen:global"]=1;SETM(next);
   SET("regen:undo",JSON.stringify(snap));
   return plan.moves.length+plan.fila.length;
 }
-function undoRegen(){const raw=G("regen:undo");if(!raw){toast("Nada para desfazer.");return}try{const snap=JSON.parse(raw);for(const k in snap)SET(k,snap[k]);SET("regen:undo",null);render();toast("Replanejamento desfeito.")}catch(e){toast("Não foi possível desfazer.")}}
+function undoRegen(){const raw=G("regen:undo");if(!raw){toast("Nada para desfazer.");return}try{const snap=JSON.parse(raw);snap["regen:undo"]=null;SETM(snap);render();toast("Replanejamento desfeito.")}catch(e){toast("Não foi possível desfazer.")}}
 function showRegenPreview(plan){
   const ov=document.createElement("div");ov.className="overlay";
   const byDay={};plan.moves.forEach(m=>{(byDay[m.to]=byDay[m.to]||[]).push(m)});
-  const daysHtml=Object.keys(byDay).sort().map(d=>'<div style="margin:6px 0"><b>'+wdName(d)+' '+fmt(d)+'</b> <span class="mmin">('+byDay[d].reduce((a,m)=>a+m.min,0)+'min)</span><br>'+byDay[d].map(m=>'<span class="mmin">· '+esc(m.mat)+': '+esc(String(m.label).slice(0,60))+'</span>').join("<br>")+'</div>').join("");
-  ov.innerHTML='<div class="modal" style="max-width:520px;max-height:85vh;overflow:auto"><h2>Prévia do replanejamento</h2><p>'+plan.moves.length+' atividades serão recolocadas (teto '+plan.cap+' min líquidos/dia; matérias com acerto &lt;70% primeiro). '+(plan.fila.length?plan.fila.length+' não couberam e vão para a fila.':"")+' Nada feito é alterado.</p><div style="font-size:.8rem;max-height:45vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px">'+(daysHtml||"<i>Você está em dia.</i>")+'</div><div class="btns" style="margin-top:12px"><button class="primary" id="rgOk">Aplicar</button><button class="ghost" id="rgNo">Cancelar</button></div></div>';
+  const tipoNome=t=>TIPO_NOME[t]||t;
+  const resumo=arr=>{const z={};arr.forEach(m=>{const k=tipoNome(m.tipo);z[k]=(z[k]||0)+1});return Object.entries(z).map(([k,n])=>n+' '+k.toLowerCase()).join(' · ')};
+  const daysHtml=Object.keys(byDay).sort().map(d=>'<div style="margin:6px 0"><b>'+wdName(d)+' '+fmt(d)+'</b> <span class="mmin">'+plan.load[d]+'/'+plan.cap+'min · '+byDay[d].length+' atividades</span><br><span class="mmin">'+esc(resumo(byDay[d]))+'</span></div>').join("");
+  const infoOk=plan.moves.filter(m=>m.tipo==="info").length,infoFila=plan.fila.filter(m=>m.tipo==="info").length;
+  ov.innerHTML='<div class="modal" style="max-width:560px;max-height:85vh;overflow:auto"><h2>Prévia do replanejamento global</h2><p><b>'+plan.total+' atividades pendentes</b> foram recolhidas, inclusive as futuras. '+plan.moves.length+' cabem antes da prova e '+plan.fila.length+' ficam na fila por falta de capacidade. Concluídas e simulados não são alterados.</p><div class="note" style="margin:8px 0"><b>Informativos 10x:</b> '+infoOk+' agendados · '+infoFila+' na fila. Todos os '+INFOS.length+' itens agora entram no cálculo de carga e no corte de prioridade.</div><div style="font-size:.8rem;max-height:42vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px">'+(daysHtml||"<i>Não há atividade pendente para distribuir.</i>")+'</div>'+(plan.fila.length?'<div class="note" style="margin-top:8px"><b>Fila:</b> '+esc(resumo(plan.fila))+'. Ela continuará visível no Hoje e poderá ser redistribuída quando houver espaço.</div>':"")+'<div class="btns" style="margin-top:12px"><button class="primary" id="rgOk">Aplicar reconstrução</button><button class="ghost" id="rgNo">Cancelar</button></div></div>';
   document.body.appendChild(ov);
   ov.querySelector("#rgNo").addEventListener("click",()=>ov.remove());
   ov.querySelector("#rgOk").addEventListener("click",()=>{const n=applyRegen(plan);ov.remove();render();toast(n?n+" atividades replanejadas. Desfazer em Ajustes.":"Você está em dia: nada para replanejar.")});
@@ -338,13 +366,13 @@ if(false)(()=>{
     if(!ok)for(const d of DATA.days){if(d.d>=hoje&&d.d<"2026-10-17"&&extraLoad(d.d)+pm<=60){SET("mv:"+b.id,d.d);n+=pend.length;ok=true;break}}
     if(!ok){SET("mv:"+b.id,"fila");n+=pend.length}});
   allBlocks.forEach(b=>{if(b.tipo!=="SIM"||isDone(b)||b.t.indexOf("PROVA")>=0)return;if(effDate(b)>=hoje)return;
-    const t=DATA.days.find(d=>d.d>=hoje&&new Date(d.d+"T12:00:00").getDay()===0&&d.d<"2026-10-18"&&!d.blocks.some(x=>x.tipo==="SIM"&&!isDone(x)&&effDate(x)===d.d));
+    const t=DATA.days.find(d=>d.d>=hoje&&new Date(d.d+"T12:00:00").getDay()===0&&d.d<DATA.prova&&!d.blocks.some(x=>x.tipo==="SIM"&&!isDone(x)&&effDate(x)===d.d));
     if(t){SET("mv:"+b.id,t.d);n++}});
   render();})();
 // ---------- índices ----------
 const dayIdx={};DATA.days.forEach((d,i)=>dayIdx[d.d]=i);
 migrateV3();migrateV4();
-const allBlocks=[];DATA.days.forEach(d=>d.blocks.forEach(b=>{b.day=d.d;b.wk=d.wk;b.fase=d.fase;allBlocks.push(b)}));
+const allBlocks=[];DATA.days.forEach(d=>d.blocks.forEach(b=>{b.day=d.d;b.wk=d.wk;b.fase=d.fase;if(b.tipo==="QUEST")b.det=String(b.det||"").replace(/registre o % no bloco\.?/gi,"registre resolvidas, acertos e erros nos campos abaixo.");allBlocks.push(b)}));
 function isDone(b){const s=G("st:"+b.id);return s==="done"||s==="done-auto"}
 function effDate(b){return G("mv:"+b.id)||b.day}
 function unitDate(u){return G("mvu:"+u.key)||effDate(u.b)}
@@ -353,13 +381,15 @@ function extras(){const out=[];for(const k in S.kv){if(!k.startsWith("ext:"))con
 function extraUnit(o){const key="xdone:"+o.id;const b={id:"ext:"+o.id,mat:o.mat||"Extra",tipo:o.tipo||"REV",min:o.min||30,t:o.t,day:o.day||"",wk:0,det:o.det||""};
   return {key,title:"<b>➕ "+esc(o.t)+"</b>",meta:(o.min||30)+"min",chips:o.url?'<a class="lch" target="_blank" rel="noopener" href="'+esc(o.url)+'">abrir material ↗</a>':"",min:o.min||30,val:G(key),done:!!G(key),b}}
 function unitsOn(dstr){
-  const out=[];
-  revPend(dstr).forEach(u=>out.push(u));
-  simSemanal(dstr).forEach(u=>out.push(u));
-  extras().forEach(o=>{const u=extraUnit(o);if(unitDate(u)===dstr||(!G("mvu:"+u.key)&&o.day===dstr))out.push(u)});
-  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(unitDate(u)===dstr)out.push(u)})});
+  const out=[],seen=new Set();const add=u=>{if(!u||seen.has(u.key))return;seen.add(u.key);out.push(u)};
+  revPend(dstr).forEach(add);
+  simSemanal(dstr).forEach(add);
+  extras().forEach(o=>{const u=extraUnit(o);if(unitDate(u)===dstr||(!G("mvu:"+u.key)&&o.day===dstr))add(u)});
+  allBlocks.forEach(b=>{if(b.opt||b.tipo==="INFO")return;unitsOf(b).forEach(u=>{if(unitDate(u)===dstr)add(u)})});
+  // Informativos nao dependem mais dos 12 blocos-amostra: cada item usa sua propria data.
+  INFOS.forEach(o=>{const u=infoUnit(o);if(G("mvu:"+u.key)===dstr)add(u)});
   jurisSemBloco().forEach(o=>{const jk=jkey(o.i);const d=G("mvu:"+jk);if(d===dstr){const j=DATA.juris[o.i];const fake={id:"jsb:"+jk,mat:o.mat,tipo:"JURIS",min:10,t:j.ref,day:dstr,wk:(DATA.days[dayIdx[dstr]]||{}).wk,det:""};
-    out.push({key:jk,title:"<b>⚖ "+esc(j.ref)+"</b>"+(j.tema?" · "+esc(j.tema):""),meta:j.cit+"× · 10min",chips:'<a class="lch" target="_blank" rel="noopener" href="'+(j.url||jurl(j.ref))+'">fonte oficial ↗</a>',min:10,val:JG(o.i),done:!!JG(o.i),b:fake})}});
+    add({key:jk,title:"<b>⚖ "+esc(j.ref)+"</b>"+(j.tema?" · "+esc(j.tema):""),meta:j.cit+"× · 10min",chips:'<a class="lch" target="_blank" rel="noopener" href="'+(j.url||jurl(j.ref))+'">fonte oficial ↗</a>',min:10,val:JG(o.i),done:!!JG(o.i),b:fake})}});
   return out;
 }
 function effMin(b){return b.tipo==="AULA"?Math.round(b.min/1.5):b.min}
@@ -460,6 +490,11 @@ let curDate=(()=>{const t=todayStr();if(dayIdx[t]!=null)return t;const f=DATA.da
 let curTab="hoje",jurFilter="",jurQ="",cursoFilter="";
 const EBK={};(DATA.ebooks||[]).forEach(e=>EBK[e.k]=e);
 const CAPL=DATA.caplinks||{},EBL=DATA.eblinks||{},INFL=DATA.inflinks||[],CADL=DATA.cadernos||{},LG=DATA.leigroups||{},LDOC=DATA.leidocs||{};
+const LEI_ESCOPO_FIX={
+  d85104:"Súmulas TST 331 e 425 — leitura integral",
+  "7198e2":"LUG (Anexo I) · arts. 1–2, 11–17, 30–34, 38–40, 43–44, 70–71 e 75–78"
+};
+const LEI_MIN_FIX={"7198e2":45};
 const TECMAP=DATA.tecmap||{};   // key da atividade -> [assuntos TEC exatos]
 // ---------- EIXO 1: rendimento (questoes esperadas por hora) e nucleo (corte de 80% do peso) ----------
 const PESO=DATA.peso||{},REND=DATA.rend||{},HEAT=DATA.heat||{};
@@ -497,31 +532,85 @@ function heatOf(rotulo,art){const r=(rotulo||"").toUpperCase();
     const sig=p[0];if(r.indexOf(sig)>=0||r.replace(/\./g,"").indexOf(sig.replace(/\./g,""))>=0)return HEAT[k]}
   return 0}
 function stars(v){return v>=12?"★★★":v>=6?"★★":v>0?"★":""}
-// ---------- filtros TEC baseados no que foi ESTUDADO ----------
+// ---------- desempenho e caderno incremental do TEC ----------
+function numState(k){const v=G(k);return v==null||v===""?null:Math.max(0,Math.round(+v||0))}
+function questionResult(b){
+  let total=numState("qtot:"+b.id),hits=numState("qhit:"+b.id),errors=numState("qerr:"+b.id);
+  if(total==null&&hits!=null&&errors!=null)total=hits+errors;
+  const hasCounts=total!=null&&total>0&&hits!=null;
+  const legacy=G("pct:"+b.id),pct=hasCounts?hits/total*100:(legacy==null?null:+legacy);
+  return {total,hits,errors,pct,hasCounts};
+}
+function setQuestionResult(b,field,raw){
+  let r=questionResult(b),total=r.total,hits=r.hits,errors=r.errors;
+  const val=raw==null||raw===""?null:Math.max(0,Math.round(+raw||0));
+  if(field==="total")total=val;if(field==="hits")hits=val;if(field==="errors")errors=val;
+  if(field==="total"&&total!=null){if(hits!=null)errors=Math.max(0,total-hits);else if(errors!=null)hits=Math.max(0,total-errors)}
+  else if(field==="hits"&&hits!=null){if(errors!=null)total=hits+errors;else if(total!=null)errors=Math.max(0,total-hits)}
+  else if(field==="errors"&&errors!=null){if(hits!=null)total=hits+errors;else if(total!=null)hits=Math.max(0,total-errors)}
+  if(total!=null&&hits!=null&&hits>total){total=hits+(errors||0)}
+  if(total!=null&&errors!=null&&errors>total){total=errors+(hits||0)}
+  const pct=total>0&&hits!=null?Math.round(hits/total*1000)/10:null;
+  const vals={};vals["qtot:"+b.id]=total;vals["qhit:"+b.id]=hits;vals["qerr:"+b.id]=errors;vals["pct:"+b.id]=pct;SETM(vals);
+  return questionResult(b);
+}
+function questionFields(b){const r=questionResult(b),v=x=>x==null?"":x,score=r.pct==null?"sem resultado":Math.round(r.pct)+"%";
+  return '<div class="tecresult"><label>Resolvidas<input class="qnum" data-field="total" type="number" min="0" step="1" value="'+v(r.total)+'"></label><label>Acertos<input class="qnum" data-field="hits" type="number" min="0" step="1" value="'+v(r.hits)+'"></label><label>Erros<input class="qnum" data-field="errors" type="number" min="0" step="1" value="'+v(r.errors)+'"></label><span class="score">'+score+'</span><label style="flex:1;min-width:210px">Assuntos em que errei (opcional)<input class="errin" type="text" placeholder="separe por vírgula" value="'+escAttr(G("err:"+b.id)||"")+'" style="width:100%"></label></div>'}
+function bindQuestionFields(root,b,after){
+  root.querySelectorAll(".qnum").forEach(inp=>inp.addEventListener("change",e=>{const r=setQuestionResult(b,e.target.dataset.field,e.target.value);toast("Desempenho atualizado — "+(r.pct==null?"aguardando acertos e total":Math.round(r.pct)+"% em "+r.total+" questões")+".");if(after)after()}));
+  const errin=root.querySelector(".errin");if(errin)errin.addEventListener("change",e=>{SET("err:"+b.id,e.target.value.trim()||null);toast("Assuntos anotados — entram no filtro de revisão.")});
+}
+function performanceDetail(mat){
+  let total=0,hits=0;const legacy=[];
+  allBlocks.filter(b=>b.tipo==="QUEST"&&(!mat||b.mat===mat)).forEach(b=>{const r=questionResult(b);if(r.hasCounts){total+=r.total;hits+=r.hits}else if(r.pct!=null)legacy.push(r.pct)});
+  const pct=total?hits/total*100:(legacy.length?legacy.reduce((a,c)=>a+c,0)/legacy.length:null);
+  return {total,hits,errors:total-hits,pct,records:allBlocks.filter(b=>b.tipo==="QUEST"&&(!mat||b.mat===mat)).filter(b=>questionResult(b).pct!=null).length};
+}
+function performanceMap(){const out={};MATLIST.forEach(m=>{const p=performanceDetail(m).pct;if(p!=null)out[m]=p});return out}
 function tecStudied(mat){
-  // assuntos das atividades feitas (capitulos, aulas, grupos de lei) + dos blocos de questoes ja feitos
-  const st={};const add=(t,src)=>{if(!t)return;st[t]=st[t]||{n:0,tested:false,pcts:[]};st[t].n++};
-  allBlocks.forEach(b=>{if(mat&&b.mat!==mat)return;unitsOf(b).forEach(u=>{if(!unitDone(u))return;(TECMAP[u.key]||[]).forEach(t=>add(t,u.key))})});
-  allBlocks.forEach(b=>{if(b.tipo!=="QUEST"||(mat&&b.mat!==mat))return;const p=G("pct:"+b.id);(b.tec||[]).forEach(t=>{if(!st[t])return;if(isDone(b)||p!=null){st[t].tested=true;if(p!=null)st[t].pcts.push(p)}})});
+  // assuntos efetivamente cobertos; o desempenho e ponderado pelo numero de questoes, nao por medias soltas
+  const st={};const add=t=>{if(!t)return;st[t]=st[t]||{n:0,tested:false,total:0,hits:0,legacy:[]};st[t].n++};
+  allBlocks.forEach(b=>{if(mat&&b.mat!==mat)return;unitsOf(b).forEach(u=>{if(!unitDone(u))return;(TECMAP[u.key]||[]).forEach(add)})});
+  allBlocks.forEach(b=>{if(b.tipo!=="QUEST"||(mat&&b.mat!==mat))return;const r=questionResult(b);(b.tec||[]).forEach(t=>{if(!st[t])return;if(isDone(b)||r.pct!=null){st[t].tested=true;if(r.hasCounts){st[t].total+=r.total;st[t].hits+=r.hits}else if(r.pct!=null)st[t].legacy.push(r.pct)}})});
   return st;
 }
 function tecPick(mat,modo){
-  const st=tecStudied(mat);const arr=Object.entries(st).map(([t,v])=>({t,n:v.n,tested:v.tested,avg:v.pcts.length?v.pcts.reduce((a,c)=>a+c,0)/v.pcts.length:null}));
-  // revisoes vencidas: assuntos de blocos REV/EBOOK antigos (>14 dias) sem teste recente
-  const hoje=todayStr();
-  const errs=[];for(const k in S.kv){if(!k.startsWith("err:"))continue;const v=S.kv[k][0];if(!v)continue;const b=allBlocks.find(x=>"err:"+x.id===k);if(mat&&b&&b.mat!==mat)continue;String(v).split(",").forEach(x=>{const t=x.trim();if(t)errs.push(t)})}
-  if(modo==="pior"){const base=arr.filter(x=>x.avg!=null&&x.avg<70).sort((a,b)=>a.avg-b.avg).map(x=>x.t);return errs.concat(base.filter(t=>errs.indexOf(t)<0))}
-  // ordem: nao testado > <70% > mais estudado
+  const st=tecStudied(mat);const arr=Object.entries(st).map(([t,v])=>({t,n:v.n,tested:v.tested,avg:v.total?v.hits/v.total*100:(v.legacy.length?v.legacy.reduce((a,c)=>a+c,0)/v.legacy.length:null)}));
+  const errs=[];for(const k in S.kv){if(!k.startsWith("err:"))continue;const v=S.kv[k][0];if(!v)continue;const b=allBlocks.find(x=>"err:"+x.id===k);if(mat&&b&&b.mat!==mat)continue;String(v).split(",").forEach(x=>{const t=x.trim();if(t&&!errs.includes(t))errs.push(t)})}
+  if(modo==="pior"){const base=arr.filter(x=>x.avg!=null&&x.avg<70).sort((a,b)=>a.avg-b.avg).map(x=>x.t);return errs.concat(base.filter(t=>!errs.includes(t)))}
   return arr.sort((a,b)=>(a.tested?1:0)-(b.tested?1:0)||((a.avg!=null&&a.avg<70)?-1:0)-((b.avg!=null&&b.avg<70)?-1:0)||b.n-a.n).map(x=>x.t);
 }
-function tecCopy(mat,modo){
-  let ass=[],head="";
-  if(modo==="fgv"){ass=tecPick(mat,"fgv").slice(0,8);head="TEC — 20 questões · banca FGV · área jurídica · 2021-2026\nAssuntos (o que você já estudou e ainda não testou primeiro):"}
-  else if(modo==="ceb"){ass=tecPick(mat,"fgv").slice(0,6);head="TEC — 10 questões · banca CEBRASPE · procuradorias (AGU/PGE/PGM) · 2021-2026\nAssuntos (ponte, sem competir com a prioridade FGV):"}
-  else{ass=tecPick(mat,"pior").slice(0,8);head="TEC — revisão · FGV + CEBRASPE · 2021-2026\nAssuntos com desempenho < 70% (piores primeiro):"}
-  if(!ass.length){toast(modo==="pior"?"Sem assuntos abaixo de 70% registrados — anote o % de acerto nos blocos de questões.":"Nada estudado ainda nesta matéria (tique capítulos, aulas ou leis).");return}
-  const txt=head+"\n"+ass.map(a=>"• "+a).join("\n");
-  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast("Filtro copiado ("+ass.length+" assuntos) — cole no TEC ao montar o caderno."),()=>toast(txt));else toast(txt);
+function tecHistKey(mat){return "tech:"+encodeURIComponent(mat)}
+function tecHistory(mat){const raw=G(tecHistKey(mat));if(!raw)return[];try{const a=JSON.parse(raw);return Array.isArray(a)?a:[]}catch(e){return[]}}
+function tecGeneratedSet(mat){const set=new Set();tecHistory(mat).filter(x=>x.kind==="add").forEach(x=>(x.assuntos||[]).forEach(t=>set.add(t)));return set}
+function tecNewSubjects(mat,modo){
+  if(modo==="pior")return tecPick(mat,"pior").slice(0,8);
+  const used=tecGeneratedSet(mat),lim=modo==="ceb"?6:8;
+  return tecPick(mat,"fgv").filter(t=>!used.has(t)).slice(0,lim);
+}
+function tecRecordGeneration(mat,modo,assuntos,at){
+  if(!assuntos.length)return null;
+  const hist=tecHistory(mat),rec={id:String(Date.now())+"-"+Math.random().toString(16).slice(2,8),at:at||new Date().toISOString(),modo,kind:modo==="pior"?"review":"add",assuntos:assuntos.slice()};
+  hist.push(rec);SET(tecHistKey(mat),JSON.stringify(hist));return rec;
+}
+function fmtDateTime(iso){try{return new Date(iso).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(e){return iso}}
+function tecModeLabel(modo){return modo==="fgv"?"FGV — 20 questões":modo==="ceb"?"CEBRASPE — 10 questões":"revisão de desempenho"}
+function tecBookUrl(mat){const fallback="https://www.tecconcursos.com.br/questoes/cadernos",v=G("tecbook:"+mat);if(!v)return fallback;try{const u=new URL(v);return u.protocol==="https:"&&/(^|\.)tecconcursos\.com\.br$/i.test(u.hostname)?u.href:fallback}catch(e){return fallback}}
+function showTecGeneration(mat,modo,rec,assuntos){
+  const ov=document.createElement("div");ov.className="overlay";const book=tecBookUrl(mat);
+  const novo=modo!=="pior",titulo=rec?(novo?"Novos filtros para incluir no caderno":"Assuntos para revisar no caderno"):(novo?"Nenhum filtro novo":"Sem revisão pendente");
+  const lista=assuntos.length?'<ol style="padding-left:22px">'+assuntos.map(t=>'<li style="margin:8px 0">'+esc(t)+'</li>').join("")+'</ol>':'<div class="note">'+(novo?"Tudo o que você já estudou nesta matéria e está mapeado no TEC já foi registrado no histórico. Avance no conteúdo e gere novamente.":"Registre questões e erros para o aplicativo identificar seus pontos fracos.")+'</div>';
+  ov.innerHTML='<div class="modal" style="max-width:620px;max-height:86vh;overflow:auto"><h2>'+titulo+'</h2>'+(rec?'<p class="mmin">Registrado em '+fmtDateTime(rec.at)+' · '+tecModeLabel(modo)+'.</p>':"")+lista+'<div class="note">'+(novo?"Inclua cada assunto individualmente no mesmo caderno do TEC. Esta lista já ficou salva; na próxima geração esses assuntos não serão repetidos.":"Estes assuntos já podem estar no caderno: use-os para uma nova bateria, começando pelos piores resultados.")+'</div><div class="btns"><a class="primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+escAttr(book)+'">abrir meu caderno no TEC ↗</a><button class="ghost" id="tecClose">fechar</button></div></div>';
+  document.body.appendChild(ov);ov.querySelector("#tecClose").addEventListener("click",()=>ov.remove());
+}
+function tecGenerate(mat,modo){const assuntos=tecNewSubjects(mat,modo),rec=tecRecordGeneration(mat,modo,assuntos);showTecGeneration(mat,modo,rec,assuntos);render()}
+function tecHistoryPanel(mat){
+  const box=document.createElement("div");box.className="note";box.style.margin="8px 0";const hist=tecHistory(mat),added=tecGeneratedSet(mat).size,last=hist.length?hist[hist.length-1]:null,perf=performanceDetail(mat);
+  const desempenho=perf.pct==null?"sem resultado registrado":Math.round(perf.pct)+"% · "+perf.hits+" acertos · "+perf.errors+" erros · "+perf.total+" resolvidas";
+  box.innerHTML='<b>Caderno incremental do TEC</b><div class="mmin">'+added+' filtros já registrados'+(last?' · última geração '+fmtDateTime(last.at):' · nenhuma geração ainda')+'</div><div class="mmin"><b>Desempenho:</b> '+desempenho+'</div><input class="lnkinput tecbook" placeholder="cole uma vez o link do seu caderno desta matéria no TEC" value="'+escAttr(G("tecbook:"+mat)||"")+'">'+(hist.length?'<details style="margin-top:7px"><summary style="cursor:pointer;font-weight:600">ver histórico completo ('+hist.length+')</summary><div class="techistory"></div></details>':'<div class="mmin" style="margin-top:6px">Ao gerar, a lista, a data e a hora ficarão registradas aqui.</div>');
+  box.querySelector(".tecbook").addEventListener("change",e=>{SET("tecbook:"+mat,e.target.value.trim()||null);toast("Link do caderno salvo.")});
+  const root=box.querySelector(".techistory");if(root)hist.slice().reverse().forEach(rec=>{const el=document.createElement("div");el.className="techist";el.innerHTML='<b>'+fmtDateTime(rec.at)+' · '+tecModeLabel(rec.modo)+'</b><ul>'+(rec.assuntos||[]).map(t=>'<li>'+esc(t)+'</li>').join("")+'</ul>';root.appendChild(el)});
+  return box;
 }
 // ---------- matriz de equivalencia capitulo <-> aula (N:N) ----------
 // DATA.equiv = [{eb, cap, aula:"curso:n", grau:"total"|"parcial"}]
@@ -540,8 +629,14 @@ function infoUnit(o){
   const key="inf:"+o.id;
   const b={id:"info:"+o.id,mat:o.mat,tipo:"INFO",min:o.min,t:o.tit,day:"",wk:0,det:""};
   const nj=(o.pids||[]).length;
-  return {key,title:"<b>\u{1F4D8} "+esc(o.tit)+"</b>",meta:o.trib+" \u00b7 "+o.arq+" \u00b7 p."+o.pg+" \u00b7 "+o.min+"min"+(nj?" \u00b7 "+nj+" juris":""),
+  const pd=G("mvu:"+key),plano=pd==="fila"?"fila":pd?fmt(pd):"sem data";
+  return {key,title:"<b>\u{1F4D8} "+esc(o.tit)+"</b>",meta:o.trib+" \u00b7 "+o.arq+" \u00b7 p."+o.pg+" \u00b7 "+o.min+"min"+(nj?" \u00b7 "+nj+" juris":"")+" \u00b7 "+plano,
     chips:"",min:o.min,val:G(key),done:!!G(key),b,info:o};
+}
+function infoPlanStats(){
+  const z={total:INFOS.length,done:0,agendados:0,fila:0,semData:0,min:0};
+  INFOS.forEach(o=>{const k="inf:"+o.id,d=G("mvu:"+k);if(G(k))z.done++;else z.min+=o.min;if(d==="fila")z.fila++;else if(d)z.agendados++;else z.semData++});
+  return z;
 }
 const CAP2AULAS={},AULA2CAPS={};   // "eb:cap" -> [{aula,grau}] ; "curso:n" -> [{eb,cap,grau}]
 EQ.forEach(e=>{const ck=e.eb+":"+e.cap;(CAP2AULAS[ck]=CAP2AULAS[ck]||[]).push({aula:e.aula,grau:e.grau});(AULA2CAPS[e.aula]=AULA2CAPS[e.aula]||[]).push({eb:e.eb,cap:e.cap,grau:e.grau})});
@@ -633,7 +728,7 @@ function adiarUnit(u){
 function adiar(b){
   const from=effDate(b);
   if(b.tipo==="SIM"){
-    const target=DATA.days.find(d=>d.d>from&&new Date(d.d+"T12:00:00").getDay()===0&&d.d<"2026-10-18"&&!d.blocks.some(x=>x.tipo==="SIM"&&!isDone(x)&&effDate(x)===d.d));
+    const target=DATA.days.find(d=>d.d>from&&new Date(d.d+"T12:00:00").getDay()===0&&d.d<DATA.prova&&!d.blocks.some(x=>x.tipo==="SIM"&&!isDone(x)&&effDate(x)===d.d));
     if(target){SET("mv:"+b.id,target.d);render();toast("Simulado movido para "+wdName(target.d)+" "+fmt(target.d))}
     else toast("Sem domingo livre antes da prova.");
     return;
@@ -645,6 +740,7 @@ function adiar(b){
 }
 function toast(msg){const t=document.createElement("div");t.textContent=msg;t.style.cssText="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-size:.82rem;z-index:99;max-width:90%";document.body.appendChild(t);setTimeout(()=>t.remove(),2800)}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function escAttr(s){return esc(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 // ---------- cards ----------
 function blockCard(b,showOrigin){
   const done=isDone(b);
@@ -653,7 +749,6 @@ function blockCard(b,showOrigin){
   div.style.setProperty("--stripe","var("+(TIPO_VAR[b.tipo]||"--rev")+")");
   const mv=G("mv:"+b.id);
   const moved=mv&&mv!==b.day;
-  const pctVal=G("pct:"+b.id);
   const aw=k=>!!G("au:"+k.c+":"+k.n);
   const watched=b.aulas&&b.aulas.length>0&&b.aulas.every(aw);
   const altWatched=b.alt&&b.alt.length>0&&b.alt.every(aw);
@@ -689,9 +784,9 @@ function blockCard(b,showOrigin){
     (b.eb&&b.pg&&!done&&EBK[b.eb]&&rangeCovered(capsTicked(EBK[b.eb]),b.pg[0],b.pg[1])?'<span class="badge-moved" style="background:var(--done-soft);color:var(--done)">📖 trecho já lido</span>':"")+
     (b.aulas&&b.aulas.length?'<span class="mmin" style="font-weight:700;color:'+(wn===b.aulas.length?"var(--done)":wn?"var(--warn)":"var(--muted)")+'">▶ '+wn+'/'+b.aulas.length+' assistidas</span>':"")+'</div>'+lrow+
     '<div class="det">'+esc(b.det||"")+'</div>'+
+    (b.tipo==="QUEST"?questionFields(b):"")+
     '<div class="actions"><button class="exp">detalhes</button>'+
     (done?"":'<button class="adi">não consegui → realocar</button>')+
-    (b.tipo==="QUEST"?'<input class="pct" type="number" min="0" max="100" placeholder="% acerto" value="'+(pctVal==null?"":pctVal)+'" aria-label="Percentual de acerto">':"")+
     '</div></div></div>';
   div.querySelector(".ck").addEventListener("change",e=>{
     SET("st:"+b.id,e.target.checked?"done":null);
@@ -699,7 +794,7 @@ function blockCard(b,showOrigin){
     render()});
   div.querySelector(".exp").addEventListener("click",()=>div.classList.toggle("open"));
   const adi=div.querySelector(".adi");if(adi)adi.addEventListener("click",()=>adiar(b));
-  const pct=div.querySelector(".pct");if(pct)pct.addEventListener("change",e=>{SET("pct:"+b.id,+e.target.value);updateStats()});
+  if(b.tipo==="QUEST")bindQuestionFields(div,b,render);
   if(b.tipo==="JURIS"){
     const MATMAP={"Constitucional":"Direito Constitucional","Const. Tributário":"Direito Tributário","Const. Trabalho":"Direito Constitucional","Normas Const. Proc. Penal":"Direito Processual Penal","Civil":"Direito Civil","Proc. Civil":"Direito Processual Civil","Penal":"Direito Penal","Administrativo":"Direito Administrativo","Empresarial":"Direito Empresarial","Direitos Humanos":"Direitos Humanos","Humanística":"Humanística"};
     const mms=MATJURIS[b.mat]||[MATMAP[b.mat]||b.mat];
@@ -757,7 +852,10 @@ async function textoDe(u){
   if(m&&u.b&&u.b.tipo==="LEI"){
     const j=await leiTexto(m[1]);if(!j)return "";
     const g=m[2]?(j.g||[]).find(x=>x.id===m[2]):(j.g||[])[0];if(!g)return "";
-    return '<h3 style="font-family:Georgia,serif;font-size:1rem;margin:0 0 8px">'+esc(g.r||"")+'</h3>'+g.a.map(a=>artHtml(g.r,a)).join("");
+    const gm=(LG[m[1]]||[]).find(x=>x.id===g.id),titulo=gm?leiEscopo(gm):(g.r||"");
+    const tema=gm&&gm.r&&gm.r!==titulo?'<div class="mmin" style="margin:-4px 0 8px">'+esc(gm.r)+'</div>':"";
+    const vazio=!g.a||!g.a.length?'<div class="note">O recorte está indicado acima. Abra a fonte oficial e leia somente esses dispositivos; o caderno completo é apenas referência.</div>':"";
+    return '<h3 style="font-family:Georgia,serif;font-size:1rem;margin:0 0 8px">'+esc(titulo)+'</h3>'+tema+vazio+(g.a||[]).map(a=>artHtml(titulo,a)).join("");
   }
   return "";
 }
@@ -768,7 +866,19 @@ function ritmoPag(){const v=+G("spd:pag");return v>0?v:2}
 function ritmoAula(){const v=+G("spd:aula");return v>0?v:1/1.5}
 function ritmoLei(){const v=+G("spd:lei");return v>0?v:3.0}   // min por dispositivo (20/h, ritmo declarado)
 function lgKey(bid,g2,gs){return gs.length>1?"lg2:"+bid+":"+g2.id:"st:"+bid}
-function leiMin(g2,b,n){if(g2.dir)return g2.m;if(g2.d)return Math.max(5,Math.round(g2.d*ritmoLei()));return g2.m||Math.round(b.min/n)}
+function leiMin(g2,b,n){if(LEI_MIN_FIX[g2.id])return LEI_MIN_FIX[g2.id];if(g2.dir)return g2.m;if(g2.d)return Math.max(5,Math.round(g2.d*ritmoLei()));return g2.m||Math.round(b.min/n)}
+function leiEscopo(g2){
+  if(LEI_ESCOPO_FIX[g2.id])return LEI_ESCOPO_FIX[g2.id];
+  if(g2.sub)return g2.sub;
+  const aa=g2.a||[];
+  if(aa.length===1)return "art. "+aa[0];
+  if(aa.length>1)return "arts. "+aa[0]+"–"+aa[aa.length-1];
+  return g2.r||"Lei seca";
+}
+function leiTitulo(g2){
+  const escopo=leiEscopo(g2),tema=g2.r&&g2.r!==escopo?g2.r:"";
+  return '<b>📜 '+esc(escopo)+'</b>'+(tema?'<br><span class="mmin">'+esc(tema)+'</span>':"");
+}
 // ---------- anotacoes ----------
 function notaHtml(u){const n=G("nt:"+u.key);return '<textarea class="nota" data-k="nt:'+u.key+'" rows="2" placeholder="anotação (o que não pode esquecer)">'+(n?esc(n):"")+'</textarea>'}
 // ---------- ATIVIDADES: a unica unidade do app ----------
@@ -794,21 +904,16 @@ function unitsOf(b){
   if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length){
     const gs=LG[b.id];
     gs.forEach((g2,i)=>{const k=lgKey(b.id,g2,gs);
-      const chips=(g2.u?'<a class="lch" target="_blank" rel="noopener" href="'+g2.u+'">abrir lei ↗</a>':"")+(LDOC[b.id]?'<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 DOCX ↗</a>':"");
+      const chips=(g2.u?'<a class="lch" target="_blank" rel="noopener" href="'+g2.u+'">fonte oficial — lei completa ↗</a>':"")+(LDOC[b.id]?'<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 caderno completo — referência ↗</a>':"");
       const mm=leiMin(g2,b,gs.length);
-      push(k,"<b>📜</b> "+esc(g2.r)+(g2.dir?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)" title="o cronograma manda leitura dirigida; a lei integral está no caderno para consulta">leitura dirigida</span>':""),
-        (g2.d?g2.d+" disp · ":"")+mm+"min",chips,mm)});
+      push(k,leiTitulo(g2)+(g2.dir?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)" title="o cronograma manda leitura dirigida; a lei integral está no caderno para consulta">leitura dirigida</span>':""),
+        "bloco "+(i+1)+"/"+gs.length+(g2.d?" · "+g2.d+" dispositivos":"")+" · "+mm+"min",chips,mm)});
     return U;
   }
-  if(b.tipo==="INFO"&&INFOS.length){
-    const matsSem=new Set();(DATA.days||[]).forEach(d=>{if(d.wk===b.wk)d.blocks.forEach(x=>matsSem.add(x.mat))});
-    const cand=INFOS.filter(o=>!G("inf:"+o.id));
-    cand.sort((x,y)=>((matsSem.has(y.mat)?1:0)-(matsSem.has(x.mat)?1:0))||((y.pids||[]).length-(x.pids||[]).length)||x.arq.localeCompare(y.arq));
-    let acc=0;const mine=[];
-    for(const o of cand){if(acc+o.min>b.min&&mine.length)break;mine.push(o);acc+=o.min}
-    mine.forEach(o=>{const u=infoUnit(o);push(u.key,u.title,u.meta,u.chips,u.min)});
-    if(mine.length)return U;
-  }
+  // Os antigos 12 blocos INFO eram apenas janelas amostrais e deixavam a maior parte do
+  // acervo invisivel. Agora os 1.797 itens sao atividades independentes, adicionadas por
+  // pendentes(), unitsOn() e planRegen(); o bloco-pai nao gera unidade duplicada.
+  if(b.tipo==="INFO")return U;
   if(b.tipo==="JURIS"){
     // julgados desta materia (ordem: incidencia desc), fatiados entre os blocos JURIS da materia em ordem cronologica
     const mms=MATJURIS[b.mat]||[MATMAPG[b.mat]||b.mat];
@@ -841,7 +946,6 @@ function unitCard(u,showOrigin){
   const mvd=unitDate(u),moved=mvd&&mvd!==b.day&&!String(b.id).startsWith("jsb:");
   const prov=dn?unitProv(u):"";
   const isBlock=u.key==="st:"+b.id;
-  const pctVal=G("pct:"+b.id);
   const chips=isBlock?blockChips(b):u.chips;
   div.innerHTML='<div class="rowa"><input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Concluir atividade">'+
     '<div style="flex:1"><div class="bt">'+u.title+'</div>'+
@@ -850,13 +954,13 @@ function unitCard(u,showOrigin){
     (moved&&showOrigin?'<span class="badge-moved">↻ de '+fmt(b.day)+'</span>':"")+'</div>'+
     (chips?'<div class="lrow">'+chips+'</div>':"")+
     (isBlock&&b.det?'<div class="det">'+esc(b.det)+'</div>':(u.key.startsWith("jur:")||u.key.startsWith("js:")?'<div class="det">'+jurisFicha(u.key)+'</div>':""))+
+    (isBlock&&b.tipo==="QUEST"?questionFields(b):"")+
     '<div class="actions">'+((isBlock&&b.det)||u.key.startsWith("jur:")||u.key.startsWith("js:")?'<button class="exp">'+(isBlock&&b.det?"detalhes":"ver tese")+'</button>':"")+
-    ((u.b.tipo==="LEI"||u.key.startsWith("inf:"))?'<button class="lerbt">📖 ler aqui</button>':"")+
+    ((u.b.tipo==="LEI"||u.key.startsWith("inf:"))?'<button class="lerbt">'+(u.b.tipo==="LEI"?'📖 ler exatamente este trecho':'📖 ler aqui')+'</button>':"")+
     '<button class="focbt" title="modo foco com cronômetro">▶ focar</button>'+
     '<button class="notabt" title="anotação">✎</button>'+
     (capRange(u)&&!dn?'<input class="pct pgin" type="number" placeholder="parei na p." value="'+(G("pg:"+u.key)||"")+'" style="width:96px" title="marca-página: a carga restante é recalculada">':"")+
     (dn?"":'<button class="adi">não consegui → realocar</button>')+
-    (isBlock&&b.tipo==="QUEST"?'<input class="pct" type="number" min="0" max="100" placeholder="% acerto" value="'+(pctVal==null?"":pctVal)+'" aria-label="Percentual de acerto"><input class="pct errin" type="text" placeholder="assuntos que errei" value="'+esc(G("err:"+b.id)||"")+'" style="width:150px" title="separe por vírgula — entram no filtro de revisão do TEC">':"")+
     '</div></div></div>';
   div.querySelector(".ck").addEventListener("change",e=>{
     if(isBlock){SET("st:"+b.id,e.target.checked?"done":null)}
@@ -864,8 +968,7 @@ function unitCard(u,showOrigin){
     render()});
   const ex=div.querySelector(".exp");if(ex)ex.addEventListener("click",()=>div.classList.toggle("open"));
   const adi=div.querySelector(".adi");if(adi)adi.addEventListener("click",()=>{if(b.tipo==="SIM")adiar(b);else adiarUnit(u)});
-  const pct=div.querySelector(".pct:not(.pgin):not(.errin)");if(pct)pct.addEventListener("change",e=>{SET("pct:"+b.id,+e.target.value);updateStats()});
-  const errin=div.querySelector(".errin");if(errin)errin.addEventListener("change",e=>{SET("err:"+b.id,e.target.value.trim()||null);toast("Assuntos anotados — entram no filtro de revisão.")});
+  if(isBlock&&b.tipo==="QUEST")bindQuestionFields(div,b,render);
   const pgin=div.querySelector(".pgin");if(pgin)pgin.addEventListener("change",e=>{SET("pg:"+u.key,+e.target.value||null);render()});
   const lerbt=div.querySelector(".lerbt");if(lerbt)lerbt.addEventListener("click",async()=>{
     let box=div.querySelector(".inlinetxt");
@@ -913,11 +1016,12 @@ function cardsDeck(){
 function cardsDue(){const h=hojeNum();const seen=new Set();
   return cardsDeck().filter(c=>{if(seen.has(c.k))return false;seen.add(c.k);return (c.due||0)<=h}).sort((a,b)=>(a.box-b.box)||(b.cit-a.cit))}
 function srsAnswer(k,ok){const st=srsGet(k);const box=ok?Math.min(SRS_STEPS.length-1,(st.box||0)+1):0;srsSet(k,box,hojeNum()+SRS_STEPS[box]);if(ok&&!G(k))SET(k,1)}
-// ---------- revisoes espacadas de atividades concluidas (D+3, D+10, D+30) ----------
+// ---------- revisoes espacadas de atividades concluidas, calibradas pelo desempenho ----------
 const REV_STEPS=[3,10,30];
 // ciclo: estudo -> QUESTOES -> revisao. Revisao so de LEITURA (capitulo/lei) marcada POR VOCE (nao por
 // equivalencia), e so depois de um bloco de questoes da materia feito APOS aquele estudo. Nunca rever video.
-function questTsMat(){const out={};allBlocks.forEach(b=>{if(b.tipo!=="QUEST"||!isDone(b))return;const e=S.kv["st:"+b.id];const ts=e?(e[1]||0):0;if(!out[b.mat]||ts>out[b.mat])out[b.mat]=ts});return out}
+function revStepsFor(mat){const p=performanceDetail(mat).pct;if(p==null)return REV_STEPS;if(p<60)return[1,3,7,14,30];if(p<70)return[2,5,10,21,35];if(p<80)return[3,7,14,30];if(p<90)return[7,21,45];return[14,45]}
+function questTsMat(){const out={};allBlocks.forEach(b=>{if(b.tipo!=="QUEST"||(!isDone(b)&&!questionResult(b).hasCounts))return;const es=[S.kv["st:"+b.id],S.kv["qtot:"+b.id],S.kv["qhit:"+b.id],S.kv["qerr:"+b.id]].filter(Boolean);const ts=es.reduce((a,e)=>Math.max(a,e[1]||0),0);if(!out[b.mat]||ts>out[b.mat])out[b.mat]=ts});return out}
 function revPend(dstr){
   const out=[];const alvo=Math.floor(new Date(dstr+"T12:00:00").setHours(0,0,0,0)/86400000);
   const h=hojeNum();if(alvo!==h)return out;
@@ -931,17 +1035,18 @@ function revPend(dstr){
     const mat=matDaChave(k);if(!mat)continue;
     if(!qts[mat]||qts[mat]<=(e[1]||0))continue;   // sem questoes da materia depois do estudo, sem revisao
     const dias=h-Math.floor(new Date(e[1]).setHours(0,0,0,0)/86400000);
-    for(const st of REV_STEPS){
+    const perf=performanceDetail(mat).pct,steps=revStepsFor(mat);
+    for(const st of steps){
       if(dias<st)continue;
       const rk="rv:"+k+":"+st;if(G(rk))continue;
       const nome=nomeDaChave(k);if(!nome)break;
-      out.push({stp:st,key:rk,title:"<b>↻ Revisar</b> "+esc(nome)+" <span class='mmin'>(D+"+st+")</span>",meta:"10min · revisão de leitura",chips:"",min:10,val:null,done:false,
-        b:{id:"rev:"+k,mat,tipo:"REV",min:10,t:"Revisar "+nome,day:dstr,wk:0,det:"Releia só seus grifos e a anotação. Liberada porque você já fez questões de "+mat+" depois desse estudo."}});
+      out.push({stp:st,perf:perf==null?100:perf,key:rk,title:"<b>↻ Revisar</b> "+esc(nome)+" <span class='mmin'>(D+"+st+")</span>",meta:"10min · "+(perf==null?"sem resultado":Math.round(perf)+"% na matéria"),chips:"",min:10,val:null,done:false,
+        b:{id:"rev:"+k,mat,tipo:"REV",min:10,t:"Revisar "+nome,day:dstr,wk:0,det:"Releia só seus grifos e a anotação. O intervalo foi calculado pelo seu desempenho em questões de "+mat+"."}});
       break;   // um passo por atividade (o menor pendente)
     }
   }
-  out.sort((a,b)=>a.stp-b.stp);
-  return out.slice(0,4);
+  out.sort((a,b)=>a.perf-b.perf||a.stp-b.stp);
+  return out.slice(0,6);
 }
 function nomeDaChave(k){
   let m=k.match(/^eb:(.+):(\d+)$/);if(m){const bk=EBK[m[1]];const c=bk&&bk.caps.find(x=>x.n===+m[2]);return c?("Cap. "+c.n+" "+c.t):null}
@@ -1014,7 +1119,7 @@ function aprendeRitmo(u,min){
 }
 function blockChips(b){
   const lchips=[];const btxt=b.t+" "+(b.det||"");
-  if(b.tipo==="LEI"&&LDOC[b.id])lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 caderno da lei (DOCX) ↗</a>');
+  if(b.tipo==="LEI"&&LDOC[b.id])lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 caderno completo — referência ↗</a>');
   if(b.tipo==="LEI"||b.tipo==="SETUP"||b.tipo==="JURIS"||b.tipo==="REV"){
     for(const L of LEIS){if(lchips.length>=7)break;if(L[1].test(btxt))lchips.push('<a class="lch" target="_blank" rel="noopener" href="'+L[2]+'">'+L[0]+' ↗</a>')}
   }
@@ -1028,21 +1133,22 @@ function blockChips(b){
 // ---------- tipo de carga de uma atividade (para o painel por tipo) ----------
 function tipoCarga(u){
   const k=u.key||"",b=u.b||{};
-  if(k.startsWith("inf:"))return "compl";
+  if(k.startsWith("inf:")||b.tipo==="INFO")return "info";
   if(k.startsWith("au:")||b.tipo==="AULA")return "video";
   if(k.startsWith("eb:")||b.tipo==="EBOOK")return "ebook";
   if(k.startsWith("lg2:")||k.startsWith("lg:")||b.tipo==="LEI")return "lei";
   if(k.startsWith("jur:")||k.startsWith("js:")||b.tipo==="JURIS")return "juris";
   if(b.tipo==="QUEST"||b.tipo==="SIM"||k.startsWith("wq:"))return "quest";
-  return "compl";   // informativos, revisao, extras, setup, ponte, temas quentes
+  return "compl";   // revisao, extras, setup, ponte e temas quentes
 }
-const TIPO_NOME={video:"Vídeo",lei:"Lei seca",ebook:"E-books",juris:"Jurisprudência",quest:"Questões",compl:"Complementares"};
-const TIPO_ORD=["video","lei","ebook","juris","quest","compl"];
+const TIPO_NOME={video:"Vídeo",lei:"Lei seca",ebook:"E-books",juris:"Jurisprudência",info:"Informativos",quest:"Questões",compl:"Complementares"};
+const TIPO_ORD=["video","lei","ebook","juris","info","quest","compl"];
 // todas as atividades PENDENTES do plano, sem duplicar, com minutos restantes
 function pendentes(){
   const out=[];const seen=new Set();
   const add=(u,min)=>{if(seen.has(u.key))return;seen.add(u.key);if(!unitDone(u))out.push({u,min})};
-  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>add(u,minRestante(u)))});
+  allBlocks.forEach(b=>{if(b.opt||b.tipo==="INFO")return;unitsOf(b).forEach(u=>add(u,minRestante(u)))});
+  INFOS.forEach(o=>{const u=infoUnit(o);add(u,u.min)});
   jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);if(!JG(o.i)){const j=DATA.juris[o.i];out.push({u:{key:k,min:10,b:{id:"jsb:"+k,mat:o.mat,tipo:"JURIS",t:j.ref}},min:10})}});
   extras().forEach(o=>{const u=extraUnit(o);add(u,u.min)});
   return out;
@@ -1055,21 +1161,17 @@ function cargaPorTipo(){
   return T;
 }
 function viabilidade(){
-  const hoje=todayStr();let pend=0;const seen=new Set();
-  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);if(!unitDone(u))pend+=minRestante(u)})});
-  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);if(!JG(o.i))pend+=10});
-  extras().forEach(o=>{if(!G("xdone:"+o.id))pend+=o.min||30});
-  const prova=new Date("2026-10-18T12:00:00"),now=new Date(hoje+"T12:00:00");
+  const hoje=todayStr();const pend=pendentes().reduce((a,x)=>a+x.min,0);
+  const prova=new Date(DATA.prova+"T12:00:00"),now=new Date(hoje+"T12:00:00");
   const dias=Math.max(1,Math.round((prova-now)/86400000));
   const hd=pend/60/dias;
   return {pend,dias,hd,nucleoH:nucleoHoras()/dias};
 }
 function horasSemDado(){let m=0;const seen=new Set();
-  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);if(!unitDone(u)&&!pesoOf(u))m+=minRestante(u)})});
+  pendentes().forEach(({u,min})=>{if(seen.has(u.key))return;seen.add(u.key);if(!pesoOf(u)&&!nucleoDef(u))m+=min});
   return m/60}
 function nucleoHoras(){const set=nucleoSet();let m=0;const seen=new Set();
-  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(seen.has(u.key)||!set.has(u.key))return;seen.add(u.key);if(!unitDone(u))m+=minRestante(u)})});
-  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k)||!set.has(k))return;seen.add(k);if(!JG(o.i))m+=10});
+  pendentes().forEach(({u,min})=>{if(seen.has(u.key)||!(set.has(u.key)||nucleoDef(u)))return;seen.add(u.key);m+=min});
   return m/60}
 function semaforoEl(){
   const v=viabilidade();const T=cargaPorTipo();const dias=v.dias;
@@ -1084,7 +1186,7 @@ function semaforoEl(){
   el.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="flex:1"><b style="color:'+cor(hdN)+'">'+hdN.toFixed(1)+' h/dia</b> <span class="mmin">só o núcleo · <b>'+hdT.toFixed(1)+' h/dia</b> tudo · '+dias+' dias até a prova</span></div>'+
     '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:.75rem;cursor:pointer;white-space:nowrap">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button></div>'+
     '<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">ativ.</th></tr>'+rows+'</table></div>'+
-    '<div class="mmin" style="margin-top:4px">Núcleo = atividades que somam 80% das questões esperadas <b>+ todo informativo, atualização legislativa e novo informativo + todas as questões e simulados</b> (entram por definição). h/dia = horas líquidas pendentes ÷ dias restantes.</div>';
+    '<div class="mmin" style="margin-top:4px">Núcleo = atividades que somam 80% das questões esperadas <b>+ os '+INFOS.length+' itens de informativos, atualizações legislativas e todas as questões e simulados</b>. A linha Informativos contabiliza o acervo integral, inclusive o que estiver na fila. h/dia = horas líquidas pendentes ÷ dias restantes.</div>';
   el.querySelector("#nucbt").addEventListener("click",()=>{nucleoOnly=!nucleoOnly;render()});
   return el;
 }
@@ -1094,12 +1196,17 @@ function vHoje(root){
   const fb=document.createElement("button");fb.textContent="▶ Modo foco";fb.style.fontWeight="600";fb.addEventListener("click",()=>abrirFoco(null));
   const cb=document.createElement("button");cb.textContent="🃏 Flashcards ("+cardsDue().length+")";cb.addEventListener("click",()=>{curTab="cards";render()});
   bf.appendChild(fb);bf.appendChild(cb);root.appendChild(bf);
+  const ips=infoPlanStats();
+  if(ips.semData){const av=document.createElement("div");av.className="backlog";av.innerHTML='<b>'+ips.semData+' informativos ainda estão sem data.</b> Toque em ⟳ Regenerar para incluí-los na reconstrução global do cronograma.';root.appendChild(av)}
   const filaU=unitsOn("fila");
   if(filaU.length){
     const bl=document.createElement("div");bl.className="backlog";
     bl.innerHTML="<b>Fila ("+filaU.length+" atividade"+(filaU.length>1?"s":"")+" sem dia):</b> replaneje quando abrir espaço.";
     root.appendChild(bl);
-    filaU.forEach(u=>root.appendChild(unitCard(u,true)));
+    const infoFila=filaU.filter(u=>tipoCarga(u)==="info"),outras=filaU.filter(u=>tipoCarga(u)!=="info");
+    outras.slice(0,80).forEach(u=>root.appendChild(unitCard(u,true)));
+    if(outras.length>80)root.insertAdjacentHTML("beforeend",'<div class="note">Mostrando 80 de '+outras.length+' atividades gerais da fila.</div>');
+    if(infoFila.length){const ib=document.createElement("div");ib.className="note";ib.innerHTML='<b>📘 '+infoFila.length+' informativos na fila.</b> Eles continuam contabilizados na carga. <button id="verInfoFila" class="ghost">ver todos</button>';root.appendChild(ib);ib.querySelector("#verInfoFila").addEventListener("click",()=>{curTab="mats";matSel="Informativos 10x";infoPlan="fila";infoLimit=300;render()})}
   }
   const di=dayIdx[curDate];
   const day=DATA.days[di];
@@ -1161,7 +1268,7 @@ function vProg(root){
   });
   tw.appendChild(tb);root.appendChild(tw);
   root.appendChild(semaforoEl());
-  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Onde estou</h2><div class="note">Feito = atividades concluídas. Núcleo = quanto das questões esperadas você já cobriu (é o número que importa). Acerto = média dos blocos de questões registrados.</div>');
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Onde estou</h2><div class="note">Feito = atividades concluídas. Núcleo = quanto das questões esperadas você já cobriu. Acerto = acertos totais ÷ questões resolvidas; blocos maiores pesam corretamente.</div>');
   const pw=document.createElement("div");pw.className="tablewrap";const pt=document.createElement("table");pt.className="panel";
   pt.innerHTML="<tr><th>Matéria</th><th>Feito</th><th>Núcleo</th><th>Acerto</th><th></th></tr>";
   MATLIST.forEach(m=>{
@@ -1169,29 +1276,27 @@ function vProg(root){
     let t=0,d=0,pt2=0,pd=0;const seen=new Set();
     bl.forEach(b=>unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);t++;const p=pesoOf(u);pt2+=p;if(unitDone(u)){d++;pd+=p}}));
     (MATJURIS[m]||[]).forEach(()=>{});
-    const pcts=[];allBlocks.filter(b=>b.tipo==="QUEST"&&b.mat===m).forEach(b=>{const p=G("pct:"+b.id);if(p!=null)pcts.push(p)});
-    const avg=pcts.length?Math.round(pcts.reduce((a,c)=>a+c,0)/pcts.length):null;
+    const perf=performanceDetail(m),avg=perf.pct==null?null:Math.round(perf.pct);
     const fp=t?Math.round(d/t*100):0,np=pt2?Math.round(pd/pt2*100):0;
     const sinal=np>=80&&(avg==null||avg>=70)?"✓":(np<40?"!":"·");
     const tr=document.createElement("tr");
-    tr.innerHTML="<td>"+esc(m)+"</td><td>"+fp+"%</td><td><b>"+np+"%</b></td><td>"+(avg==null?"—":avg+"%")+"</td><td>"+sinal+"</td>";
+    tr.innerHTML="<td>"+esc(m)+"</td><td>"+fp+"%</td><td><b>"+np+"%</b></td><td>"+(avg==null?"—":avg+"% · "+perf.total+"q")+"</td><td>"+sinal+"</td>";
     tr.style.cursor="pointer";tr.addEventListener("click",()=>{curTab="mats";matSel=m;render()});
     pt.appendChild(tr);
   });
   pw.appendChild(pt);root.appendChild(pw);
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Progresso por matéria</h2>');
   const mats={};
-  allBlocks.forEach(b=>{if(!mats[b.mat])mats[b.mat]={t:0,d:0,pct:[],min:0};const m=mats[b.mat];m.min+=b.min;
-    unitsOf(b).forEach(u=>{m.t++;if(unitDone(u))m.d++});
-    if(b.tipo==="QUEST"){const p=G("pct:"+b.id);if(p!=null)m.pct.push(p)}});
+  allBlocks.forEach(b=>{if(!mats[b.mat])mats[b.mat]={t:0,d:0,min:0};const m=mats[b.mat];m.min+=b.min;
+    unitsOf(b).forEach(u=>{m.t++;if(unitDone(u))m.d++})});
   Object.entries(mats).sort((a,b)=>b[1].min-a[1].min).forEach(en=>{
     const m=en[0],v=en[1];
-    const avg=v.pct.length?Math.round(v.pct.reduce((a,c)=>a+c,0)/v.pct.length):null;
+    const perf=performanceDetail(m),avg=perf.pct==null?null:Math.round(perf.pct);
     const line=document.createElement("div");line.className="matline";
-    line.innerHTML='<div class="nm">'+esc(m)+'</div><div class="bar"><i style="width:'+Math.round(v.d/v.t*100)+'%"></i></div><div class="n">'+v.d+"/"+v.t+(avg!=null?" · "+avg+"%":"")+"</div>";
+    line.innerHTML='<div class="nm">'+esc(m)+'</div><div class="bar"><i style="width:'+Math.round(v.d/v.t*100)+'%"></i></div><div class="n">'+v.d+"/"+v.t+(avg!=null?" · "+avg+"%/"+perf.total+"q":"")+"</div>";
     root.appendChild(line);
   });
-  root.insertAdjacentHTML("beforeend",'<div class="note">A média % vem dos blocos de questões com acerto registrado. Média &lt; 60%: o tópico volta no Ciclo 2 — priorize nas baterias de domingo.</div>');
+  root.insertAdjacentHTML("beforeend",'<div class="note">O desempenho é ponderado pelas questões realmente resolvidas. Resultado abaixo de 70% aumenta a prioridade da matéria no replanejamento e alimenta a revisão dos piores assuntos.</div>');
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Leitura dos e-books (CPJuris)</h2><div class="note">Lido = blocos de e-book concluídos + capítulos ticados por você. Plano = quanto o cronograma prevê ler. Toque num livro para abrir os capítulos e registrar leitura feita fora do cronograma.</div>');
   (DATA.ebooks||[]).forEach(bk=>{
     const readIv=planIv(bk.k,true).concat(capsTicked(bk));
@@ -1316,7 +1421,7 @@ function appendItems(root,items){
   // concluidos permanecem na lista (ticados, com selo), ordenados para o fim.
   // A COR segue a POSICAO na lista exibida: topo = vermelho (faca primeiro), fim = azul claro.
   let arr=ord(items);
-  if(nucleoOnly){const nu=nucleoSet();const f=arr.filter(o=>o.dn||nu.has(o.k||""));if(f.length)arr=f}
+  if(nucleoOnly){const nu=nucleoSet();const f=arr.filter(o=>o.dn||nu.has(o.k||"")||String(o.k||"").startsWith("inf:"));if(f.length)arr=f}
   const nPend=arr.filter(o=>!o.dn).length;
   let iP=0;
   arr.forEach(o=>{const el=o.el();
@@ -1360,14 +1465,14 @@ function vMats(root){
   const pn=document.createElement("span");pn.className="pill"+(nucleoOnly?" on":"");pn.textContent="★ só o núcleo";pn.addEventListener("click",()=>{nucleoOnly=!nucleoOnly;render()});ordBar.appendChild(pn);
   root.appendChild(ordBar);
   const tecBar=document.createElement("div");tecBar.className="toolbar";tecBar.style.margin="6px 0";
-  const mkT=(txt,modo)=>{const bt=document.createElement("button");bt.textContent=txt;bt.addEventListener("click",()=>tecCopy(m,modo));return bt};
-  tecBar.appendChild(mkT("20 questões FGV do que estudei","fgv"));
-  tecBar.appendChild(mkT("10 questões CEBRASPE — ponte procuradorias","ceb"));
+  const mkT=(txt,modo)=>{const bt=document.createElement("button");bt.textContent=txt;bt.addEventListener("click",()=>tecGenerate(m,modo));return bt};
+  tecBar.appendChild(mkT("Gerar novos filtros FGV","fgv"));
+  tecBar.appendChild(mkT("Gerar novos filtros CEBRASPE","ceb"));
   tecBar.appendChild(mkT("Revisar meus assuntos com pior desempenho","pior"));
-  root.appendChild(tecBar);
+  root.appendChild(tecBar);root.appendChild(tecHistoryPanel(m));
   // atalhos de seção (a página é longa)
   const anc=document.createElement("div");anc.className="filterchips";anc.style.margin="8px 0 2px";
-  [["📖 Leituras","Leituras"],["📜 Lei seca","Artigos de lei"],["▶ Vídeos","Vídeos"],["⚖ Juris","Jurisprudência"]].forEach(p=>{
+  [["📖 Leituras","Leituras"],["📜 Lei seca","Artigos de lei"],["▶ Vídeos","Vídeos"],["◎ Questões","Questões TEC"],["⚖ Juris","Jurisprudência"]].forEach(p=>{
     const btn=document.createElement("button");btn.textContent=p[0];
     btn.addEventListener("click",()=>{const h=[...document.querySelectorAll("h2.sec")].find(x=>x.textContent.startsWith(p[1]));if(h)h.scrollIntoView({behavior:"smooth",block:"start"})});
     anc.appendChild(btn);
@@ -1401,16 +1506,17 @@ function vMats(root){
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Artigos de lei — blocos de leitura seca</h2>');
   items=[];
   allBlocks.filter(b=>b.mat===m&&b.tipo==="LEI"&&!b.opt).forEach(b=>{
-    const dchip=LDOC[b.id]?" <a class='lch' target='_blank' rel='noopener' href='"+dlink(LDOC[b.id])+"'>📄 DOCX ↗</a>":"";
+    const dchip=LDOC[b.id]?" <a class='lch' target='_blank' rel='noopener' href='"+dlink(LDOC[b.id])+"'>📄 caderno completo — referência ↗</a>":"";
     const gs=LG[b.id]||[];
-    if(gs.length>1){
-      gs.forEach((g2,i)=>{const k=lgKey(b.id,g2,gs);
-        const gl=(g2.u?" <a class='lch' target='_blank' rel='noopener' href='"+g2.u+"'>abrir lei ↗</a>":"");
-        items.push({s:wkScore(b.wk),dn:!!G(k)||isDone(b),r:REND[k]||0,el:()=>pitem(k,"<b>📜</b> "+esc(g2.r)+autoBadge(G(k),"pela equivalência")+gl+dchip,fmt(b.day)+" · "+leiMin(g2,b,gs.length)+"min",wkScore(b.wk))});
+    if(gs.length){
+      gs.forEach((g2,i)=>{const k=lgKey(b.id,g2,gs),tick=gs.length===1?"done":1;
+        const gl=(g2.u?" <a class='lch' target='_blank' rel='noopener' href='"+g2.u+"'>fonte oficial — lei completa ↗</a>":"");
+        const ler=" <button type='button' class='lch lerlei' style='border:0;cursor:pointer'>📖 ler exatamente este trecho</button>";
+        items.push({k,s:wkScore(b.wk),dn:!!G(k)||isDone(b),r:REND[k]||0,el:()=>{const el=pitem(k,leiTitulo(g2)+autoBadge(G(k),"pela equivalência")+ler+gl+dchip,fmt(b.day)+" · bloco "+(i+1)+"/"+gs.length+" · "+leiMin(g2,b,gs.length)+"min",wkScore(b.wk),null,tick);el.querySelector(".lerlei").addEventListener("click",()=>{const u=unitsOf(b).find(x=>x.key===k);if(u)abrirFoco(u)});return el}});
       });
     }else{
       let lu="";const btx=b.t+" "+(b.det||"");for(const L of LEIS){if(L[1].test(btx)){lu=L[2];break}}
-      items.push({s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:",""))+autoBadge(G("st:"+b.id)==="done-auto"?"auto":null,"pela equivalência")+dchip+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>abrir lei ↗</a>":""),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
+      items.push({k:"st:"+b.id,s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,"<b>📜 "+esc(b.t.replace("Lei seca:","").trim())+"</b>"+autoBadge(G("st:"+b.id)==="done-auto"?"auto":null,"pela equivalência")+dchip+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>fonte oficial — lei completa ↗</a>":""),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
     }
   });
   appendItems(root,items);
@@ -1423,7 +1529,13 @@ function vMats(root){
     items.push({s:wkScore(b.wk),dn:!!G("au:"+key),r:REND["au:"+key]||0,el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura")+altCapsHtml(key),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
   }));
   appendItems(root,items);
-  // 4) jurisprudência
+  // 4) questoes e desempenho
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Questões TEC — baterias e desempenho</h2><div class="note">Registre resolvidas, acertos e erros. O percentual ponderado direciona o regenerador e as próximas revisões.</div>');
+  items=[];
+  allBlocks.filter(b=>b.mat===m&&b.tipo==="QUEST"&&!b.opt).forEach(b=>{const k="st:"+b.id,sc=wkScore(b.wk);
+    items.push({k,s:sc,dn:isDone(b),r:REND[k]||0,el:()=>{const filtros=(b.tec||[]).length?'<div class="mmin" style="margin-top:4px">Filtros desta bateria: '+(b.tec||[]).map(esc).join(" · ")+'</div>':"";const abrir=' <a class="lch" target="_blank" rel="noopener" href="'+escAttr(tecBookUrl(m))+'">abrir meu caderno ↗</a>';const el=pitem(k,'<b>◎ '+esc(b.t)+'</b>'+abrir+filtros,fmt(b.day)+' · '+b.min+'min',sc,null,"done");el.children[1].insertAdjacentHTML("beforeend",questionFields(b));bindQuestionFields(el,b,render);return el}})});
+  appendItems(root,items);
+  // 5) jurisprudência
   const infM=(INFO_BY_MAT[m]||[]);
   if(infM.length){
     root.insertAdjacentHTML("beforeend",'<h2 class="sec">Informativos 10x — '+infM.length+' itens desta matéria</h2><div class="note">Ler o item marca as jurisprudências citadas nele. Matéria completa: Matérias → Informativos 10x.</div>');
@@ -1431,8 +1543,7 @@ function vMats(root){
     infM.forEach(o=>{const dn=!!G("inf:"+o.id);const sc=(o.pids&&o.pids.length)?0.9:0.4;
       itensI.push({s:sc,dn,r:0,k:"inf:"+o.id,el:()=>pitem("inf:"+o.id,"<b>\u{1F4D8} "+esc(o.tit)+"</b> <span class='mat'>\u00b7 "+o.trib+" \u00b7 "+esc(o.arq)+"</span>"+((o.pids||[]).length?" <span class='badge-moved' style='background:var(--accent-soft);color:var(--accent)'>\u2696 "+o.pids.length+" juris</span>":""),"p."+o.pg+" \u00b7 "+o.min+"min",sc)});
     });
-    appendItems(root,itensI.slice(0,40));
-    if(infM.length>40)root.insertAdjacentHTML("beforeend",'<div class="note">+'+(infM.length-40)+' itens em Matérias → Informativos 10x.</div>');
+    appendItems(root,itensI);
   }
   const cadId=CADL[m];
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Jurisprudência — cada tese é um bloco</h2><div class="note">'+(cadId?'Caderno DOCX desta matéria (teses que NÃO estão nos seus Informativos 10x): <a class="lch" target="_blank" rel="noopener" href="'+dlink(cadId)+'">abrir no Drive ↗</a>':'As teses estão abaixo; 📘 marca as que também aparecem nos seus Informativos 10x.')+'</div>');
@@ -1443,7 +1554,7 @@ function vMats(root){
   });
   appendItems(root,items);
 }
-let infoMat="",infoArq="";
+let infoMat="",infoArq="",infoPlan="",infoLimit=300;
 function vInfos(root){
   const top=document.createElement("div");top.className="daynav";
   top.innerHTML='<button id="volt">\u2039</button><div class="dlabel"><b>\u{1F4D8} Informativos 10x</b><small>ler por matéria \u00b7 ticar marca as jurisprudências</small></div><span style="width:38px"></span>';
@@ -1451,7 +1562,7 @@ function vInfos(root){
   top.querySelector("#volt").addEventListener("click",()=>{matSel="";render()});
   const mats=[...new Set(INFOS.map(o=>o.mat))].sort();
   const arqs=[...new Set(INFOS.map(o=>o.arq))].sort();
-  const mk=(txt,val,cur,setter)=>{const p=document.createElement("span");p.className="pill"+(cur===val?" on":"");p.textContent=txt;p.addEventListener("click",()=>{setter(val);render()});return p};
+  const mk=(txt,val,cur,setter)=>{const p=document.createElement("span");p.className="pill"+(cur===val?" on":"");p.textContent=txt;p.addEventListener("click",()=>{setter(val);infoLimit=300;render()});return p};
   const c1=document.createElement("div");c1.style.margin="6px 0";
   c1.appendChild(mk("todas as matérias","",infoMat,v=>infoMat=v));
   mats.forEach(x=>c1.appendChild(mk(x+" ("+INFO_BY_MAT[x].length+")",x,infoMat,v=>infoMat=v)));
@@ -1460,16 +1571,23 @@ function vInfos(root){
   c2.appendChild(mk("todos os semestres","",infoArq,v=>infoArq=v));
   arqs.forEach(x=>c2.appendChild(mk(x,x,infoArq,v=>infoArq=v)));
   root.appendChild(c2);
-  let lista=INFOS.filter(o=>(!infoMat||o.mat===infoMat)&&(!infoArq||o.arq===infoArq));
+  const c3=document.createElement("div");c3.style.margin="2px 0 8px";
+  c3.appendChild(mk("todo o acervo","",infoPlan,v=>infoPlan=v));
+  c3.appendChild(mk("agendados","agendado",infoPlan,v=>infoPlan=v));
+  c3.appendChild(mk("na fila","fila",infoPlan,v=>infoPlan=v));
+  c3.appendChild(mk("sem data","sem",infoPlan,v=>infoPlan=v));root.appendChild(c3);
+  const planOk=o=>{const d=G("mvu:inf:"+o.id);return !infoPlan||(infoPlan==="agendado"&&d&&d!=="fila")||(infoPlan==="fila"&&d==="fila")||(infoPlan==="sem"&&!d)};
+  let lista=INFOS.filter(o=>(!infoMat||o.mat===infoMat)&&(!infoArq||o.arq===infoArq)&&planOk(o));
   const feitos=lista.filter(o=>G("inf:"+o.id)).length;
-  root.insertAdjacentHTML("beforeend",'<div class="note">'+feitos+"/"+lista.length+" itens lidos \u00b7 "+Math.round(lista.reduce((a,o)=>a+o.min,0)/60)+"h. Ao ticar um item, as jurisprudências citadas nele são marcadas como dominadas nas matérias.</div>");
-  lista=lista.slice().sort((a,b)=>(G("inf:"+a.id)?1:0)-(G("inf:"+b.id)?1:0)||a.arq.localeCompare(b.arq)||a.mat.localeCompare(b.mat)||a.trib.localeCompare(b.trib)||a.n-b.n);
-  lista.slice(0,300).forEach(o=>{
+  const ips=infoPlanStats();
+  root.insertAdjacentHTML("beforeend",'<div class="note">'+feitos+"/"+lista.length+" itens lidos neste filtro \u00b7 "+Math.round(lista.reduce((a,o)=>a+o.min,0)/60)+"h. Planejamento geral: "+ips.agendados+" agendados · "+ips.fila+" na fila · "+ips.semData+" sem data. Ao ticar um item, as jurisprudências citadas nele são marcadas como dominadas.</div>");
+  lista=lista.slice().sort((a,b)=>(G("inf:"+a.id)?1:0)-(G("inf:"+b.id)?1:0)||((b.pids||[]).length-(a.pids||[]).length)||b.arq.localeCompare(a.arq)||a.mat.localeCompare(b.mat)||a.trib.localeCompare(b.trib)||a.n-b.n);
+  lista.slice(0,infoLimit).forEach(o=>{
     const dn=!!G("inf:"+o.id);
     const el=document.createElement("div");el.className="pitem"+(dn?" done":"");
     el.style.setProperty("--pc",(o.pids&&o.pids.length)?"var(--juris)":"var(--rev)");
     el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+'><div style="flex:1"><b>'+o.n+".</b> "+esc(o.tit)+
-      '<div class="mmin">'+o.trib+" \u00b7 "+esc(o.mat)+" \u00b7 "+esc(o.arq)+" \u00b7 p."+o.pg+" \u00b7 "+o.min+"min"+((o.pids||[]).length?' \u00b7 <span style="color:var(--juris)">'+o.pids.length+" juris ligada"+(o.pids.length>1?"s":"")+"</span>":"")+"</div>"+
+      '<div class="mmin">'+o.trib+" \u00b7 "+esc(o.mat)+" \u00b7 "+esc(o.arq)+" \u00b7 p."+o.pg+" \u00b7 "+o.min+"min \u00b7 "+esc(infoUnit(o).meta.split(" · ").slice(-1)[0])+((o.pids||[]).length?' \u00b7 <span style="color:var(--juris)">'+o.pids.length+" juris ligada"+(o.pids.length>1?"s":"")+"</span>":"")+"</div>"+
       '<button class="lerinf" style="background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:5px 10px;font-size:.75rem;cursor:pointer;margin-top:5px">\u{1F4D6} ler aqui</button></div>';
     el.querySelector("input").addEventListener("change",e=>{SET("inf:"+o.id,e.target.checked?1:null);render()});
     el.querySelector(".lerinf").addEventListener("click",async()=>{
@@ -1486,7 +1604,7 @@ function vInfos(root){
     });
     root.appendChild(el);
   });
-  if(lista.length>300)root.insertAdjacentHTML("beforeend",'<div class="note">Mostrando 300 de '+lista.length+" — use os filtros de matéria e semestre.</div>");
+  if(lista.length>infoLimit){const more=document.createElement("button");more.className="primary";more.style.cssText="display:block;margin:14px auto";more.textContent="mostrar mais "+Math.min(300,lista.length-infoLimit)+" ("+infoLimit+" de "+lista.length+")";more.addEventListener("click",()=>{infoLimit+=300;render()});root.appendChild(more)}
 }
 function vAjustes(root){
   const tb=document.createElement("div");tb.className="toolbar";tb.style.marginTop="16px";
@@ -1568,20 +1686,21 @@ function vAjustes(root){
   const info=document.createElement("div");info.className="note";
   info.innerHTML="Progresso sincronizado automaticamente entre aparelhos via seu Supabase (projeto elucidados-dev, tabela enam_sync). O selo no topo mostra o estado: <b>✓ sync</b> = tudo salvo na nuvem; <b>offline</b> = salvo neste aparelho e reenviado quando a conexão voltar.<br><br>"+
   "<b>Primeiro uso em cada aparelho:</b> abrir o link → colar o código de sincronização → pronto. No celular, use “Adicionar à tela inicial”.<br><br>"+
-  "<b>Filtro-base do TEC</b> (montar uma vez): bancas <b>FGV + Cebraspe</b> · área jurídica · <b>2021-2026</b>. Cada bloco de questões indica o(s) assunto(s) a adicionar.<br><br>"+
+  "<b>Caderno incremental do TEC:</b> salve o link uma vez na página da matéria. Cada geração registra data, hora e assuntos; as seguintes mostram somente filtros novos. Nos blocos de questões, informe resolvidas, acertos e erros para direcionar o replanejamento.<br><br>"+
   "<b>Quando o edital 2026.2 sair:</b> confira a data da prova; se mudar, avise o Claude no chat que ele regenera o app.";
   root.appendChild(info);
 }
 // ---------- stats + render ----------
 function updateStats(){
   const t=todayStr();
-  const prova=new Date("2026-10-18T12:00:00"),now=new Date(t+"T12:00:00");
+  const prova=new Date(DATA.prova+"T12:00:00"),now=new Date(t+"T12:00:00");
   document.getElementById("stDays").textContent=Math.max(0,Math.round((prova-now)/86400000));
   const BLKIDX={};allBlocks.forEach(b=>BLKIDX[b.id]=b);
   // progresso por UNIDADE atomica: cada aula, cada capitulo, cada tese e cada bloco de lei/questoes/revisao
   // fonte unica: as mesmas atividades que aparecem no dia, na semana e nas materias + as teses
   let done=0,total=0;const seenJ=new Set();
   allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(u.key.startsWith("jur:")||u.key.startsWith("js:")){if(seenJ.has(u.key))return;seenJ.add(u.key)}total++;if(unitDone(u))done++})});
+  INFOS.forEach(o=>{total++;if(G("inf:"+o.id))done++});
   jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seenJ.has(k))return;seenJ.add(k);total++;if(JG(o.i))done++});
   extras().forEach(o=>{total++;if(G("xdone:"+o.id))done++});
   document.getElementById("stDone").textContent=done+"/"+total;
