@@ -465,7 +465,17 @@ function nucleoSet(){   // conjunto de atividades que somam 80% do peso total, d
   _NUC.set=set;_NUC.tot=tot;_NUC.n=set.size;_NUC.all=all.length;
   return set;
 }
-function isNucleo(u){return nucleoSet().has(u.key)}
+// nucleo POR DEFINICAO (independe do rendimento calculado): informativos 10x, atualizacoes legislativas,
+// novos informativos e qualquer material extra marcado como tal
+const NUC_RE=/informativo|atualiza[cç][aã]o legislativa|atualiza[cç][õo]es legislativas|legisla[cç][aã]o nova|novidade legislativa/i;
+function nucleoDef(u){
+  const b=u.b||{};
+  if(b.tipo==="INFO")return true;
+  if(String(b.id||"").startsWith("ext:")){const o=extras().find(x=>"ext:"+x.id===b.id);if(o&&(o.nuc||NUC_RE.test(o.t||"")||NUC_RE.test(o.mat||"")))return true}
+  if(b.tipo==="QUEST"||b.tipo==="SIM"||u.key.startsWith("wq:"))return true;   // questoes e simulados: pratica e nucleo por definicao
+  return NUC_RE.test(b.t||"");
+}
+function isNucleo(u){return nucleoDef(u)||nucleoSet().has(u.key)}
 function qphBadge(u){const r=rendOf(u);if(!r)return "";
   return '<span class="qph" title="questões esperadas por hora de estudo, a partir das provas anteriores">~'+(r>=10?Math.round(r):r.toFixed(1))+' q/h</span>'+(isNucleo(u)?'<span class="nucleo" title="faz parte do núcleo: as atividades que somam 80% das questões esperadas">★ núcleo</span>':"")}
 // mapa de calor por artigo: HEAT["CP|121"] = citacoes
@@ -966,6 +976,34 @@ function blockChips(b){
   return lchips.join("");
 }
 // ---------- views ----------
+// ---------- tipo de carga de uma atividade (para o painel por tipo) ----------
+function tipoCarga(u){
+  const k=u.key||"",b=u.b||{};
+  if(k.startsWith("au:")||b.tipo==="AULA")return "video";
+  if(k.startsWith("eb:")||b.tipo==="EBOOK")return "ebook";
+  if(k.startsWith("lg2:")||k.startsWith("lg:")||b.tipo==="LEI")return "lei";
+  if(k.startsWith("jur:")||k.startsWith("js:")||b.tipo==="JURIS")return "juris";
+  if(b.tipo==="QUEST"||b.tipo==="SIM"||k.startsWith("wq:"))return "quest";
+  return "compl";   // informativos, revisao, extras, setup, ponte, temas quentes
+}
+const TIPO_NOME={video:"Vídeo",lei:"Lei seca",ebook:"E-books",juris:"Jurisprudência",quest:"Questões",compl:"Complementares"};
+const TIPO_ORD=["video","lei","ebook","juris","quest","compl"];
+// todas as atividades PENDENTES do plano, sem duplicar, com minutos restantes
+function pendentes(){
+  const out=[];const seen=new Set();
+  const add=(u,min)=>{if(seen.has(u.key))return;seen.add(u.key);if(!unitDone(u))out.push({u,min})};
+  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>add(u,minRestante(u)))});
+  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);if(!JG(o.i)){const j=DATA.juris[o.i];out.push({u:{key:k,min:10,b:{id:"jsb:"+k,mat:o.mat,tipo:"JURIS",t:j.ref}},min:10})}});
+  extras().forEach(o=>{const u=extraUnit(o);add(u,u.min)});
+  return out;
+}
+function cargaPorTipo(){
+  const T={};TIPO_ORD.forEach(t=>T[t]={tot:0,nuc:0,n:0,nn:0,semdado:0});
+  pendentes().forEach(({u,min})=>{const t=tipoCarga(u);T[t].tot+=min;T[t].n++;
+    if(isNucleo(u)){T[t].nuc+=min;T[t].nn++}
+    if(!pesoOf(u)&&!nucleoDef(u))T[t].semdado+=min});
+  return T;
+}
 function viabilidade(){
   const hoje=todayStr();let pend=0;const seen=new Set();
   allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);if(!unitDone(u))pend+=minRestante(u)})});
@@ -984,13 +1022,19 @@ function nucleoHoras(){const set=nucleoSet();let m=0;const seen=new Set();
   jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k)||!set.has(k))return;seen.add(k);if(!JG(o.i))m+=10});
   return m/60}
 function semaforoEl(){
-  const v=viabilidade();
-  const sd=horasSemDado();
-  const cor=v.hd<=4?"var(--done)":v.hd<=5?"var(--warn)":"var(--danger)";
-  const el=document.createElement("div");el.className="sem";el.style.setProperty("--sc",cor);
-  el.innerHTML='<div style="flex:1"><b style="color:'+cor+'">'+v.hd.toFixed(1)+' h/dia</b> <span class="mmin">para dar conta de tudo em '+v.dias+' dias ('+Math.round(v.pend/60)+'h pendentes)</span><br>'+
-    '<span class="mmin">só o núcleo (80% das questões): <b>'+v.nucleoH.toFixed(1)+' h/dia</b> · +'+(sd/v.dias).toFixed(1)+' h/dia de atividades sem dado de incidência</span></div>'+
-    '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:.75rem;cursor:pointer">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button>';
+  const v=viabilidade();const T=cargaPorTipo();const dias=v.dias;
+  let totAll=0,nucAll=0;TIPO_ORD.forEach(t=>{totAll+=T[t].tot;nucAll+=T[t].nuc});
+  const hdT=totAll/60/dias,hdN=nucAll/60/dias;
+  const cor=h=>h<=4?"var(--done)":h<=5?"var(--warn)":"var(--danger)";
+  const el=document.createElement("div");el.className="sem";el.style.setProperty("--sc",cor(hdN));el.style.display="block";
+  const f=x=>(x/60/dias).toFixed(1);
+  let rows="";
+  TIPO_ORD.forEach(t=>{const x=T[t];if(!x.n)return;
+    rows+='<tr><td>'+TIPO_NOME[t]+'</td><td style="text-align:right">'+f(x.tot)+'</td><td style="text-align:right;font-weight:700;color:'+cor(x.nuc/60/dias*TIPO_ORD.length/2)+'">'+f(x.nuc)+'</td><td style="text-align:right" class="mmin">'+x.nn+'/'+x.n+'</td></tr>'});
+  el.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="flex:1"><b style="color:'+cor(hdN)+'">'+hdN.toFixed(1)+' h/dia</b> <span class="mmin">só o núcleo · <b>'+hdT.toFixed(1)+' h/dia</b> tudo · '+dias+' dias até a prova</span></div>'+
+    '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:.75rem;cursor:pointer;white-space:nowrap">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button></div>'+
+    '<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">ativ.</th></tr>'+rows+'</table></div>'+
+    '<div class="mmin" style="margin-top:4px">Núcleo = atividades que somam 80% das questões esperadas <b>+ todo informativo, atualização legislativa e novo informativo + todas as questões e simulados</b> (entram por definição). h/dia = horas líquidas pendentes ÷ dias restantes.</div>';
   el.querySelector("#nucbt").addEventListener("click",()=>{nucleoOnly=!nucleoOnly;render()});
   return el;
 }
@@ -1066,6 +1110,7 @@ function vProg(root){
     tb.appendChild(tr);
   });
   tw.appendChild(tb);root.appendChild(tw);
+  root.appendChild(semaforoEl());
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Onde estou</h2><div class="note">Feito = atividades concluídas. Núcleo = quanto das questões esperadas você já cobriu (é o número que importa). Acerto = média dos blocos de questões registrados.</div>');
   const pw=document.createElement("div");pw.className="tablewrap";const pt=document.createElement("table");pt.className="panel";
   pt.innerHTML="<tr><th>Matéria</th><th>Feito</th><th>Núcleo</th><th>Acerto</th><th></th></tr>";
@@ -1341,11 +1386,13 @@ function vAjustes(root){
     const min=pag>0?Math.round(pag*ritmoPag()):(+prompt("Minutos líquidos estimados:","60")||60);
     const url=prompt("Link (Drive, PDF, site) — opcional:","")||"";
     const pri=+prompt("Prioridade 1 (baixa) a 5 (alta):","3")||3;
+    const nucAuto=NUC_RE.test(t)||NUC_RE.test(mat);
+    const nuc=nucAuto||confirm("É informativo / atualização legislativa / novo informativo?\n(Esses entram no NÚCLEO por definição.)");
     const fat=pag>60?(+prompt("Dividir em quantas atividades? (recomendo "+Math.ceil(min/50)+")",String(Math.ceil(min/50)))||1):1;
     const base=Date.now().toString(36);
     for(let i=0;i<fat;i++){
       const pi=pag?Math.round(pag/fat*i)+1:0,pf=pag?Math.round(pag/fat*(i+1)):0;
-      SET("ext:"+base+"-"+i,JSON.stringify({t:t+(fat>1?" ("+(i+1)+"/"+fat+(pag?", p. "+pi+"-"+pf:"")+")":""),mat,min:Math.round(min/fat),url,pri,day:""}));
+      SET("ext:"+base+"-"+i,JSON.stringify({t:t+(fat>1?" ("+(i+1)+"/"+fat+(pag?", p. "+pi+"-"+pf:"")+")":""),mat,min:Math.round(min/fat),url,pri,day:"",nuc:nuc?1:0}));
     }
     render();toast(fat>1?fat+" atividades criadas — toque em ⟳ replanejar para encaixá-las.":"Material adicionado — toque em ⟳ replanejar para encaixá-lo.");
   }));
