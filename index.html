@@ -807,10 +807,13 @@ function unitsOf(b){
   if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length){
     const gs=LG[b.id];
     gs.forEach((g2,i)=>{const k=lgKey(b.id,g2,gs);
-      const chips=(g2.u?'<a class="lch" target="_blank" rel="noopener" href="'+g2.u+'">abrir lei ↗</a>':"")+(LDOC[b.id]?'<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 DOCX ↗</a>':"");
+      // REGRA INEGOCIAVEL: todo card de lei seca diz, nele mesmo, QUAIS dispositivos ler
+      const faixa=g2.sub||(g2.a&&g2.a.length?("arts. "+g2.a[0]+(g2.a.length>1?"–"+g2.a[g2.a.length-1]:"")):"");
+      const fx=(faixa.match(/arts?\.[^·(]*/)||[faixa])[0].trim();
+      const chips=(g2.u?'<a class="lch" target="_blank" rel="noopener" href="'+g2.u+'">abrir lei ↗</a>':"")+(LDOC[b.id]?'<a class="lch" target="_blank" rel="noopener" href="'+dlink(LDOC[b.id])+'">📄 DOCX'+(fx?" — "+esc(fx):"")+' ↗</a>':"");
       const mm=leiMin(g2,b,gs.length);
       push(k,"<b>📜</b> "+esc(g2.r)+(g2.dir?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)" title="não é leitura obrigatória artigo a artigo: use o tempo indicado e o texto fica à mão para consulta">'+(/consulta/i.test(g2.r)?"opcional":"leitura dirigida")+'</span>':""),
-        (g2.d?g2.d+" disp · ":"")+mm+"min",chips,mm)});
+        (faixa?'<b style="color:var(--ink)">'+(/arts?\./.test(faixa)?(g2.dir?"Consulte: ":"Leia: "):"")+esc(faixa)+'</b> · ':"")+(g2.d?g2.d+" disp · ":"")+mm+"min",chips,mm)});
     return U;
   }
   if(b.tipo==="INFO"&&INFOS.length){
@@ -959,7 +962,7 @@ function revPend(dstr){
 function nomeDaChave(k){
   let m=k.match(/^eb:(.+):(\d+)$/);if(m){const bk=EBK[m[1]];const c=bk&&bk.caps.find(x=>x.n===+m[2]);return c?("Cap. "+c.n+" "+c.t):null}
   m=k.match(/^au:(.+):(\d+)$/);if(m){const a=aulaNome(m[1]+":"+m[2]);return "Aula "+a.n+" "+a.nome}
-  m=k.match(/^lg2:(.+):([0-9a-f]{6})$/);if(m){const g=(LG[m[1]]||[]).find(x=>x.id===m[2]);return g?g.r:null}
+  m=k.match(/^lg2:(.+):([0-9a-f]{6})$/);if(m){const g=(LG[m[1]]||[]).find(x=>x.id===m[2]);return g?(g.r+(g.sub?" — "+g.sub:"")):null}
   m=k.match(/^lg:(.+):(\d+)$/);if(m){const b2=allBlocks.find(x=>x.id===m[1]);return b2?b2.t.replace("Lei seca: ",""):null}
   m=k.match(/^st:(.+)$/);if(m){const b2=allBlocks.find(x=>x.id===m[1]);return b2&&b2.tipo==="LEI"?b2.t.replace("Lei seca: ",""):null}
   return null}
