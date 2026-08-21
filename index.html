@@ -1168,7 +1168,69 @@ function vSemana(root){
   });
   root.appendChild(grid);
 }
+function qRegistros(){
+  // todo bloco de questoes reportado: dos cards (pct:<blocoId>) e avulsos (qx:<ts>)
+  const out=[];
+  for(const k in S.kv){
+    const e=S.kv[k];if(!e||e[0]==null)continue;
+    if(k.startsWith("pct:")){
+      const b=allBlocks.find(x=>x.id===k.slice(4));if(!b)continue;
+      const nq=(String(b.t).match(/(\d+)\s*quest/i)||[])[1];
+      out.push({ts:e[1]||0,mat:b.mat,t:b.t,n:nq?+nq:20,pct:+e[0],origem:"plano"});
+    }else if(k.startsWith("qx:")){
+      try{const o=JSON.parse(e[0]);out.push({ts:+k.slice(3)||e[1],mat:o.mat,t:"Bloco avulso — "+o.mat,n:+o.n||20,pct:+o.pct,origem:"avulso"})}catch(err){}
+    }
+  }
+  return out.filter(r=>!isNaN(r.pct)).sort((a,b)=>a.ts-b.ts);
+}
+function pctCor(p){return p>=70?"var(--done)":p>=50?"var(--warn)":"var(--danger)"}
+function vDesempenho(root){
+  const regs=qRegistros();
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Desempenho em questões</h2>');
+  // formulario de registro avulso
+  const f=document.createElement("div");f.className="sem";f.style.display="block";
+  let opts="";MATLIST.filter(m=>m!=="Informativos 10x").forEach(m=>opts+='<option>'+esc(m)+'</option>');
+  f.innerHTML='<b>Registrar bloco de questões</b> <span class="mmin">(feito fora do cronograma? registre aqui; os do dia têm campo no próprio card)</span>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center">'+
+    '<select id="qxmat" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">'+opts+'</select>'+
+    '<input id="qxn" type="number" min="1" max="200" placeholder="nº questões" style="width:100px" class="pct">'+
+    '<input id="qxp" type="number" min="0" max="100" placeholder="% acerto" style="width:100px" class="pct">'+
+    '<button id="qxok" style="background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600">salvar</button></div>';
+  f.querySelector("#qxok").addEventListener("click",()=>{
+    const mat=f.querySelector("#qxmat").value,n=+f.querySelector("#qxn").value,p=+f.querySelector("#qxp").value;
+    if(!n||isNaN(p)){toast("Preencha nº de questões e % de acerto.");return}
+    SET("qx:"+Date.now(),JSON.stringify({mat,n,pct:p}));render();toast("Registrado: "+mat+" · "+n+" questões · "+p+"%");});
+  root.appendChild(f);
+  if(!regs.length){root.insertAdjacentHTML("beforeend",'<div class="note">Nenhum bloco reportado ainda. Ao terminar um bloco TEC, preencha o campo "% acerto" no card do dia — tudo aparece aqui.</div>');return}
+  // resumo geral
+  const totQ=regs.reduce((a,r)=>a+r.n,0);
+  const media=regs.reduce((a,r)=>a+r.pct*r.n,0)/Math.max(1,totQ);
+  const rec=regs.slice(-5);const ant=regs.slice(0,-5);
+  const mRec=rec.reduce((a,r)=>a+r.pct*r.n,0)/Math.max(1,rec.reduce((a,r)=>a+r.n,0));
+  const mAnt=ant.length?ant.reduce((a,r)=>a+r.pct*r.n,0)/Math.max(1,ant.reduce((a,r)=>a+r.n,0)):null;
+  const tend=mAnt==null?"":(mRec-mAnt>2?" · em alta ↑":mRec-mAnt<-2?" · em queda ↓":" · estável →");
+  root.insertAdjacentHTML("beforeend",'<div class="sem" style="display:block;--sc:'+pctCor(media)+'"><b style="color:'+pctCor(media)+';font-size:1.2rem">'+Math.round(media)+'%</b> <span class="mmin">de acerto em '+totQ+' questões ('+regs.length+' blocos) · meta 70% (56/80)'+tend+'</span></div>');
+  // por materia
+  const porMat={};regs.forEach(r=>{(porMat[r.mat]=porMat[r.mat]||[]).push(r)});
+  let rows="";
+  Object.entries(porMat).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([m,rs])=>{
+    const q=rs.reduce((a,r)=>a+r.n,0);const md=rs.reduce((a,r)=>a+r.pct*r.n,0)/q;
+    const ult=rs[rs.length-1].pct;const seta=rs.length>1?(ult-md>2?"↑":md-ult>2?"↓":"→"):"";
+    rows+='<tr><td>'+esc(m)+'</td><td style="text-align:right;font-weight:700;color:'+pctCor(md)+'">'+Math.round(md)+'%</td><td style="text-align:right">'+q+'</td><td style="text-align:right">'+rs.length+'</td><td style="text-align:center">'+seta+'</td></tr>'});
+  root.insertAdjacentHTML("beforeend",'<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>Matéria</th><th style="text-align:right">média</th><th style="text-align:right">questões</th><th style="text-align:right">blocos</th><th>tend.</th></tr>'+rows+'</table></div>');
+  // linha do tempo (ultimos 20, mais recentes primeiro)
+  root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:8px"><b>Últimos blocos</b> — barra na cor do resultado (verde ≥70 · amarelo 50-69 · vermelho &lt;50):</div>');
+  const lst=document.createElement("div");
+  regs.slice(-20).reverse().forEach(r=>{
+    const d=new Date(r.ts);const dd=isNaN(d)?"":(("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2));
+    const el=document.createElement("div");el.className="pitem";el.style.setProperty("--pc",pctCor(r.pct));
+    el.innerHTML='<div style="flex:1"><b>'+r.pct+'%</b> · '+esc(r.mat)+' · '+r.n+'q <span class="mmin">· '+dd+' · '+esc(String(r.t).substring(0,44))+(r.origem==="avulso"?" · avulso":"")+'</span>'+
+      '<div class="bar" style="margin-top:4px"><i style="width:'+Math.min(100,r.pct)+'%;background:'+pctCor(r.pct)+'"></i></div></div>';
+    lst.appendChild(el)});
+  root.appendChild(lst);
+}
 function vProg(root){
+  vDesempenho(root);
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Simulados oficiais</h2><div class="note">Registre os acertos ao corrigir. Meta em 80 questões.</div>');
   const tw=document.createElement("div");tw.className="tablewrap";
   const tb=document.createElement("table");
