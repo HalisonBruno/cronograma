@@ -549,6 +549,66 @@ function tecCopy(mat,modo){
 // ---------- matriz de equivalencia capitulo <-> aula (N:N) ----------
 // DATA.equiv = [{eb, cap, aula:"curso:n", grau:"total"|"parcial"}]
 const EQ=DATA.equiv||[];
+// ---------- QUESTOES DO DIA (sistematica propria, fora dos blocos) ----------
+const META_Q=30;
+const BANCAS=["FGV","CEBRASPE","Outras"];
+function qdRegs(dstr){
+  const out=[];
+  for(const k in S.kv){
+    if(!k.startsWith("qd:"+dstr+":"))continue;
+    const e=S.kv[k];if(!e||e[0]==null)continue;
+    try{const o=JSON.parse(e[0]);o.key=k;out.push(o)}catch(err){}
+  }
+  return out.sort((a,b)=>a.key<b.key?-1:1);
+}
+function qdTodos(){
+  const out=[];
+  for(const k in S.kv){
+    if(!k.startsWith("qd:"))continue;
+    const e=S.kv[k];if(!e||e[0]==null)continue;
+    try{const o=JSON.parse(e[0]);o.key=k;o.d=k.split(":")[1];out.push(o)}catch(err){}
+  }
+  return out.sort((a,b)=>a.key<b.key?-1:1);
+}
+function qdCard(dstr){
+  const regs=qdRegs(dstr);
+  const tot=regs.reduce((a,r)=>a+(+r.n||0),0);
+  const ac=regs.reduce((a,r)=>a+(+r.ac||0),0);
+  const div=document.createElement("div");
+  div.className="card";div.style.borderLeft="4px solid var(--quest,#b8860b)";
+  let opts="";MATLIST.filter(m=>m!=="Informativos 10x").forEach(m=>opts+='<option>'+esc(m)+'</option>');
+  let bops="";BANCAS.forEach(b=>bops+='<option>'+b+'</option>');
+  const pct=tot?Math.round(ac/tot*100):0;
+  const okMeta=tot>=META_Q;
+  let lista="";
+  regs.forEach(r=>{
+    const er=(+r.n||0)-(+r.ac||0);
+    lista+='<div class="mmin" style="display:flex;gap:8px;align-items:center;margin-top:4px"><b>'+esc(r.mat)+'</b> · '+esc(r.banca)+' · '+r.n+'q · <span style="color:var(--done)">'+r.ac+' acertos</span> · <span style="color:var(--danger)">'+er+' erros</span> · '+(r.n?Math.round(r.ac/r.n*100):0)+'%'+
+      '<button class="qdel" data-k="'+esc(r.key)+'" style="background:none;border:0;color:var(--muted);cursor:pointer">✕</button></div>';
+  });
+  div.innerHTML='<div class="bt"><b>✏ Questões do dia</b> <span class="mmin">— registre aqui TODAS as questões que fizer (qualquer matéria, quantas vezes quiser)</span></div>'+
+    '<div class="bmeta"><span class="tag" style="background:var(--quest,#b8860b);color:#fff">Questões</span>'+
+    '<span class="mmin"><b style="color:'+(okMeta?"var(--done)":"var(--warn)")+'">'+tot+'/'+META_Q+'</b> da meta de hoje'+(tot?' · '+pct+'% de acerto':'')+'</span></div>'+
+    '<div class="bar" style="margin:6px 0"><i style="width:'+Math.min(100,Math.round(tot/META_Q*100))+'%;background:'+(okMeta?"var(--done)":"var(--warn)")+'"></i></div>'+
+    lista+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">'+
+    '<select id="qdmat" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">'+opts+'</select>'+
+    '<select id="qdban" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">'+bops+'</select>'+
+    '<input id="qdn" class="pct" type="number" min="1" max="300" placeholder="questões" style="width:86px">'+
+    '<input id="qda" class="pct" type="number" min="0" max="300" placeholder="acertos" style="width:80px">'+
+    '<button id="qdok" style="background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600">registrar</button>'+
+    '<a class="lch" target="_blank" rel="noopener" href="https://www.tecconcursos.com.br/questoes/cadernos">abrir TEC ↗</a></div>';
+  div.querySelector("#qdok").addEventListener("click",()=>{
+    const mat=div.querySelector("#qdmat").value,ban=div.querySelector("#qdban").value;
+    const n=+div.querySelector("#qdn").value,a=+div.querySelector("#qda").value;
+    if(!n){toast("Diga quantas questões você respondeu.");return}
+    if(isNaN(a)||a>n){toast("Acertos deve ser um número até o total de questões.");return}
+    SET("qd:"+dstr+":"+Date.now(),JSON.stringify({mat,banca:ban,n,ac:a}));
+    render();toast("Registrado: "+mat+" · "+ban+" · "+n+"q · "+a+" acertos.");
+  });
+  div.querySelectorAll(".qdel").forEach(bt=>bt.addEventListener("click",()=>{SET(bt.dataset.k,null);render()}));
+  return div;
+}
 // ---------- INFORMATIVOS 10x como materia ----------
 const INFOS=DATA.infos||[];
 const INFO_BY_MAT={};INFOS.forEach(o=>{(INFO_BY_MAT[o.mat]=INFO_BY_MAT[o.mat]||[]).push(o)});
@@ -893,7 +953,7 @@ function unitCard(u,showOrigin){
     '<button class="notabt" title="anotação">✎</button>'+
     (capRange(u)&&!dn?'<input class="pct pgin" type="number" placeholder="parei na p." value="'+(G("pg:"+u.key)||"")+'" style="width:96px" title="marca-página: a carga restante é recalculada">':"")+
     (dn?"":'<button class="adi">não consegui → realocar</button>')+
-    (isBlock&&b.tipo==="QUEST"?'<input class="pct" type="number" min="0" max="100" placeholder="% acerto" value="'+(pctVal==null?"":pctVal)+'" aria-label="Percentual de acerto"><input class="pct errin" type="text" placeholder="assuntos que errei" value="'+esc(G("err:"+b.id)||"")+'" style="width:150px" title="separe por vírgula — entram no filtro de revisão do TEC">':"")+
+    (isBlock&&b.tipo==="QUEST"?'<span class="mmin">registre os números no card “✏ Questões do dia” abaixo</span><input class="pct errin" type="text" placeholder="assuntos que errei" value="'+esc(G("err:"+b.id)||"")+'" style="width:170px" title="separe por vírgula — entram no fecho e no filtro de revisão do TEC">':"")+
     '</div></div></div>';
   div.querySelector(".ck").addEventListener("change",e=>{
     if(isBlock){SET("st:"+b.id,e.target.checked?"done":null)}
@@ -1169,6 +1229,7 @@ function vHoje(root){
     const semDado=ocultas.filter(u=>!pesoOf(u)).length,baixo=ocultas.length-semDado;
     root.insertAdjacentHTML("beforeend",'<div class="note">Ocultas: <b>'+baixo+'</b> de baixo rendimento'+(semDado?' e <b>'+semDado+'</b> sem dado de incidência (o app não sabe quanto rendem — decida você)':"")+'.</div>');
   }
+  root.appendChild(qdCard(curDate));   // Questoes do dia: sempre presente, NAO conta como atividade
   const foot=document.createElement("div");foot.className="dayfoot";
   foot.innerHTML="<span>"+dn+"/"+units.length+" atividades · "+(Math.round(mins/60*10)/10)+"h líquidas (leitura 30 pág/h · aulas a 1,5x)</span><button id=\"allok\">marcar dia como feito</button>";
   foot.querySelector("#allok").addEventListener("click",()=>{units.forEach(u=>{if(!unitDone(u))SET(u.key,u.key.startsWith("st:")?"done":1)});render()});
@@ -1195,6 +1256,11 @@ function vSemana(root){
   root.appendChild(grid);
 }
 function qRegistros(){
+  // NOVA sistematica: registros diarios qd: (com banca). Legado pct:/qx: mantido no historico.
+  const novo=qdTodos().map(o=>({ts:+o.key.split(":")[2]||0,d:o.d,mat:o.mat,t:o.banca+" · "+o.mat,n:+o.n||0,pct:o.n?Math.round((+o.ac||0)/o.n*100):0,ac:+o.ac||0,banca:o.banca,origem:"dia"}));
+  if(novo.length||true)return novo.concat(qRegistrosLegado()).sort((a,b)=>a.ts-b.ts);
+}
+function qRegistrosLegado(){
   // todo bloco de questoes reportado: dos cards (pct:<blocoId>) e avulsos (qx:<ts>)
   const out=[];
   for(const k in S.kv){
@@ -1213,6 +1279,23 @@ function pctCor(p){return p>=70?"var(--done)":p>=50?"var(--warn)":"var(--danger)
 function vDesempenho(root){
   const regs=qRegistros();
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Desempenho em questões</h2>');
+  // meta diaria: ultimos 14 dias
+  const porDia={};qdTodos().forEach(o=>{porDia[o.d]=(porDia[o.d]||0)+(+o.n||0)});
+  const dias=Object.keys(porDia).sort().slice(-14);
+  if(dias.length){
+    let barras="";
+    dias.forEach(d=>{const n=porDia[d];const h=Math.min(100,Math.round(n/META_Q*100));
+      barras+='<div style="flex:1;text-align:center"><div style="height:56px;display:flex;align-items:flex-end"><div style="width:100%;height:'+Math.max(4,Math.round(h*0.56))+'px;border-radius:3px 3px 0 0;background:'+(n>=META_Q?"var(--done)":"var(--warn)")+'"></div></div><div class="mmin" style="font-size:.62rem">'+d.slice(8,10)+"/"+d.slice(5,7)+'</div><div class="mmin" style="font-size:.66rem"><b>'+n+'</b></div></div>'});
+    root.insertAdjacentHTML("beforeend",'<div class="note"><b>Meta: '+META_Q+' questões/dia.</b> Últimos dias com registro:</div><div style="display:flex;gap:3px;margin:4px 0 10px">'+barras+'</div>');
+  }
+  // por banca
+  const porBanca={};qdTodos().forEach(o=>{const b=o.banca||"—";porBanca[b]=porBanca[b]||{n:0,ac:0};porBanca[b].n+=+o.n||0;porBanca[b].ac+=+o.ac||0});
+  const bks=Object.keys(porBanca);
+  if(bks.length){
+    let rows="";bks.forEach(b=>{const x=porBanca[b];const p=x.n?Math.round(x.ac/x.n*100):0;
+      rows+='<tr><td>'+esc(b)+'</td><td style="text-align:right">'+x.n+'</td><td style="text-align:right;font-weight:700;color:'+pctCor(p)+'">'+p+'%</td></tr>'});
+    root.insertAdjacentHTML("beforeend",'<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>Banca</th><th style="text-align:right">questões</th><th style="text-align:right">acerto</th></tr>'+rows+'</table></div>');
+  }
   // formulario de registro avulso
   const f=document.createElement("div");f.className="sem";f.style.display="block";
   let opts="";MATLIST.filter(m=>m!=="Informativos 10x").forEach(m=>opts+='<option>'+esc(m)+'</option>');
