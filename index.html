@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{
-  --bg:#FAF7F4; --surface:#FFFFFF; --surface2:#F3EDE8; --ink:#26201E; --muted:#7A6E6A;
+  --bg:#FAF7F4; --surface:#FFFFFF; --surface2:#F3EDE8; --ink:#26201E; --muted:#675B57;   /* AA 4.5:1 em 13px */
   --line:#E6DCD5; --accent:#7A2F3F; --accent-ink:#FFFFFF; --accent-soft:#F5E6EA;
   --done:#2E7D4F; --done-soft:#E4F1E9; --warn:#8A5407; --warn-soft:#F7ECDC; --danger:#B3383B;
   --lei:#7A2F3F; --ebook:#1F5C7A; --aula:#8A5A10; --quest:#2E6B4F; --juris:#5B4A7A;
@@ -27,6 +27,17 @@
   --rev:#A99B96; --sim:#E07B7E; --ceb:#5BB3A4; --tq:#D0A254; --setup:#A99B96;
 }}
 *{box-sizing:border-box}
+.secidx{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.secidx .pill{white-space:nowrap}
+h2.sec{cursor:pointer;user-select:none}
+h2.sec .fold{color:var(--muted);font-size:.8rem;margin-left:6px}
+#topo-bt{position:fixed;right:14px;bottom:88px;z-index:9;background:var(--surface);border:1px solid var(--line);border-radius:99px;width:46px;height:46px;font-size:1.2rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);display:none}
+details.mais{display:inline-block}
+details.mais>summary{list-style:none;cursor:pointer;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:.8rem;display:inline-flex;align-items:center;min-height:38px}
+details.mais>summary::-webkit-details-marker{display:none}
+details.mais[open]>summary{background:var(--accent-soft)}
+details#semdet>summary{list-style:none;cursor:pointer}
+details#semdet>summary::-webkit-details-marker{display:none}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;margin:0;padding:0 0 80px}
 .wrap{max-width:760px;margin:0 auto;padding:0 14px}
 header.top{padding:10px 0 0}
@@ -58,7 +69,7 @@ nav.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .card.done{opacity:.55}
 .card.done .bt{text-decoration:line-through}
 .card .rowa{display:flex;gap:10px;align-items:flex-start}
-.ck{appearance:none;width:28px;height:28px;min-width:28px;border:2px solid var(--line);border-radius:7px;cursor:pointer;margin-top:2px;position:relative;background:var(--surface)}
+.ck{appearance:none;width:34px;height:34px;min-width:34px;border:2px solid var(--line);border-radius:7px;cursor:pointer;margin-top:2px;position:relative;background:var(--surface)}
 .ck::before{content:"";position:absolute;inset:-9px}
 .ck:checked{background:var(--done);border-color:var(--done)}
 .ck:checked::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;font-weight:700}
@@ -66,11 +77,11 @@ nav.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .bt{font-weight:600;font-size:.92rem}
 .bmeta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:2px}
 .tag{font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--stripe,var(--muted))}
-.mmin{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.mmin{font-size:.8125rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .mat{font-size:.75rem;color:var(--muted)}
 .badge-moved{font-size:.72rem;background:var(--warn-soft);color:var(--warn);border-radius:99px;padding:1px 8px;font-weight:600}
 .lrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
-.lch{font-size:.74rem;font-weight:600;text-decoration:none;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:5px 11px;display:inline-block}
+.lch{font-size:.78rem;font-weight:600;text-decoration:none;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:9px 13px;display:inline-flex;align-items:center;min-height:38px}
 #regen{align-self:center;font-size:.7rem;border-radius:99px;padding:4px 11px;border:1px solid var(--line);color:var(--accent);background:var(--surface);cursor:pointer;font-weight:700}
 .pitem{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--pc,var(--muted));border-radius:9px;padding:7px 11px;margin:6px 0;display:flex;gap:9px;align-items:flex-start;font-size:.84rem}
 .pitem.done{opacity:.45}
@@ -998,9 +1009,10 @@ function unitCard(u,showOrigin){
     '<div class="actions">'+((isBlock&&b.det)||u.key.startsWith("jur:")||u.key.startsWith("js:")?'<button class="exp">'+(isBlock&&b.det?"detalhes":"ver tese")+'</button>':"")+
     ((u.b.tipo==="LEI"||u.key.startsWith("inf:"))?'<button class="lerbt">📖 ler aqui</button>':"")+
     '<button class="focbt" title="modo foco com cronômetro">▶ focar</button>'+
-    '<button class="notabt" title="anotação">✎</button>'+
+    '<details class="mais"><summary>⋯</summary><span style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-left:6px;vertical-align:middle">'+
+    '<button class="notabt" title="anotação">✎ anotar</button>'+
     (capRange(u)&&!dn?'<input class="pct pgin" type="number" placeholder="parei na p." value="'+(G("pg:"+u.key)||"")+'" style="width:96px" title="marca-página: a carga restante é recalculada">':"")+
-    (dn?"":'<button class="adi">não consegui → realocar</button>')+
+    (dn?"":'<button class="adi">não consegui → realocar</button>')+'</span></details>'+
     (isBlock&&b.tipo==="QUEST"?'<span class="mmin">registre os números no card “✏ Questões do dia” abaixo</span><input class="pct errin" type="text" placeholder="assuntos que errei" value="'+esc(G("err:"+b.id)||"")+'" style="width:170px" title="separe por vírgula — entram no fecho e no filtro de revisão do TEC">':"")+
     '</div></div></div>';
   div.querySelector(".ck").addEventListener("change",e=>{
@@ -1233,11 +1245,13 @@ function semaforoEl(){
   let rows="";
   TIPO_ORD.forEach(t=>{const x=T[t];if(!x.n)return;
     rows+='<tr><td>'+TIPO_NOME[t]+'</td><td style="text-align:right">'+f(x.tot)+'</td><td style="text-align:right;font-weight:700;color:'+cor(x.nuc/60/dias*TIPO_ORD.length/2)+'">'+f(x.nuc)+'</td><td style="text-align:right" class="mmin">'+x.nn+'/'+x.n+'</td></tr>'});
-  el.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="flex:1"><b style="color:'+cor(hdN)+'">'+hdN.toFixed(1)+' h/dia</b> <span class="mmin">só o núcleo · <b>'+hdT.toFixed(1)+' h/dia</b> tudo · '+dias+' dias até a prova</span></div>'+
-    '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:.75rem;cursor:pointer;white-space:nowrap">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button></div>'+
-    '<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">ativ.</th></tr>'+rows+'</table></div>'+
-    '<div class="mmin" style="margin-top:4px">Núcleo = atividades que somam 80% das questões esperadas <b>+ todo informativo, atualização legislativa e novo informativo + todas as questões e simulados</b> (entram por definição). h/dia = horas líquidas pendentes ÷ dias restantes.</div>';
-  el.querySelector("#nucbt").addEventListener("click",()=>{nucleoOnly=!nucleoOnly;render()});
+  const semAberto=localStorage.getItem("semOpen")==="1";
+  el.innerHTML='<details id="semdet"'+(semAberto?" open":"")+'><summary><div style="display:flex;align-items:center;gap:8px"><div style="flex:1"><b style="color:'+cor(hdN)+'">'+hdN.toFixed(1)+' h/dia</b> <span class="mmin">núcleo · <b>'+hdT.toFixed(1)+'</b> tudo · '+dias+' dias <span style="color:var(--muted)">'+(semAberto?"▴":"▾ detalhes")+'</span></span></div>'+
+    '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:.78rem;cursor:pointer;white-space:nowrap">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button></div></summary>'+
+    '<div class="tablewrap" style="margin-top:6px"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">ativ.</th></tr>'+rows+'</table></div>'+
+    '<div class="mmin" style="margin-top:4px">Núcleo = atividades que somam 80% das questões esperadas <b>+ todo informativo, atualização legislativa e novo informativo + todas as questões e simulados</b> (entram por definição). h/dia = horas líquidas pendentes ÷ dias restantes.</div></details>';
+  el.querySelector("#semdet").addEventListener("toggle",e=>{localStorage.setItem("semOpen",e.target.open?"1":"")});
+  el.querySelector("#nucbt").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();nucleoOnly=!nucleoOnly;render()});
   return el;
 }
 function vHoje(root){
@@ -1593,6 +1607,7 @@ function vMats(root){
     const lg=legendaPrio();
     root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. Feitas e capítulos já cobertos por vídeo caem para o fim.</div>');
     const g=document.createElement("div");g.className="matgrid";
+    gradeBusca(root);
     MATLIST.forEach(m=>{
       if(m==="Informativos 10x"){
         const tt2=INFOS.length,dn2=INFOS.filter(o=>G("inf:"+o.id)).length;
@@ -1611,6 +1626,7 @@ function vMats(root){
     root.appendChild(g);return;
   }
   if(matSel==="Informativos 10x"){vInfos(root);return}
+  setTimeout(matNavEnhance,0);   // indice + colapso de secoes + voltar ao topo (pos-render)
   const m=matSel;
   const top=document.createElement("div");top.className="daynav";
   top.innerHTML='<button id="volt">‹</button><div class="dlabel"><b>'+esc(m)+'</b><small id="ordlbl"></small></div><span style="width:38px"></span>';
@@ -1744,6 +1760,59 @@ function vInfos(root){
     root.appendChild(el);
   });
   if(lista.length>300)root.insertAdjacentHTML("beforeend",'<div class="note">Mostrando 300 de '+lista.length+" — use os filtros de matéria e semestre.</div>");
+}
+function matNavEnhance(){
+  const view=document.getElementById("view");if(!view)return;
+  const secs=[...view.querySelectorAll("h2.sec")];if(secs.length<2)return;
+  // chips-indice fixos
+  const bar=document.createElement("div");bar.className="secidx";
+  secs.forEach(h=>{const p=document.createElement("span");p.className="pill";
+    p.textContent=h.textContent.split("—")[0].replace(/Leituras.*/,"📖 Leituras").replace(/Artigos.*/,"📜 Lei").replace(/Vídeos.*/,"▶ Vídeos").replace(/Informativos.*/,"📘 Informativos").replace(/Jurisprudência.*/,"⚖ Juris").substring(0,18);
+    p.addEventListener("click",()=>h.scrollIntoView({behavior:"smooth",block:"start"}));bar.appendChild(p)});
+  const nav=view.querySelector(".daynav");
+  if(nav)nav.after(bar);else view.prepend(bar);
+  // secoes colapsaveis: toque no titulo esconde/mostra ate o proximo h2
+  secs.forEach((h,i)=>{
+    const key="fold:"+matSel+":"+i;
+    const irm=[];let n=h.nextElementSibling;
+    while(n&&n.tagName!=="H2"){irm.push(n);n=n.nextElementSibling}
+    const badge=document.createElement("span");badge.className="fold";h.appendChild(badge);
+    const aplica=fech=>{irm.forEach(el=>el.style.display=fech?"none":"");badge.textContent=fech?"▸ "+irm.length+" itens ocultos — toque para abrir":"▾"};
+    let fech=localStorage.getItem(key)==="1";aplica(fech);
+    h.addEventListener("click",()=>{fech=!fech;localStorage.setItem(key,fech?"1":"");aplica(fech)});
+  });
+  // voltar ao topo
+  let bt=document.getElementById("topo-bt");
+  if(!bt){bt=document.createElement("button");bt.id="topo-bt";bt.textContent="↑";bt.title="voltar ao topo";
+    bt.addEventListener("click",()=>scrollTo({top:0,behavior:"smooth"}));document.body.appendChild(bt);
+    addEventListener("scroll",()=>{bt.style.display=(scrollY>1200&&curTab==="mats"&&matSel)?"block":"none"},{passive:true});}
+}
+let _buscaIdx=null;
+function buscaIndex(){
+  if(_buscaIdx)return _buscaIdx;
+  const ix=[];
+  for(const k in EBK)(EBK[k].caps||[]).forEach(c=>ix.push({t:"Cap. "+c.n+" "+c.t,mat:EB2MAT[k]||"",tipo:"📖"}));
+  allBlocks.forEach(b=>{(LG[b.id]||[]).forEach(g=>{if(!g.x)ix.push({t:(g.sub||"")+" — "+(g.r||""),mat:b.mat,tipo:"📜"})})});
+  DATA.juris.forEach(j=>ix.push({t:j.ref+" · "+(j.tese||"").substring(0,60),mat:j.mat,tipo:"⚖"}));
+  (DATA.infos||[]).forEach(o=>ix.push({t:o.tit,mat:o.mat,tipo:"📘",info:1}));
+  _buscaIdx=ix;return ix;
+}
+function gradeBusca(root){
+  const box=document.createElement("div");box.style.margin="4px 0 10px";
+  box.innerHTML='<input id="buscaq" type="search" placeholder="🔎 buscar assunto, artigo, julgado… (mín. 3 letras)" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:.9rem"><div id="buscares"></div>';
+  const inp=box.querySelector("#buscaq"),res=box.querySelector("#buscares");
+  inp.addEventListener("input",()=>{
+    const q=inp.value.trim().toLowerCase();res.innerHTML="";
+    if(q.length<3)return;
+    const norm=t=>t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const nq=norm(q);
+    const hits=buscaIndex().filter(x=>norm(x.t).includes(nq)).slice(0,30);
+    if(!hits.length){res.innerHTML='<div class="mmin" style="padding:6px">nada encontrado</div>';return}
+    hits.forEach(h=>{const d=document.createElement("div");d.className="pitem";d.style.cursor="pointer";
+      d.innerHTML='<div style="flex:1">'+h.tipo+" <b>"+esc(h.t.substring(0,70))+'</b> <span class="mat">· '+esc(h.mat)+'</span></div>';
+      d.addEventListener("click",()=>{matSel=h.info?"Informativos 10x":h.mat;render()});res.appendChild(d)});
+  });
+  root.appendChild(box);
 }
 function vAjustes(root){
   const tb=document.createElement("div");tb.className="toolbar";tb.style.marginTop="16px";
