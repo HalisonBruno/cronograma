@@ -592,6 +592,9 @@ function qdTodos(){
 }
 function qdCard(dstr){
   const regs=qdRegs(dstr);
+  // materias que o plano manda praticar hoje (o antigo bloco TEC, agora so informativo)
+  const dd=(DATA.days||[]).find(x=>x.d===dstr)||{blocks:[]};
+  const matsHoje=[...new Set(dd.blocks.filter(b=>b.tipo==="QUEST").map(b=>b.mat))];
   const tot=regs.reduce((a,r)=>a+(+r.n||0),0);
   const ac=regs.reduce((a,r)=>a+(+r.ac||0),0);
   const div=document.createElement("div");
@@ -607,6 +610,7 @@ function qdCard(dstr){
       '<button class="qdel" data-k="'+esc(r.key)+'" style="background:none;border:0;color:var(--muted);cursor:pointer">✕</button></div>';
   });
   div.innerHTML='<div class="bt"><b>✏ Questões do dia</b> <span class="mmin">— registre aqui TODAS as questões que fizer (qualquer matéria, quantas vezes quiser)</span></div>'+
+    (matsHoje.length?'<div class="note" style="margin:4px 0"><b>O plano sugere questões de:</b> '+matsHoje.map(x=>esc(x)).join(" · ")+'</div>':"")+
     '<div class="bmeta"><span class="tag" style="background:var(--quest,#b8860b);color:#fff">Questões</span>'+
     '<span class="mmin"><b style="color:'+(okMeta?"var(--done)":"var(--warn)")+'">'+tot+'/'+META_Q+'</b> da meta de hoje'+(tot?' · '+pct+'% de acerto':'')+'</span></div>'+
     '<div class="bar" style="margin:6px 0"><i style="width:'+Math.min(100,Math.round(tot/META_Q*100))+'%;background:'+(okMeta?"var(--done)":"var(--warn)")+'"></i></div>'+
@@ -618,6 +622,7 @@ function qdCard(dstr){
     '<input id="qda" class="pct" type="number" min="0" max="300" placeholder="acertos" style="width:80px">'+
     '<button id="qdok" style="background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600">registrar</button>'+
     '<a class="lch" target="_blank" rel="noopener" href="https://www.tecconcursos.com.br/questoes/cadernos">abrir TEC ↗</a></div>';
+  if(matsHoje.length){const sel=div.querySelector("#qdmat");if(sel&&[...sel.options].some(o=>o.value===matsHoje[0]))sel.value=matsHoje[0]}
   div.querySelector("#qdok").addEventListener("click",()=>{
     const mat=div.querySelector("#qdmat").value,ban=div.querySelector("#qdban").value;
     const n=+div.querySelector("#qdn").value,a=+div.querySelector("#qda").value;
@@ -910,6 +915,8 @@ function notaHtml(u){const n=G("nt:"+u.key);return '<textarea class="nota" data-
 // Cada atividade tem: key (estado), title, meta, chips (html de links), min (carga efetiva), done, val (procedencia)
 function unitsOf(b){
   const U=[];
+  // QUEST nao e mais tarefa ticavel: o registro e no card "Questoes do dia" (sistematica propria).
+  if(b.tipo==="QUEST")return U;
   const push=(key,title,meta,chips,min,doneExtra)=>{const val=G(key);U.push({key,title,meta,chips:chips||"",min,val,done:!!val||!!doneExtra,b})};
   if(b.tipo==="EBOOK"&&b.eb&&b.pg&&EBK[b.eb]){
     const rng=(k2,pg)=>{const cs=capsIn(k2,pg);const per=cs.length?Math.round(b.min/cs.length):b.min;
@@ -1544,8 +1551,30 @@ function pitem(key,titulo,extra,score,linkHtml,onTick){
   el.querySelector("input").addEventListener("change",e=>{SET(key,e.target.checked?(onTick||1):null);el.classList.toggle("done",e.target.checked)});
   return el;
 }
-let ordModo="rend";   // "rend" = questoes/hora (padrao) | "crono" = ordem do cronograma
-function ord(list){return list.sort((a,b)=>(a.dn?1:0)-(b.dn?1:0)||(ordModo==="rend"?((b.r||0)-(a.r||0))||b.s-a.s:b.s-a.s))}
+let ordModo=localStorage.getItem("ordModo")||"rend";   // "rend" = prioridade (q/h) | "mat" = ordem do material
+// REGRA DO USUARIO: ticar NUNCA move o item de lugar - a posicao e sempre a mesma, muda so o visual.
+function ordChave(x){
+  // ordem natural do material: capitulo 1,2,3... / aula 1,2,3... / artigos crescentes / juris por citacao
+  const k=x.k||"";
+  let m=k.match(/^eb:(.+):(\d+)$/);   if(m)return [0,m[1],+m[2],0];
+  m=k.match(/^au:(.+):(\d+)$/);       if(m)return [1,m[1],+m[2],0];
+  m=k.match(/^lg2:([^:]+):([0-9a-f]{6})$/);
+  if(m){const g=(LG[m[1]]||[]).find(y=>y.id===m[2]);
+    const sig=((g&&g.sub)||"").split(" · ")[0]||"";
+    const a1=(g&&g.a&&g.a.length)?parseInt(String(g.a[0]).match(/\d+/)||0,10)||0:0;
+    return [2,sig,a1,0]}
+  m=k.match(/^st:(.+)$/); if(m)return [2,m[1],0,0];
+  m=k.match(/^inf:(.+)$/); if(m)return [3,"",0,0];
+  return [4,"",0,0];
+}
+function ord(list){
+  const arr=list.slice();
+  if(ordModo==="mat"){
+    return arr.sort((a,b)=>{const A=ordChave(a),B=ordChave(b);
+      return A[0]-B[0]||String(A[1]).localeCompare(String(B[1]))||A[2]-B[2]||(b.s-a.s)});
+  }
+  return arr.sort((a,b)=>((b.r||0)-(a.r||0))||b.s-a.s);   // prioridade: feito NAO vai para o fim
+}
 function appendItems(root,items){
   // concluidos permanecem na lista (ticados, com selo), ordenados para o fim.
   // A COR segue a POSICAO na lista exibida: topo = vermelho (faca primeiro), fim = azul claro.
@@ -1584,13 +1613,15 @@ function vMats(root){
   if(matSel==="Informativos 10x"){vInfos(root);return}
   const m=matSel;
   const top=document.createElement("div");top.className="daynav";
-  top.innerHTML='<button id="volt">‹</button><div class="dlabel"><b>'+esc(m)+'</b><small>atividades por prioridade</small></div><span style="width:38px"></span>';
+  top.innerHTML='<button id="volt">‹</button><div class="dlabel"><b>'+esc(m)+'</b><small id="ordlbl"></small></div><span style="width:38px"></span>';
   root.appendChild(top);
+  const _ol=top.querySelector("#ordlbl");
+  if(_ol)_ol.textContent=(ordModo==="mat"?"na ordem do material":"por prioridade (o que mais cai)");
   top.querySelector("#volt").addEventListener("click",()=>{matSel="";render()});
   const ordBar=document.createElement("div");ordBar.style.margin="6px 0";
-  const mkP=(txt,val)=>{const p=document.createElement("span");p.className="pill"+(ordModo===val?" on":"");p.textContent=txt;p.addEventListener("click",()=>{ordModo=val;render()});return p};
+  const mkP=(txt,val)=>{const p=document.createElement("span");p.className="pill"+(ordModo===val?" on":"");p.textContent=txt;p.addEventListener("click",()=>{ordModo=val;localStorage.setItem("ordModo",val);render()});return p};
   root.insertAdjacentHTML("beforeend",'<div class="note" style="margin:8px 0 0">q/h = questões esperadas na prova por hora de estudo, a partir das provas anteriores (peso total = 80 questões). Atividades sem dado de incidência aparecem por último, mas não são necessariamente dispensáveis.</div>');
-  ordBar.appendChild(mkP("por rendimento (q/h)","rend"));ordBar.appendChild(mkP("pela ordem do cronograma","crono"));
+  ordBar.appendChild(mkP("por prioridade (o que mais cai)","rend"));ordBar.appendChild(mkP("na ordem do material (cap. 1, 2, 3…)","mat"));
   const pn=document.createElement("span");pn.className="pill"+(nucleoOnly?" on":"");pn.textContent="★ só o núcleo";pn.addEventListener("click",()=>{nucleoOnly=!nucleoOnly;render()});ordBar.appendChild(pn);
   root.appendChild(ordBar);
   const tecBar=document.createElement("div");tecBar.className="toolbar";tecBar.style.margin="6px 0";
@@ -1628,7 +1659,7 @@ function vMats(root){
       const s=c.out?0.02:wkScore(wk===99?10:wk);   // prioridade NUNCA cai por cobertura parcial (regra do usuario)
       const dn=!!G("eb:"+k+":"+c.n)||rangeCovered(planIv(k,true),c.pi,c.pf);
       const lk=capLink(k,c.n)||ebFallback(k);
-      items.push({s,dn,r:REND["eb:"+k+":"+c.n]||0,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+altAulasHtml(k,c.n)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
+      items.push({k:"eb:"+k+":"+c.n,s,dn,r:REND["eb:"+k+":"+c.n]||0,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+altAulasHtml(k,c.n)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
     })});
   appendItems(root,items);
   // 2) artigos de lei (blocos de lei seca)
@@ -1641,11 +1672,11 @@ function vMats(root){
     if(gs.length>1){
       gs.forEach((g2,i)=>{const k=lgKey(b.id,g2,gs);
         const gl=(g2.u?" <a class='lch' target='_blank' rel='noopener' href='"+g2.u+"'>abrir lei ↗</a>":"");
-        items.push({s:wkScore(b.wk),dn:!!G(k)||isDone(b),r:REND[k]||0,el:()=>pitem(k,"<b>📜 "+esc((g2.sub||"").split(" (")[0]||g2.r)+"</b>"+((String(g2.r||"").replace(/\s*—\s*arts?\..*$/,"").trim())?" — "+esc(String(g2.r).replace(/\s*—\s*arts?\..*$/,"").trim()):"")+autoBadge(G(k),"pela equivalência")+gl+dchipG(g2),fmt(b.day)+" · "+leiMin(g2,b,gs.length)+"min",wkScore(b.wk))});
+        items.push({k:k,s:wkScore(b.wk),dn:!!G(k)||isDone(b),r:REND[k]||0,el:()=>pitem(k,"<b>📜 "+esc((g2.sub||"").split(" (")[0]||g2.r)+"</b>"+((String(g2.r||"").replace(/\s*—\s*arts?\..*$/,"").trim())?" — "+esc(String(g2.r).replace(/\s*—\s*arts?\..*$/,"").trim()):"")+autoBadge(G(k),"pela equivalência")+gl+dchipG(g2),fmt(b.day)+" · "+leiMin(g2,b,gs.length)+"min",wkScore(b.wk))});
       });
     }else{
       let lu="";const btx=b.t+" "+(b.det||"");for(const L of LEIS){if(L[1].test(btx)){lu=L[2];break}}
-      items.push({s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:",""))+autoBadge(G("st:"+b.id)==="done-auto"?"auto":null,"pela equivalência")+dchip+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>abrir lei ↗</a>":""),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
+      items.push({k:"st:"+b.id,s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:",""))+autoBadge(G("st:"+b.id)==="done-auto"?"auto":null,"pela equivalência")+dchip+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>abrir lei ↗</a>":""),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
     }
   });
   appendItems(root,items);
@@ -1655,7 +1686,7 @@ function vMats(root){
   allBlocks.filter(b=>b.mat===m&&b.aulas).forEach(b=>b.aulas.forEach(a=>{
     const key=a.c+":"+a.n;if(seen[key])return;seen[key]=1;
     const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);
-    items.push({s:wkScore(b.wk),dn:!!G("au:"+key),r:REND["au:"+key]||0,el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura")+altCapsHtml(key),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
+    items.push({k:"au:"+key,s:wkScore(b.wk),dn:!!G("au:"+key),r:REND["au:"+key]||0,el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura")+altCapsHtml(key),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
   }));
   appendItems(root,items);
   // 4) jurisprudência
@@ -1676,7 +1707,7 @@ function vMats(root){
   const mmsJ=MATJURIS[m]||[MATMAPG[m]||m];const mx=Math.max.apply(null,DATA.juris.filter(j=>mmsJ.indexOf(j.mat)>=0).map(j=>j.cit).concat([1]));
   items=[];
   DATA.juris.forEach((j,i)=>{if(mmsJ.indexOf(j.mat)<0)return;
-    items.push({s:Math.max(.1,j.cit/mx),dn:!!JG(i),r:REND[jkey(i)]||0,el:()=>pitem(jkey(i),"<b>"+esc(j.ref)+"</b>"+(j.tema?" <span class='mat'>· "+esc(j.tema)+"</span>":"")+"<br><span style='font-size:.8rem'>"+esc(j.tese)+"</span>"+(j.consequencia?"<br><span style='font-size:.78rem;color:var(--muted)'>→ "+esc(j.consequencia)+"</span>":"")+"<br><a class='lch' target='_blank' rel='noopener' href='"+(j.url||jurl(j.ref))+"'>fonte oficial ↗</a>"+(j.infref?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 Informativos 10x "+esc(j.infref)+"</span>":(j.inf?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 nos Informativos 10x</span>":"")),j.cit+"×",Math.max(.1,j.cit/mx))});
+    items.push({k:jkey(i),s:Math.max(.1,j.cit/mx),dn:!!JG(i),r:REND[jkey(i)]||0,el:()=>pitem(jkey(i),"<b>"+esc(j.ref)+"</b>"+(j.tema?" <span class='mat'>· "+esc(j.tema)+"</span>":"")+"<br><span style='font-size:.8rem'>"+esc(j.tese)+"</span>"+(j.consequencia?"<br><span style='font-size:.78rem;color:var(--muted)'>→ "+esc(j.consequencia)+"</span>":"")+"<br><a class='lch' target='_blank' rel='noopener' href='"+(j.url||jurl(j.ref))+"'>fonte oficial ↗</a>"+(j.infref?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 Informativos 10x "+esc(j.infref)+"</span>":(j.inf?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 nos Informativos 10x</span>":"")),j.cit+"×",Math.max(.1,j.cit/mx))});
   });
   appendItems(root,items);
 }
