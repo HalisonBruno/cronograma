@@ -868,8 +868,9 @@ function altAulasHtml(eb,cap){
   const tot=all.filter(x=>x.grau==="total"),par=all.filter(x=>x.grau!=="total");
   const fmtA=x=>{const a=aulaNome(x.aula);const w=G("au:"+x.aula);return '<span class="badge-moved" style="background:'+(w?"var(--done-soft)":"var(--surface2)")+';color:'+(w?"var(--done)":"var(--muted)")+'" title="'+esc(a.nome)+'">'+(w?"✓ ":"")+'aula '+a.n+'</span>'};
   const falta=all.filter(x=>!G("au:"+x.aula)).length;
-  const dica=tot.length?(falta?"":" — assistidas, capítulo coberto"):(falta?' <span class="mmin">(faltam '+falta+' para cobrir o capítulo)</span>':' <span class="mmin">— todas assistidas, capítulo coberto</span>');
-  return '<div class="altrow"><span class="mmin">▶ ou assista: </span>'+tot.map(fmtA).join(" ")+(par.length?" "+par.map(fmtA).join(" "):"")+dica+"</div>";
+  const dica=tot.length?(falta?"":" — assistidas, capítulo coberto"):(falta?' <span class="mmin">(faltam '+falta+')</span>':' <span class="mmin">— capítulo coberto</span>');
+  const resumo=(all.length-falta)+"/"+all.length;
+  return '<details class="altrow mais"><summary>▶ '+all.length+' aula'+(all.length>1?"s":"")+' equivalente'+(all.length>1?"s":"")+' ('+resumo+' vistas) ▾</summary><div style="margin-top:4px">'+tot.map(fmtA).join(" ")+(par.length?" "+par.map(fmtA).join(" "):"")+dica+"</div></details>";
 }
 function altCapsHtml(aulaKey){
   const all=AULA2CAPS[aulaKey]||[];if(!all.length)return "";
@@ -877,8 +878,9 @@ function altCapsHtml(aulaKey){
   const fmtC=x=>{const bk=EBK[x.eb];const c=bk&&bk.caps.find(y=>y.n===x.cap);const u=capLink(x.eb,x.cap)||ebFallback(x.eb);const rd=capLido(x.eb,x.cap);
     return '<a class="lch" target="_blank" rel="noopener" href="'+u+'" style="'+(rd?"opacity:.6":"")+'" title="'+esc(c?c.t:"")+'">'+(rd?"✓ ":"")+'Cap. '+x.cap+(c?" ("+c.pi+"-"+c.pf+")":"")+' ↗</a>'};
   const faltaC=all.filter(x=>!capLido(x.eb,x.cap)).length;
-  const dicaC=tot.length?"":(faltaC?' <span class="mmin">(faltam '+faltaC+' para cobrir a aula)</span>':' <span class="mmin">— todos lidos, aula coberta</span>');
-  return '<div class="altrow"><span class="mmin">📖 ou leia: </span>'+tot.map(fmtC).join(" ")+(par.length?" "+par.map(fmtC).join(" "):"")+dicaC+"</div>";
+  const dicaC=tot.length?"":(faltaC?' <span class="mmin">(faltam '+faltaC+')</span>':' <span class="mmin">— aula coberta</span>');
+  const resumoC=(all.length-faltaC)+"/"+all.length;
+  return '<details class="altrow mais"><summary>📖 '+all.length+' cap'+(all.length>1?"s":"")+' equivalente'+(all.length>1?"s":"")+' ('+resumoC+' lidos) ▾</summary><div style="margin-top:4px">'+tot.map(fmtC).join(" ")+(par.length?" "+par.map(fmtC).join(" "):"")+dicaC+"</div></details>";
 }
 // ---------- EIXO 2: leitura inline (texto do material dentro do app) ----------
 const _LEICACHE={};
@@ -932,7 +934,7 @@ function unitsOf(b){
   if(b.tipo==="EBOOK"&&b.eb&&b.pg&&EBK[b.eb]){
     const rng=(k2,pg)=>{const cs=capsIn(k2,pg);const per=cs.length?Math.round(b.min/cs.length):b.min;
       cs.forEach(c=>{const k="eb:"+k2+":"+c.n;const u=capLink(k2,c.n)||ebFallback(k2);
-        push(k,"<b>Cap. "+c.n+"</b> "+esc(c.t),"p. "+Math.max(c.pi,pg[0])+"-"+Math.min(c.pf,pg[1]),'<a class="lch" target="_blank" rel="noopener" href="'+u+'">📖 abrir na p. '+Math.max(c.pi,pg[0])+' ↗</a>'+altAulasHtml(k2,c.n),per,rangeCovered(planIv(k2,true),c.pi,c.pf))})};
+        push(k,"<b>Cap. "+c.n+"</b> "+esc(c.t),per+"min · semana "+b.wk,'<a class="lch" target="_blank" rel="noopener" href="'+u+'">📖 abrir na p. '+Math.max(c.pi,pg[0])+' ↗</a>'+altAulasHtml(k2,c.n),per,rangeCovered(planIv(k2,true),c.pi,c.pf))})};
     rng(b.eb,b.pg);if(b.pg2)rng(b.eb2||b.eb,b.pg2);
     if(!U.length)push("st:"+b.id,esc(b.t),"",'<a class="lch" target="_blank" rel="noopener" href="'+ebFallback(b.eb)+'">📄 e-book ↗</a>',b.min);
     return U;
@@ -1636,24 +1638,20 @@ function vMats(root){
   top.querySelector("#volt").addEventListener("click",()=>{matSel="";render()});
   const ordBar=document.createElement("div");ordBar.style.margin="6px 0";
   const mkP=(txt,val)=>{const p=document.createElement("span");p.className="pill"+(ordModo===val?" on":"");p.textContent=txt;p.addEventListener("click",()=>{ordModo=val;localStorage.setItem("ordModo",val);render()});return p};
-  root.insertAdjacentHTML("beforeend",'<div class="note" style="margin:8px 0 0">q/h = questões esperadas na prova por hora de estudo, a partir das provas anteriores (peso total = 80 questões). Atividades sem dado de incidência aparecem por último, mas não são necessariamente dispensáveis.</div>');
+
   ordBar.appendChild(mkP("por prioridade (o que mais cai)","rend"));ordBar.appendChild(mkP("na ordem do material (cap. 1, 2, 3…)","mat"));
   const pn=document.createElement("span");pn.className="pill"+(nucleoOnly?" on":"");pn.textContent="★ só o núcleo";pn.addEventListener("click",()=>{nucleoOnly=!nucleoOnly;render()});ordBar.appendChild(pn);
   root.appendChild(ordBar);
+  const ferr=document.createElement("details");ferr.className="mais";ferr.style.display="block";ferr.style.margin="6px 0";
+  ferr.innerHTML='<summary>🧰 ferramentas da matéria ▾</summary>';
+  ferr.insertAdjacentHTML("beforeend",'<div class="note" style="margin:6px 0">q/h = questões esperadas na prova por hora de estudo (peso total = 80). Atividades sem dado de incidência aparecem por último, mas não são necessariamente dispensáveis. "semana N" = a semana do cronograma em que a atividade está agendada.</div>');
   const tecBar=document.createElement("div");tecBar.className="toolbar";tecBar.style.margin="6px 0";
   const mkT=(txt,modo)=>{const bt=document.createElement("button");bt.textContent=txt;bt.addEventListener("click",()=>tecCopy(m,modo));return bt};
   tecBar.appendChild(mkT("20 questões FGV do que estudei","fgv"));
   tecBar.appendChild(mkT("10 questões CEBRASPE — ponte procuradorias","ceb"));
   tecBar.appendChild(mkT("Revisar meus assuntos com pior desempenho","pior"));
-  root.appendChild(tecBar);
-  // atalhos de seção (a página é longa)
-  const anc=document.createElement("div");anc.className="filterchips";anc.style.margin="8px 0 2px";
-  [["📖 Leituras","Leituras"],["📜 Lei seca","Artigos de lei"],["▶ Vídeos","Vídeos"],["⚖ Juris","Jurisprudência"]].forEach(p=>{
-    const btn=document.createElement("button");btn.textContent=p[0];
-    btn.addEventListener("click",()=>{const h=[...document.querySelectorAll("h2.sec")].find(x=>x.textContent.startsWith(p[1]));if(h)h.scrollIntoView({behavior:"smooth",block:"start"})});
-    anc.appendChild(btn);
-  });
-  root.appendChild(anc);
+  ferr.appendChild(tecBar);root.appendChild(ferr);
+  // (barra de atalhos antiga removida: o indice fixo .secidx cumpre o papel)
   // e-books da matéria: cadastro de link direto (só aparece se não houver links por capítulo)
   const ebs=Object.keys(EB2MAT).filter(k=>EB2MAT[k]===m&&EBK[k]);
   ebs.filter(k=>!CAPL[k]).forEach(k=>{
@@ -1675,7 +1673,7 @@ function vMats(root){
       const s=c.out?0.02:wkScore(wk===99?10:wk);   // prioridade NUNCA cai por cobertura parcial (regra do usuario)
       const dn=!!G("eb:"+k+":"+c.n)||rangeCovered(planIv(k,true),c.pi,c.pf);
       const lk=capLink(k,c.n)||ebFallback(k);
-      items.push({k:"eb:"+k+":"+c.n,s,dn,r:REND["eb:"+k+":"+c.n]||0,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+altAulasHtml(k,c.n)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · sem "+wk:""),s)});
+      items.push({k:"eb:"+k+":"+c.n,s,dn,r:REND["eb:"+k+":"+c.n]||0,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+altAulasHtml(k,c.n)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · semana "+wk:""),s)});
     })});
   appendItems(root,items);
   // 2) artigos de lei (blocos de lei seca)
@@ -1683,16 +1681,22 @@ function vMats(root){
   items=[];
   allBlocks.filter(b=>b.mat===m&&b.tipo==="LEI"&&!b.opt).forEach(b=>{
     const dchip=LDOC[b.id]?" <a class='lch' target='_blank' rel='noopener' href='"+dlink(LDOC[b.id])+"'>📄 caderno do dia ↗</a>":"";
-    const dchipG=g2=>LDOCG[g2.id]?" <a class='lch' target='_blank' rel='noopener' href='"+dlink(LDOCG[g2.id])+"'>📄 DOCX — "+esc((g2.sub||"").split(" (")[0])+" ↗</a>":dchip;
+    const dchipG=g2=>LDOCG[g2.id]?" <a class='lch' target='_blank' rel='noopener' href='"+dlink(LDOCG[g2.id])+"'>📄 caderno ↗</a>":dchip;
     const gs=LG[b.id]||[];
     if(gs.length>1){
       gs.forEach((g2,i)=>{const k=lgKey(b.id,g2,gs);
         const gl=(g2.u?" <a class='lch' target='_blank' rel='noopener' href='"+g2.u+"'>abrir lei ↗</a>":"");
-        items.push({k:k,s:wkScore(b.wk),dn:!!G(k)||isDone(b),r:REND[k]||0,el:()=>pitem(k,"<b>📜 "+esc((g2.sub||"").split(" (")[0]||g2.r)+"</b>"+((String(g2.r||"").replace(/\s*—\s*arts?\..*$/,"").trim())?" — "+esc(String(g2.r).replace(/\s*—\s*arts?\..*$/,"").trim()):"")+autoBadge(G(k),"pela equivalência")+gl+dchipG(g2),fmt(b.day)+" · "+leiMin(g2,b,gs.length)+"min",wkScore(b.wk))});
+        items.push({k:k,s:wkScore(b.wk),dn:!!G(k)||isDone(b),r:REND[k]||0,el:()=>{
+        let tema=String(g2.r||"").replace(/\s*—\s*arts?\..*$/,"").trim();
+        tema=tema.replace(/^Revisão\s*[—·-]?\s*/i,"");
+        const sig0=((g2.sub||"").split(" · ")[0]||"").trim();
+        if(sig0)tema=tema.replace(new RegExp("^"+sig0.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*[—·-]?\\s*"),"");
+        const pref=g2.rev?"↻ ":"";
+        return pitem(k,"<b>📜 "+pref+esc((g2.sub||"").split(" (")[0]||g2.r)+"</b>"+(tema?" — "+esc(tema):"")+autoBadge(G(k),"pela equivalência")+gl+dchipG(g2),leiMin(g2,b,gs.length)+"min · semana "+b.wk,wkScore(b.wk))}});
       });
     }else{
       let lu="";const btx=b.t+" "+(b.det||"");for(const L of LEIS){if(L[1].test(btx)){lu=L[2];break}}
-      items.push({k:"st:"+b.id,s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:",""))+autoBadge(G("st:"+b.id)==="done-auto"?"auto":null,"pela equivalência")+dchip+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>abrir lei ↗</a>":""),fmt(b.day)+" · sem "+b.wk,wkScore(b.wk),null,"done")});
+      items.push({k:"st:"+b.id,s:wkScore(b.wk),dn:isDone(b),el:()=>pitem("st:"+b.id,esc(b.t.replace("Lei seca:",""))+autoBadge(G("st:"+b.id)==="done-auto"?"auto":null,"pela equivalência")+dchip+(lu?" <a class='lch' target='_blank' rel='noopener' href='"+lu+"'>abrir lei ↗</a>":""),leiMin? b.min+"min · semana "+b.wk:"",wkScore(b.wk),null,"done")});
     }
   });
   appendItems(root,items);
@@ -1702,7 +1706,7 @@ function vMats(root){
   allBlocks.filter(b=>b.mat===m&&b.aulas).forEach(b=>b.aulas.forEach(a=>{
     const key=a.c+":"+a.n;if(seen[key])return;seen[key]=1;
     const cur=(DATA.cursos||[]).find(c=>c.curso===a.c);const al=cur&&cur.aulas.find(x=>x.n===a.n);
-    items.push({k:"au:"+key,s:wkScore(b.wk),dn:!!G("au:"+key),r:REND["au:"+key]||0,el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura")+altCapsHtml(key),(al?al.min:"?")+"min (~"+(al?Math.round(al.min/1.5):"?")+") · sem "+b.wk,wkScore(b.wk))});
+    items.push({k:"au:"+key,s:wkScore(b.wk),dn:!!G("au:"+key),r:REND["au:"+key]||0,el:()=>pitem("au:"+key,"<b>nº "+a.n+"</b> "+esc(al?al.nome:a.c)+autoBadge(G("au:"+key),"pela leitura")+altCapsHtml(key),(al?Math.round(al.min/1.5):"?")+"min a 1,5x · semana "+b.wk,wkScore(b.wk))});
   }));
   appendItems(root,items);
   // 4) jurisprudência
@@ -1723,7 +1727,17 @@ function vMats(root){
   const mmsJ=MATJURIS[m]||[MATMAPG[m]||m];const mx=Math.max.apply(null,DATA.juris.filter(j=>mmsJ.indexOf(j.mat)>=0).map(j=>j.cit).concat([1]));
   items=[];
   DATA.juris.forEach((j,i)=>{if(mmsJ.indexOf(j.mat)<0)return;
-    items.push({k:jkey(i),s:Math.max(.1,j.cit/mx),dn:!!JG(i),r:REND[jkey(i)]||0,el:()=>pitem(jkey(i),"<b>"+esc(j.ref)+"</b>"+(j.tema?" <span class='mat'>· "+esc(j.tema)+"</span>":"")+"<br><span style='font-size:.8rem'>"+esc(j.tese)+"</span>"+(j.consequencia?"<br><span style='font-size:.78rem;color:var(--muted)'>→ "+esc(j.consequencia)+"</span>":"")+"<br><a class='lch' target='_blank' rel='noopener' href='"+(j.url||jurl(j.ref))+"'>fonte oficial ↗</a>"+(j.infref?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 Informativos 10x "+esc(j.infref)+"</span>":(j.inf?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 nos Informativos 10x</span>":"")),j.cit+"×",Math.max(.1,j.cit/mx))});
+    items.push({k:jkey(i),s:Math.max(.1,j.cit/mx),dn:!!JG(i),r:REND[jkey(i)]||0,el:()=>{
+      const el=pitem(jkey(i),"<b>"+esc(j.ref)+"</b>"+(j.tema?" <span class='mat'>· "+esc(j.tema)+"</span>":"")+
+        "<br><button class='vtese' style='background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:6px 12px;font-size:.78rem;cursor:pointer;margin-top:4px'>ver tese</button>"+
+        "<div class='tesebox' style='display:none;margin-top:6px;font-size:.85rem;line-height:1.55'>"+esc(j.tese)+
+        (j.consequencia?"<br><span style='font-size:.8rem;color:var(--muted)'>→ "+esc(j.consequencia)+"</span>":"")+
+        "<br><a class='lch' target='_blank' rel='noopener' href='"+(j.url||jurl(j.ref))+"'>fonte oficial ↗</a>"+
+        (j.infref?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 Informativos 10x "+esc(j.infref)+"</span>":(j.inf?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 nos Informativos 10x</span>":""))+"</div>",
+        j.cit+"×",Math.max(.1,j.cit/mx));
+      const bt=el.querySelector(".vtese"),bx=el.querySelector(".tesebox");
+      bt.addEventListener("click",e=>{e.stopPropagation();const ab=bx.style.display==="none";bx.style.display=ab?"":"none";bt.textContent=ab?"fechar tese":"ver tese"});
+      return el;}});
   });
   appendItems(root,items);
 }
