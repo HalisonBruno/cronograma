@@ -612,9 +612,26 @@ function qdTodos(){
 }
 function qdCard(dstr){
   const regs=qdRegs(dstr);
-  // materias que o plano manda praticar hoje (o antigo bloco TEC, agora so informativo)
+  // sugestao TODO dia: bloco QUEST do plano > materias estudadas no dia > (dia livre) pior acerto registrado
   const dd=(DATA.days||[]).find(x=>x.d===dstr)||{blocks:[]};
-  const matsHoje=[...new Set(dd.blocks.filter(b=>b.tipo==="QUEST").map(b=>b.mat))];
+  const okMat=m=>m&&MATLIST.indexOf(m)>=0&&m!=="Informativos 10x";
+  let matsHoje=[...new Set(dd.blocks.filter(b=>b.tipo==="QUEST").map(b=>b.mat))].filter(okMat);
+  let rotulo="O plano sugere questões de:";
+  if(!matsHoje.length){
+    matsHoje=[...new Set(dd.blocks.map(b=>b.mat))].filter(okMat).slice(0,4);
+    if(matsHoje.length)rotulo="Faça questões do que você estudou hoje:";
+  }
+  if(!matsHoje.length){
+    const agg={};qdTodos().forEach(o=>{if(!okMat(o.mat))return;agg[o.mat]=agg[o.mat]||{n:0,ac:0};agg[o.mat].n+=+o.n||0;agg[o.mat].ac+=+o.ac||0});
+    const fraca=Object.keys(agg).filter(m=>agg[m].n>=10).sort((a,b)=>(agg[a].ac/agg[a].n)-(agg[b].ac/agg[b].n))[0];
+    if(fraca){matsHoje=[fraca];rotulo="Ataque sua matéria mais fraca:"}
+  }
+  if(!matsHoje.length){
+    // ultimo recurso (simulado/vespera): materias estudadas na mesma semana
+    const wk=dd.wk;
+    matsHoje=[...new Set((DATA.days||[]).filter(x=>x.wk===wk).flatMap(x=>(x.blocks||[]).map(b=>b.mat)))].filter(okMat).slice(0,4);
+    rotulo=matsHoje.length?"Questões do que você estudou na semana:":"Mantenha a meta de 30 questões — qualquer matéria:";
+  }
   const tot=regs.reduce((a,r)=>a+(+r.n||0),0);
   const ac=regs.reduce((a,r)=>a+(+r.ac||0),0);
   const div=document.createElement("div");
@@ -630,7 +647,7 @@ function qdCard(dstr){
       '<button class="qdel" data-k="'+esc(r.key)+'" style="background:none;border:0;color:var(--muted);cursor:pointer">✕</button></div>';
   });
   div.innerHTML='<div class="bt"><b>✏ Questões do dia</b> <span class="mmin">— registre aqui TODAS as questões que fizer (qualquer matéria, quantas vezes quiser)</span></div>'+
-    (matsHoje.length?'<div class="note" style="margin:4px 0"><b>O plano sugere questões de:</b> '+matsHoje.map(x=>esc(x)).join(" · ")+'</div>':"")+
+    '<div class="note" style="margin:4px 0"><b>'+rotulo+'</b>'+(matsHoje.length?' '+matsHoje.map(x=>esc(x)).join(" · "):'')+'</div>'+
     (new Date(dstr+"T12:00:00").getDay()===3?'<div class="note" style="margin:4px 0">◎ <b>Quarta:</b> inclua as 15 questões FGV da semana (monte no TEC com o que você estudou nos últimos 7 dias) e registre aqui.</div>':"")+
     '<div class="bmeta"><span class="tag" style="background:var(--quest,#b8860b);color:#fff">Questões</span>'+
     '<span class="mmin"><b style="color:'+(okMeta?"var(--done)":"var(--warn)")+'">'+tot+'/'+META_Q+'</b> da meta de hoje'+(tot?' · '+pct+'% de acerto':'')+'</span></div>'+
