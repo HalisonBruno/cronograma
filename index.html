@@ -548,7 +548,7 @@ function nucleoDef(u){
   const b=u.b||{};
   if(b.tipo==="INFO")return true;
   if(String(b.id||"").startsWith("ext:")){const o=extras().find(x=>"ext:"+x.id===b.id);if(o&&(o.nuc||NUC_RE.test(o.t||"")||NUC_RE.test(o.mat||"")))return true}
-  if(b.tipo==="QUEST"||b.tipo==="SIM"||u.key.startsWith("wq:"))return true;   // questoes e simulados: pratica e nucleo por definicao
+  if(b.tipo==="QUEST"||b.tipo==="SIM")return true;   // questoes e simulados: pratica e nucleo por definicao
   return NUC_RE.test(b.t||"");
 }
 function isNucleo(u){return nucleoDef(u)||nucleoSet().has(u.key)}
@@ -1125,7 +1125,6 @@ function matDaChave(k){
   m=k.match(/^st:(.+)$/);if(m){const b=allBlocks.find(x=>x.id===m[1]);return b&&b.mat}
   m=k.match(/^au:(.+):\d+$/);if(m){const b=allBlocks.find(x=>(x.aulas||[]).some(a=>a.c===m[1]));return b&&b.mat}
   return null}
-// simulado semanal de quarta: virou sugestao dentro do card "Questoes do dia" (nada de questao ticavel)
 function jurisFicha(key){
   const j=DATA.juris.find((x,i)=>jkey(i)===key);if(!j)return "";
   const row=(l,v)=>v?'<div style="margin:3px 0"><b style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em">'+l+'</b><br>'+esc(v)+'</div>':"";
@@ -1202,7 +1201,7 @@ function tipoCarga(u){
   if(k.startsWith("eb:")||b.tipo==="EBOOK")return "ebook";
   if(k.startsWith("lg2:")||k.startsWith("lg:")||b.tipo==="LEI")return "lei";
   if(k.startsWith("jur:")||k.startsWith("js:")||b.tipo==="JURIS")return "juris";
-  if(b.tipo==="QUEST"||b.tipo==="SIM"||k.startsWith("wq:"))return "quest";
+  if(b.tipo==="QUEST"||b.tipo==="SIM")return "quest";
   return "compl";   // informativos, revisao, extras, setup, ponte, temas quentes
 }
 const TIPO_NOME={video:"Vídeo",lei:"Lei seca",ebook:"E-books",juris:"Jurisprudência",info:"Informativos",quest:"Questões",compl:"Complementares"};
