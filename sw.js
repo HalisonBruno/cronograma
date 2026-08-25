@@ -1,6 +1,7 @@
-// Cache-first com atualizacao em segundo plano: o app abre offline e
-// pega versao nova na proxima abertura. Chamadas de sync (Supabase) nao passam por aqui.
-const CACHE = "enam-v3-lei-seca-atomica";
+// Network-first com fallback de cache: online voce SEMPRE ve a versao mais nova
+// (o cache so entra quando esta sem rede). O modelo antigo (cache-first) servia a
+// versao anterior do app a cada abertura — correcoes demoravam a aparecer na tela.
+const CACHE = "enam-v4-network-first";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icon-192.png"])));
   self.skipWaiting();
@@ -12,12 +13,9 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET" || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    caches.match(e.request).then(hit => {
-      const net = fetch(e.request).then(r => {
-        if (r.ok) caches.open(CACHE).then(c => c.put(e.request, r.clone()));
-        return r;
-      }).catch(() => hit);
-      return hit || net;
-    })
+    fetch(e.request).then(r => {
+      if (r.ok) caches.open(CACHE).then(c => c.put(e.request, r.clone()));
+      return r;
+    }).catch(() => caches.match(e.request))
   );
 });

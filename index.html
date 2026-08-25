@@ -379,7 +379,6 @@ function extraUnit(o){const key="xdone:"+o.id;const b={id:"ext:"+o.id,mat:o.mat|
 function unitsOn(dstr){
   const out=[];
   revPend(dstr).forEach(u=>out.push(u));
-  simSemanal(dstr).forEach(u=>out.push(u));
   extras().forEach(o=>{const u=extraUnit(o);if(unitDate(u)===dstr||(!G("mvu:"+u.key)&&o.day===dstr))out.push(u)});
   allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(unitDate(u)===dstr)out.push(u)})});
   jurisSemBloco().forEach(o=>{const jk=jkey(o.i);const d=G("mvu:"+jk);if(d===dstr){const j=DATA.juris[o.i];const fake={id:"jsb:"+jk,mat:o.mat,tipo:"JURIS",min:10,t:j.ref,day:dstr,wk:(DATA.days[dayIdx[dstr]]||{}).wk,det:""};
@@ -632,6 +631,7 @@ function qdCard(dstr){
   });
   div.innerHTML='<div class="bt"><b>✏ Questões do dia</b> <span class="mmin">— registre aqui TODAS as questões que fizer (qualquer matéria, quantas vezes quiser)</span></div>'+
     (matsHoje.length?'<div class="note" style="margin:4px 0"><b>O plano sugere questões de:</b> '+matsHoje.map(x=>esc(x)).join(" · ")+'</div>':"")+
+    (new Date(dstr+"T12:00:00").getDay()===3?'<div class="note" style="margin:4px 0">◎ <b>Quarta:</b> inclua as 15 questões FGV da semana (monte no TEC com o que você estudou nos últimos 7 dias) e registre aqui.</div>':"")+
     '<div class="bmeta"><span class="tag" style="background:var(--quest,#b8860b);color:#fff">Questões</span>'+
     '<span class="mmin"><b style="color:'+(okMeta?"var(--done)":"var(--warn)")+'">'+tot+'/'+META_Q+'</b> da meta de hoje'+(tot?' · '+pct+'% de acerto':'')+'</span></div>'+
     '<div class="bar" style="margin:6px 0"><i style="width:'+Math.min(100,Math.round(tot/META_Q*100))+'%;background:'+(okMeta?"var(--done)":"var(--warn)")+'"></i></div>'+
@@ -1125,13 +1125,7 @@ function matDaChave(k){
   m=k.match(/^st:(.+)$/);if(m){const b=allBlocks.find(x=>x.id===m[1]);return b&&b.mat}
   m=k.match(/^au:(.+):\d+$/);if(m){const b=allBlocks.find(x=>(x.aulas||[]).some(a=>a.c===m[1]));return b&&b.mat}
   return null}
-// ---------- simulado semanal (quarta): 15 questoes do que foi estudado ----------
-function simSemanal(dstr){
-  const d=new Date(dstr+"T12:00:00");if(d.getDay()!==3)return [];
-  const k="wq:"+dstr;
-  return [{key:k,title:"<b>◎ 15 questões FGV da semana</b>",meta:"25min · o que você estudou nos últimos 7 dias",chips:'<a class="lch" target="_blank" rel="noopener" href="https://www.tecconcursos.com.br/questoes/cadernos">abrir TEC ↗</a>',min:25,val:G(k),done:!!G(k),
-    b:{id:"wq:"+dstr,mat:"Simulado",tipo:"QUEST",min:25,t:"15 questões FGV da semana",day:dstr,wk:0,det:"Monte no TEC com os assuntos que você estudou nos últimos 7 dias (botão na página da matéria)."}}];
-}
+// simulado semanal de quarta: virou sugestao dentro do card "Questoes do dia" (nada de questao ticavel)
 function jurisFicha(key){
   const j=DATA.juris.find((x,i)=>jkey(i)===key);if(!j)return "";
   const row=(l,v)=>v?'<div style="margin:3px 0"><b style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em">'+l+'</b><br>'+esc(v)+'</div>':"";
