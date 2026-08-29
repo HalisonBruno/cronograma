@@ -1326,16 +1326,33 @@ function cargaPorTipo(){
     if(!pesoOf(u)&&!nucleoDef(u))T[t].semdado+=min});
   return T;
 }
-// progresso REAL por tipo: atividades feitas / total (o que o usuario espera ver no painel)
-function feitosPorTipo(){
+// progresso REAL por tipo: atividades feitas / total; soNucleo=true restringe ao nucleo
+function feitosPorTipo(soNucleo){
   const T={};TIPO_ORD.forEach(t=>T[t]={dn:0,tt:0});
   const seen=new Set();
-  const add=u=>{if(seen.has(u.key))return;seen.add(u.key);const t=tipoCarga(u);T[t].tt++;if(unitDone(u))T[t].dn++};
+  const add=u=>{if(seen.has(u.key))return;seen.add(u.key);if(soNucleo&&!isNucleo(u))return;const t=tipoCarga(u);T[t].tt++;if(unitDone(u))T[t].dn++};
   allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(add)});
-  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);T.juris.tt++;if(JG(o.i))T.juris.dn++});
+  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);if(soNucleo&&!nucleoSet().has(k))return;T.juris.tt++;if(JG(o.i))T.juris.dn++});
   extras().forEach(o=>add(extraUnit(o)));
   INFOS.forEach(o=>add(infoUnit(o)));
   return T;
+}
+// progresso por MATERIA: total e nucleo, feitas/total (para as barras duplas)
+function progressoPorMateria(){
+  const P={};const seen=new Set();
+  const add=(mat,u)=>{if(!mat||seen.has(u.key))return;seen.add(u.key);
+    if(u.key.indexOf("inf:")===0)mat="Informativos 10x";   // informativo conta sempre na materia propria
+    const p=P[mat]=P[mat]||{tt:0,dn:0,ntt:0,ndn:0};
+    const dn=unitDone(u);p.tt++;if(dn)p.dn++;
+    if(isNucleo(u)){p.ntt++;if(dn)p.ndn++}};
+  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>add(b.mat,u))});
+  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);
+    const p=P[o.mat]=P[o.mat]||{tt:0,dn:0,ntt:0,ndn:0};
+    const dn=!!JG(o.i);p.tt++;if(dn)p.dn++;
+    if(nucleoSet().has(k)){p.ntt++;if(dn)p.ndn++}});
+  extras().forEach(o=>{const u=extraUnit(o);add(u.b.mat,u)});
+  INFOS.forEach(o=>add("Informativos 10x",infoUnit(o)));
+  return P;
 }
 function viabilidade(){
   const hoje=todayStr();let pend=0;const seen=new Set();
@@ -1361,7 +1378,7 @@ function semaforoEl(){
   const cor=h=>h<=4?"var(--done)":h<=5?"var(--warn)":"var(--danger)";
   const el=document.createElement("div");el.className="sem";el.style.setProperty("--sc",cor(hdN));el.style.display="block";
   const f=x=>(x/60/dias).toFixed(1);
-  const FE=feitosPorTipo();
+  const FE=feitosPorTipo(nucleoOnly);   // com "ver so o nucleo" ativo, a coluna feitas conta so o nucleo
   let rows="";
   TIPO_ORD.forEach(t=>{const x=T[t];const fe=FE[t]||{dn:0,tt:0};if(!x.n&&!fe.tt)return;
     const pct=fe.tt?Math.round(fe.dn/fe.tt*100):0;
@@ -1369,7 +1386,7 @@ function semaforoEl(){
   const semAberto=localStorage.getItem("semOpen")==="1";
   el.innerHTML='<details id="semdet"'+(semAberto?" open":"")+'><summary><div style="display:flex;align-items:center;gap:8px"><div style="flex:1"><b style="color:'+cor(hdN)+'">'+hdN.toFixed(1)+' h/dia</b> <span class="mmin">núcleo · <b>'+hdT.toFixed(1)+'</b> tudo · '+dias+' dias <span style="color:var(--muted)">'+(semAberto?"▴":"▾ detalhes")+'</span></span></div>'+
     '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:.78rem;cursor:pointer;white-space:nowrap">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button></div></summary>'+
-    '<div class="tablewrap" style="margin-top:6px"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">feitas</th></tr>'+rows+'</table></div>'+
+    '<div class="tablewrap" style="margin-top:6px"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">feitas'+(nucleoOnly?" ★":"")+'</th></tr>'+rows+'</table></div>'+
     '<div class="mmin" style="margin-top:4px">"tudo" e "★ núcleo" = horas líquidas <b>pendentes</b> ÷ dias restantes. "feitas" = atividades que você já concluiu / total do tipo. Núcleo = atividades que somam 80% das questões esperadas + todo informativo + todas as questões e simulados (por definição).</div></details>';
   el.querySelector("#semdet").addEventListener("toggle",e=>{localStorage.setItem("semOpen",e.target.open?"1":"")});
   el.querySelector("#nucbt").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();nucleoOnly=!nucleoOnly;render()});
@@ -1556,16 +1573,17 @@ function vProg(root){
     pt.appendChild(tr);
   });
   pw.appendChild(pt);root.appendChild(pw);
-  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Progresso por matéria</h2>');
-  const mats={};
-  allBlocks.forEach(b=>{if(!mats[b.mat])mats[b.mat]={t:0,d:0,pct:[],min:0};const m=mats[b.mat];m.min+=b.min;
-    unitsOf(b).forEach(u=>{m.t++;if(unitDone(u))m.d++});
-    if(b.tipo==="QUEST"){const p=G("pct:"+b.id);if(p!=null)m.pct.push(p)}});
-  Object.entries(mats).sort((a,b)=>b[1].min-a[1].min).forEach(en=>{
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Progresso por matéria</h2><div class="note">Duas barras por matéria: <b>★ núcleo</b> (o que mais importa para a prova) e <b>total</b>.</div>');
+  const PM=progressoPorMateria();
+  MATLIST.map(m=>[m,PM[m]||{tt:0,dn:0,ntt:0,ndn:0}]).forEach(en=>{
     const m=en[0],v=en[1];
-    const avg=v.pct.length?Math.round(v.pct.reduce((a,c)=>a+c,0)/v.pct.length):null;
-    const line=document.createElement("div");line.className="matline";
-    line.innerHTML='<div class="nm">'+esc(m)+'</div><div class="bar"><i style="width:'+Math.round(v.d/v.t*100)+'%"></i></div><div class="n">'+v.d+"/"+v.t+(avg!=null?" · "+avg+"%":"")+"</div>";
+    const pT=v.tt?Math.round(v.dn/v.tt*100):0,pN=v.ntt?Math.round(v.ndn/v.ntt*100):0;
+    const line=document.createElement("div");line.className="matline";line.style.cursor="pointer";
+    line.innerHTML='<div class="nm">'+esc(m)+'</div>'+
+      '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">'+
+      '<div style="display:flex;align-items:center;gap:6px"><div class="bar" style="flex:1"><i style="width:'+pN+'%;background:var(--accent)"></i></div><span class="mmin" style="white-space:nowrap">★ '+v.ndn+'/'+v.ntt+' ('+pN+'%)</span></div>'+
+      '<div style="display:flex;align-items:center;gap:6px"><div class="bar" style="flex:1"><i style="width:'+pT+'%"></i></div><span class="mmin" style="white-space:nowrap">'+v.dn+'/'+v.tt+' ('+pT+'%)</span></div></div>';
+    line.addEventListener("click",()=>{curTab="mats";matSel=m;render()});
     root.appendChild(line);
   });
   root.insertAdjacentHTML("beforeend",'<div class="note">A média % vem dos blocos de questões com acerto registrado. Média &lt; 60%: o tópico volta no Ciclo 2 — priorize nas baterias de domingo.</div>');
@@ -1731,18 +1749,16 @@ function vMats(root){
     root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. Feitas e capítulos já cobertos por vídeo caem para o fim.</div>');
     const g=document.createElement("div");g.className="matgrid";
     gradeBusca(root);
+    const PM=progressoPorMateria();
     MATLIST.forEach(m=>{
-      if(m==="Informativos 10x"){
-        const tt2=INFOS.length,dn2=INFOS.filter(o=>G("inf:"+o.id)).length;
-        const el2=document.createElement("div");el2.className="mg";
-        el2.innerHTML="<b>\u{1F4D8} Informativos 10x</b><div class='bar'><i style='width:"+(tt2?Math.round(dn2/tt2*100):0)+"%'></i></div><small class='mmin'>"+dn2+"/"+tt2+" itens \u00b7 "+Math.round(INFOS.reduce((a,o)=>a+o.min,0)/60)+"h</small>";
-        el2.addEventListener("click",()=>{matSel=m;render()});
-        g.appendChild(el2);return;
-      }
-      const bl=allBlocks.filter(b=>b.mat===m&&!b.opt);
-      const uc=unitsCount(bl),dn=uc[0],tt=uc[1];
+      const v=PM[m]||{tt:0,dn:0,ntt:0,ndn:0};
+      const pT=v.tt?Math.round(v.dn/v.tt*100):0,pN=v.ntt?Math.round(v.ndn/v.ntt*100):0;
+      const rot=m==="Informativos 10x"?"\u{1F4D8} Informativos 10x":esc(m);
       const el=document.createElement("div");el.className="mg";
-      el.innerHTML="<b>"+esc(m)+"</b><div class='bar'><i style='width:"+(tt?Math.round(dn/tt*100):0)+"%'></i></div><small class='mmin'>"+dn+"/"+tt+" atividades</small>";
+      el.innerHTML="<b>"+rot+"</b>"+
+        "<div class='bar' title='\u2605 n\u00facleo'><i style='width:"+pN+"%;background:var(--accent)'></i></div>"+
+        "<div class='bar' style='margin-top:2px' title='total'><i style='width:"+pT+"%'></i></div>"+
+        "<small class='mmin'>\u2605 "+v.ndn+"/"+v.ntt+" ("+pN+"%) \u00b7 "+v.dn+"/"+v.tt+" ("+pT+"%)</small>";
       el.addEventListener("click",()=>{matSel=m;render()});
       g.appendChild(el);
     });
