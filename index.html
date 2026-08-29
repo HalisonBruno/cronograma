@@ -1326,6 +1326,17 @@ function cargaPorTipo(){
     if(!pesoOf(u)&&!nucleoDef(u))T[t].semdado+=min});
   return T;
 }
+// progresso REAL por tipo: atividades feitas / total (o que o usuario espera ver no painel)
+function feitosPorTipo(){
+  const T={};TIPO_ORD.forEach(t=>T[t]={dn:0,tt:0});
+  const seen=new Set();
+  const add=u=>{if(seen.has(u.key))return;seen.add(u.key);const t=tipoCarga(u);T[t].tt++;if(unitDone(u))T[t].dn++};
+  allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(add)});
+  jurisSemBloco().forEach(o=>{const k=jkey(o.i);if(seen.has(k))return;seen.add(k);T.juris.tt++;if(JG(o.i))T.juris.dn++});
+  extras().forEach(o=>add(extraUnit(o)));
+  INFOS.forEach(o=>add(infoUnit(o)));
+  return T;
+}
 function viabilidade(){
   const hoje=todayStr();let pend=0;const seen=new Set();
   allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);if(!unitDone(u))pend+=minRestante(u)})});
@@ -1350,14 +1361,16 @@ function semaforoEl(){
   const cor=h=>h<=4?"var(--done)":h<=5?"var(--warn)":"var(--danger)";
   const el=document.createElement("div");el.className="sem";el.style.setProperty("--sc",cor(hdN));el.style.display="block";
   const f=x=>(x/60/dias).toFixed(1);
+  const FE=feitosPorTipo();
   let rows="";
-  TIPO_ORD.forEach(t=>{const x=T[t];if(!x.n)return;
-    rows+='<tr><td>'+TIPO_NOME[t]+'</td><td style="text-align:right">'+f(x.tot)+'</td><td style="text-align:right;font-weight:700;color:'+cor(x.nuc/60/dias*TIPO_ORD.length/2)+'">'+f(x.nuc)+'</td><td style="text-align:right" class="mmin">'+x.nn+'/'+x.n+'</td></tr>'});
+  TIPO_ORD.forEach(t=>{const x=T[t];const fe=FE[t]||{dn:0,tt:0};if(!x.n&&!fe.tt)return;
+    const pct=fe.tt?Math.round(fe.dn/fe.tt*100):0;
+    rows+='<tr><td>'+TIPO_NOME[t]+'</td><td style="text-align:right">'+f(x.tot)+'</td><td style="text-align:right;font-weight:700;color:'+cor(x.nuc/60/dias*TIPO_ORD.length/2)+'">'+f(x.nuc)+'</td><td style="text-align:right" class="mmin"><b>'+fe.dn+'</b>/'+fe.tt+' <span style="color:'+(pct>=100?"var(--done)":"var(--muted)")+'">('+pct+'%)</span></td></tr>'});
   const semAberto=localStorage.getItem("semOpen")==="1";
   el.innerHTML='<details id="semdet"'+(semAberto?" open":"")+'><summary><div style="display:flex;align-items:center;gap:8px"><div style="flex:1"><b style="color:'+cor(hdN)+'">'+hdN.toFixed(1)+' h/dia</b> <span class="mmin">núcleo · <b>'+hdT.toFixed(1)+'</b> tudo · '+dias+' dias <span style="color:var(--muted)">'+(semAberto?"▴":"▾ detalhes")+'</span></span></div>'+
     '<button id="nucbt" style="background:'+(nucleoOnly?"var(--accent)":"var(--surface)")+';color:'+(nucleoOnly?"var(--accent-ink)":"var(--ink)")+';border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:.78rem;cursor:pointer;white-space:nowrap">'+(nucleoOnly?"vendo só o núcleo":"ver só o núcleo")+'</button></div></summary>'+
-    '<div class="tablewrap" style="margin-top:6px"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">ativ.</th></tr>'+rows+'</table></div>'+
-    '<div class="mmin" style="margin-top:4px">Núcleo = atividades que somam 80% das questões esperadas <b>+ todo informativo, atualização legislativa e novo informativo + todas as questões e simulados</b> (entram por definição). h/dia = horas líquidas pendentes ÷ dias restantes.</div></details>';
+    '<div class="tablewrap" style="margin-top:6px"><table class="panel" style="width:100%"><tr><th>por dia</th><th style="text-align:right">tudo</th><th style="text-align:right">★ núcleo</th><th style="text-align:right">feitas</th></tr>'+rows+'</table></div>'+
+    '<div class="mmin" style="margin-top:4px">"tudo" e "★ núcleo" = horas líquidas <b>pendentes</b> ÷ dias restantes. "feitas" = atividades que você já concluiu / total do tipo. Núcleo = atividades que somam 80% das questões esperadas + todo informativo + todas as questões e simulados (por definição).</div></details>';
   el.querySelector("#semdet").addEventListener("toggle",e=>{localStorage.setItem("semOpen",e.target.open?"1":"")});
   el.querySelector("#nucbt").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();nucleoOnly=!nucleoOnly;render()});
   return el;
