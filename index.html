@@ -251,7 +251,33 @@ function migrateV4(){
 }
 function JG(i){return G(jkey(i))}
 function JSET(i,v){SET(jkey(i),v)}
-function SET(k,v){S.kv[k]=[v,Date.now()];saveLocal();schedulePush();}
+const STUDY_KEY=/^(st|au|eb|lg2|lg|jur|js|inf|xdone|rv):/;
+function manualStudy(v){return v===1||v==="done"}
+let statsQueued=false;
+function queueStatsRefresh(){
+  if(statsQueued)return;
+  statsQueued=true;
+  Promise.resolve().then(()=>{try{syncEquiv();updateStats()}finally{statsQueued=false}});
+}
+function SET(k,v,study){
+  const now=Date.now();
+  if(STUDY_KEY.test(k)){
+    if(manualStudy(v)){
+      // Snapshot do tempo desta conclusão: mudar o ritmo depois não reescreve o histórico.
+      const tm=S.kv["tm:"+k];
+      const freshTimer=tm&&Number(tm[0])>0&&tm[1]<=now&&now-tm[1]<=1000;
+      const min=study&&Number(study.minutes)>0?Number(study.minutes):freshTimer?Number(tm[0]):estimateStudyMinutes(k);
+      S.kv["study:"+k]=[JSON.stringify({min:Math.max(0,Math.round(min))}),now];
+      if(tm&&!freshTimer)S.kv["tm:"+k]=[null,now];
+    }else if(v==null){
+      S.kv["study:"+k]=[null,now];
+      if(S.kv["tm:"+k])S.kv["tm:"+k]=[null,now];
+    }
+  }
+  S.kv[k]=[v,now];saveLocal();schedulePush();
+  // Os catálogos mantêm o item no lugar; atualizar o cabeçalho não exige redesenhar a página.
+  if(STUDY_KEY.test(k)||/^(qd|qx|tm|study):/.test(k))queueStatsRefresh();
+}
 // v6: o replanejamento por turnos (20/08/2026) invalida realocacoes do calendario antigo.
 // Sem isso, mv:/mvu: gravados no plano de 60 dias jogavam ~673 atividades na "fila" e
 // espalhavam itens "de 22/08" pelos dias. Tombstone [null,ts] vence o sync por timestamp.
@@ -1141,8 +1167,8 @@ function unitCard(u,showOrigin){
     (isBlock&&b.tipo==="QUEST"?'<span class="mmin">registre os números no card “✏ Questões do dia” abaixo</span><input class="pct errin" type="text" placeholder="assuntos que errei" value="'+esc(G("err:"+b.id)||"")+'" style="width:170px" title="separe por vírgula — entram no fecho e no filtro de revisão do TEC">':"")+
     '</div></div></div>';
   div.querySelector(".ck").addEventListener("change",e=>{
-    if(isBlock){SET("st:"+b.id,e.target.checked?"done":null)}
-    else{SET(u.key,e.target.checked?1:null);if(!e.target.checked&&isDone(b))SET("st:"+b.id,null)}
+    if(isBlock){SET("st:"+b.id,e.target.checked?"done":null,{minutes:minRestante(u)})}
+    else{SET(u.key,e.target.checked?1:null,{minutes:minRestante(u)});if(!e.target.checked&&isDone(b))SET("st:"+b.id,null)}
     render()});
   const ex=div.querySelector(".exp");if(ex)ex.addEventListener("click",()=>div.classList.toggle("open"));
   const adi=div.querySelector(".adi");if(adi)adi.addEventListener("click",()=>{if(b.tipo==="SIM")adiar(b);else adiarUnit(u)});
@@ -1267,14 +1293,14 @@ async function abrirFoco(u){
   const tick=()=>{const s=Math.floor((Date.now()-_focStart)/1000)+_focEl;clk.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
   _focT=setInterval(tick,1000);tick();
   const fecha=()=>{clearInterval(_focT);_focT=null;ov.remove();render()};
-  const gastos=()=>Math.max(1,Math.round(((Date.now()-_focStart)/1000+_focEl)/60));
+  const gastos=()=>Math.max(1,Math.round(((_focT?(Date.now()-_focStart)/1000:0)+_focEl)/60));
   ov.querySelector("#fnota").addEventListener("change",e=>SET("nt:"+u.key,e.target.value.trim()||null));
   ov.querySelector("#fx").addEventListener("click",fecha);
   ov.querySelector("#fpause").addEventListener("click",e=>{if(_focT){clearInterval(_focT);_focT=null;_focEl+=Math.floor((Date.now()-_focStart)/1000);e.target.textContent="retomar"}else{_focStart=Date.now();_focT=setInterval(tick,1000);e.target.textContent="pausar"}});
   ov.querySelector("#fskip").addEventListener("click",()=>{clearInterval(_focT);ov.remove();const f=filaFoco().filter(x=>x.key!==u.key);if(f.length)abrirFoco(f[0]);else render()});
   ov.querySelector("#fok").addEventListener("click",()=>{
     const min=gastos();SET("tm:"+u.key,min);aprendeRitmo(u,min);
-    SET(u.key,u.key.startsWith("st:")?"done":1);
+    SET(u.key,u.key.startsWith("st:")?"done":1,{minutes:min});
     clearInterval(_focT);ov.remove();
     const f=filaFoco();if(f.length)abrirFoco(f[0]);else{render();toast("Dia concluído. 👏")}
   });
@@ -1443,7 +1469,7 @@ function vHoje(root){
   const foot=document.createElement("div");foot.className="dayfoot";
   const nq=qdRegs(curDate).reduce((a,r)=>a+(+r.n||0),0);
   foot.innerHTML="<span>"+dn+"/"+units.length+" atividades · "+(Math.round(mins/60*10)/10)+"h líquidas (leitura 30 pág/h · aulas a 1,5x)"+(nq?" · ✏ "+nq+" questões (~"+(nq*2)+"min)":"")+"</span><button id=\"allok\">marcar dia como feito</button>";
-  foot.querySelector("#allok").addEventListener("click",()=>{units.forEach(u=>{if(!unitDone(u))SET(u.key,u.key.startsWith("st:")?"done":1)});render()});
+  foot.querySelector("#allok").addEventListener("click",()=>{units.forEach(u=>{if(!unitDone(u))SET(u.key,u.key.startsWith("st:")?"done":1,{minutes:minRestante(u)})});render()});
   root.appendChild(foot);
 }
 function vSemana(root){
@@ -2061,11 +2087,88 @@ function vAjustes(root){
   root.appendChild(info);
 }
 // ---------- stats + render ----------
+function estimateStudyMinutes(k){
+  if(k.startsWith("inf:"))return Number(INFO_BY_ID[k.slice(4)]?.min)||0;
+  if(k.startsWith("au:"))return Math.round((Number(AUMIN[k.slice(3)])||0)/1.5);
+  if(k.startsWith("jur:")||k.startsWith("js:"))return DATA.juris.some((j,i)=>jkey(i)===k||"js:"+i===k)?10:0;
+  if(k.startsWith("rv:"))return 10;
+  if(k.startsWith("xdone:")){const o=extras().find(x=>"xdone:"+x.id===k);return o?extraUnit(o).min:0}
+  const cm=k.match(/^eb:(.+):(\d+)$/);
+  if(cm){
+    // Mesmo tempo do cartão do cronograma; capítulos avulsos usam o ritmo de leitura.
+    for(const b of allBlocks){
+      if(b.tipo!=="EBOOK"||!(b.eb===cm[1]||b.eb2===cm[1]))continue;
+      const u=unitsOf(b).find(x=>x.key===k);if(u)return minRestante(u);
+    }
+    const c=EBK[cm[1]]?.caps.find(x=>x.n===Number(cm[2]));
+    return c?Math.round((c.pf-c.pi+1)*ritmoPag()):0;
+  }
+  const lm=k.match(/^lg2:(.+):([^:]+)$/)||k.match(/^lg:(.+):(\d+)$/);
+  if(lm){
+    const b=allBlocks.find(x=>x.id===lm[1]),gs=LG[lm[1]]||[];
+    const g=k.startsWith("lg2:")?gs.find(x=>x.id===lm[2]):gs[Number(lm[2])];
+    return b&&g?leiMin(g,b,gs.length):0;
+  }
+  if(k.startsWith("st:")){
+    const b=allBlocks.find(x=>"st:"+x.id===k);if(!b)return 0;
+    const us=unitsOf(b);
+    return us.length?us.reduce((sum,u)=>sum+minRestante(u),0):effMin(b);
+  }
+  return 0;
+}
+function studyMinutesOn(dstr){
+  const start=new Date(dstr+"T00:00:00"),end=new Date(start);end.setDate(end.getDate()+1);
+  const inDay=ts=>Number(ts)>=start.getTime()&&Number(ts)<end.getTime();
+  const duration=(k,e)=>{
+    const saved=S.kv["study:"+k];
+    if(saved&&saved[1]===e[1]&&saved[0]){
+      try{const min=Number(JSON.parse(saved[0]).min);if(Number.isFinite(min)&&min>=0)return min}catch(err){}
+    }
+    // Compatibilidade com conclusões anteriores à correção, inclusive sessões do modo foco.
+    const tm=S.kv["tm:"+k];
+    if(tm&&Number(tm[0])>0&&tm[1]<=e[1]&&e[1]-tm[1]<=1000)return Number(tm[0]);
+    return estimateStudyMinutes(k);
+  };
+  const direct=new Map(),parents=[];
+  for(const k in S.kv){
+    const e=S.kv[k];if(!STUDY_KEY.test(k)||!e||!manualStudy(e[0]))continue;
+    // A migração antiga manteve js: junto de jur:; as duas chaves representam a mesma leitura.
+    if(k.startsWith("js:")){
+      const canonical=jkey(Number(k.slice(3)));
+      if(canonical!==k&&S.kv[canonical])continue;
+    }
+    if(k.startsWith("st:")){
+      const b=allBlocks.find(x=>"st:"+x.id===k);
+      const children=b?unitsOf(b).filter(u=>u.key!==k):[];
+      if(children.length){parents.push({k,e,children});continue}
+    }
+    direct.set(k,{e,min:duration(k,e)});
+  }
+  let total=0;
+  direct.forEach(({e,min})=>{if(inDay(e[1]))total+=min});
+  // Marcações antigas do bloco inteiro não somam novamente os filhos já contabilizados.
+  const covered=new Set(direct.keys());
+  parents.sort((a,b)=>a.e[1]-b.e[1]).forEach(({k,e,children})=>{
+    let all=0,remaining=0;const seen=new Set();
+    children.forEach(u=>{
+      if(seen.has(u.key))return;seen.add(u.key);
+      const min=minRestante(u);all+=min;
+      if(!covered.has(u.key)){remaining+=min;covered.add(u.key)}
+    });
+    if(inDay(e[1])&&all>0)total+=duration(k,e)*remaining/all;
+  });
+  // Questões usam a data do registro, com a mesma estimativa de 2 min/questão do cartão.
+  qdRegs(dstr).forEach(r=>{const n=Number(r.n);if(Number.isFinite(n)&&n>0)total+=n*2});
+  for(const k in S.kv){
+    const e=S.kv[k];if(!k.startsWith("qx:")||!e||!e[0]||!inDay(Number(k.slice(3))))continue;
+    try{const n=Number(JSON.parse(e[0]).n);if(Number.isFinite(n)&&n>0)total+=n*2}catch(err){}
+  }
+  return Math.round(total);
+}
 function updateStats(){
   const t=todayStr();
   const prova=new Date((DATA.prova||"2027-04-17")+"T12:00:00"),now=new Date(t+"T12:00:00");
   document.getElementById("stDays").textContent=Math.max(0,Math.round((prova-now)/86400000));
-  const BLKIDX={};allBlocks.forEach(b=>BLKIDX[b.id]=b);
   // progresso por UNIDADE atomica: cada aula, cada capitulo, cada tese e cada bloco de lei/questoes/revisao
   // fonte unica: as mesmas atividades que aparecem no dia, na semana e nas materias + as teses
   let done=0,total=0;const seenJ=new Set();
@@ -2076,16 +2179,9 @@ function updateStats(){
   let moved=0;
   for(const k in S.kv){const v=S.kv[k][0];if(k.startsWith("mvu:")&&v!=null&&!G(k.slice(4)))moved++}
   document.getElementById("stPend").textContent=moved;
-  const t0=new Date();t0.setHours(0,0,0,0);const ts0=t0.getTime();let minH=0;
-  const counted=new Set();
-  for(const k in S.kv){const e=S.kv[k];if(!e||e[1]<ts0||e[0]==null)continue;
-    if(k.startsWith("st:")&&(e[0]==="done"||e[0]==="done-auto")){const b=BLKIDX[k.slice(3)];if(!b||b.opt)continue;
-      const viaAulas=e[0]==="done-auto"&&b.alt&&b.alt.length&&b.alt.every(a=>G("au:"+a.c+":"+a.n)===1);
-      const aulasProprias=e[0]==="done-auto"&&b.tipo==="AULA";
-      if(!viaAulas&&!aulasProprias){minH+=effMin(b);(b.aulas||[]).concat(b.alt||[]).forEach(a=>counted.add(a.c+":"+a.n))}}}
-  for(const k in S.kv){const e=S.kv[k];if(!e||e[1]<ts0||e[0]==null)continue;
-    if(k.startsWith("au:")&&e[0]===1&&!counted.has(k.slice(3))){const m=AUMIN[k.slice(3)];if(m)minH+=Math.round(m/1.5)}}
-  document.getElementById("stHoje").textContent=minH;
+  const todayMinutes=document.getElementById("stHoje");
+  todayMinutes.textContent=studyMinutesOn(t);
+  todayMinutes.title="Minutos das atividades que você concluiu hoje: tempo estimado ou medido no modo foco, mais 2 min por questão registrada. Equivalências avançam os blocos sem duplicar minutos.";
 }
 function render(){
   syncEquiv();

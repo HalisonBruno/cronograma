@@ -1,7 +1,7 @@
 // Network-first com fallback de cache: online voce SEMPRE ve a versao mais nova
 // (o cache so entra quando esta sem rede). O modelo antigo (cache-first) servia a
 // versao anterior do app a cada abertura — correcoes demoravam a aparecer na tela.
-const CACHE = "enam-v4-network-first";
+const CACHE = "enam-v5-study-minutes";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icon-192.png"])));
   self.skipWaiting();
