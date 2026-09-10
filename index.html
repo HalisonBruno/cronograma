@@ -388,7 +388,10 @@ function planRegen(){
   pend.forEach(p=>{p.pri=(perf[p.mat]!=null&&perf[p.mat]<70?0:1)});
   pend.sort((a,c)=>a.pri-c.pri||(a.age<c.age?-1:a.age>c.age?1:0)||((c.cit||0)-(a.cit||0)));
   const moves=[];const fila=[];
+  const placedKeys=new Set();
   pend.forEach(p=>{
+    if(placedKeys.has(p.u.key))return;
+    placedKeys.add(p.u.key);
     // preferencia: dias em que a materia esta no plano; fallback: qualquer dia; nunca acima do teto
     const pref=days.filter(d=>dayOf(d).blocks.some(x=>x.mat===p.mat&&!x.opt));
     let dst=pref.find(d=>load[d]+p.u.min<=cap)||days.find(d=>load[d]+p.u.min<=cap);
@@ -448,7 +451,7 @@ function unitsOn(dstr){
   allBlocks.forEach(b=>{if(b.opt)return;unitsOf(b).forEach(u=>{if(unitDate(u)===dstr)out.push(u)})});
   jurisSemBloco().forEach(o=>{const jk=jkey(o.i);const d=G("mvu:"+jk);if(d===dstr){const j=DATA.juris[o.i];const fake={id:"jsb:"+jk,mat:o.mat,tipo:"JURIS",min:10,t:j.ref,day:dstr,wk:(DATA.days[dayIdx[dstr]]||{}).wk,det:""};
     out.push({key:jk,title:"<b>⚖ "+esc(j.ref)+"</b>"+(j.tema?" · "+esc(j.tema):""),meta:j.cit+"× · 10min",chips:'<a class="lch" target="_blank" rel="noopener" href="'+(j.url||jurl(j.ref))+'">fonte oficial ↗</a>',min:10,val:JG(o.i),done:!!JG(o.i),b:fake})}});
-  return out;
+  return uniqueJurisUnits(out);
 }
 function effMin(b){return b.tipo==="AULA"?Math.round(b.min/1.5):b.min}
 // valores de estado: 1/"done" = marcado por voce; "auto"/"done-auto" = pela equivalencia video<->leitura; "grupo" = ao ticar o bloco-pai
@@ -457,155 +460,116 @@ function autoBadge(val,txt){if(val==="auto")return ' <span class="badge-moved" s
 // Regra: o campo alt de cada bloco EBOOK diz quais aulas cobrem o mesmo assunto.
 // Ler o trecho (bloco feito ou capitulos ticados) => aulas equivalentes ficam assistidas.
 // Assistir todas as aulas equivalentes => bloco de e-book fica cumprido (e os capitulos aparecem como lidos).
-// Todas as aulas de um bloco de videoaulas assistidas => bloco cumprido. So aditivo: desmarcar nao desfaz.
+// Todas as aulas de um bloco de videoaulas assistidas => bloco cumprido. Desmarcar revoga apenas derivados sem suporte.
 function syncEquiv(){
-  for(let pass=0;pass<6;pass++){
-    let ch=false;
+  // Derivados são uma projeção das conclusões MANUAIS, nunca raízes entre si.
+  // Recalcular em memória evita ciclos auto -> auto e não regrava timestamps intactos.
+  const manual=new Set(),derived=new Map();
+  for(const k in S.kv)if(STUDY_KEY.test(k)&&manualStudy(G(k)))manual.add(k);
+  const has=k=>manual.has(k)||derived.has(k);
+  const put=(k,v)=>{if(has(k))return false;derived.set(k,v);return true};
+  const visible=b=>(LG[b.id]||[]).filter(g=>!g.x);
+  const lawKey=(b,g)=>{const gs=visible(b);return gs.includes(g)?lgKey(b.id,g,gs):"lg2:"+b.id+":"+g.id};
+  const manualIv=eb=>{
+    const iv=[];
+    allBlocks.forEach(b=>{if(!manual.has("st:"+b.id))return;
+      if(b.eb===eb&&b.pg)iv.push(b.pg);
+      if((b.eb2||b.eb)===eb&&b.pg2)iv.push(b.pg2);
+    });
+    return iv;
+  };
+  const readIv=eb=>{
+    const iv=manualIv(eb);
+    (EBK[eb]?.caps||[]).forEach(c=>{if(has("eb:"+eb+":"+c.n))iv.push([c.pi,c.pf])});
+    return iv;
+  };
+  // Lei seca mantém a regra estrita: revisão, consulta e leitura parcial não
+  // comprovam leitura integral; fragmentos só cobrem o artigo quando todos foram lidos.
+  const lawRead={};
+  allBlocks.forEach(b=>{
+    if(b.tipo!=="LEI"||!LG[b.id])return;
+    const parent=manual.has("st:"+b.id);
+    (LG[b.id]||[]).forEach(g=>{
+      if(!g.u||!g.a?.length||g.rev||g.dir||g.x)return;
+      if(!parent&&!manual.has(lawKey(b,g)))return;
+      if(g.fa&&!parent){
+        const siblings=LG[b.id].filter(x=>x.fa===g.fa&&x.u===g.u);
+        if(!siblings.every(x=>manual.has(lawKey(b,x))))return;
+      }
+      const articles=lawRead[g.u]||(lawRead[g.u]=new Set());
+      g.a.forEach(a=>articles.add(String(a)));
+    });
+  });
+  let changed;
+  do{
+    changed=false;
+    const add=(k,v)=>{if(put(k,v))changed=true};
     allBlocks.forEach(b=>{
-      if(b.tipo==="AULA"&&b.aulas&&b.aulas.length&&!isDone(b)&&b.aulas.every(a=>G("au:"+a.c+":"+a.n))){SET("st:"+b.id,"done-auto");ch=true}
-      if(b.tipo==="LEI"&&LG[b.id]&&LG[b.id].length>1){
-        const ks=LG[b.id].map(g2=>"lg2:"+b.id+":"+g2.id);
-        if(!isDone(b)&&ks.every(k=>G(k))){SET("st:"+b.id,"done-auto");ch=true}
-        if(G("st:"+b.id)==="done")ks.forEach(k=>{if(!G(k)){SET(k,"grupo");ch=true}});   // so bloco concluido POR VOCE espalha "grupo"
+      const parent="st:"+b.id;
+      if(b.tipo==="AULA"&&b.aulas?.length){
+        const keys=b.aulas.map(a=>"au:"+a.c+":"+a.n);
+        if(manual.has(parent))keys.forEach(k=>add(k,"grupo"));
+        if(keys.every(has))add(parent,"done-auto");
+      }
+      if(b.tipo==="LEI"&&LG[b.id]){
+        const gs=visible(b),keys=gs.map(g=>lawKey(b,g));
+        if(manual.has(parent))keys.forEach(k=>{if(k!==parent)add(k,"grupo")});
+        (LG[b.id]||[]).forEach(g=>{
+          const rs=g.u&&lawRead[g.u];
+          if(rs&&g.a?.length&&g.a.every(a=>rs.has(String(a))))
+            add(lawKey(b,g),lawKey(b,g)===parent?"done-auto":"auto");
+        });
+        if(keys.length&&keys.every(has))add(parent,"done-auto");
       }
       if(b.eb&&b.pg&&EBK[b.eb]){
-        const capsRead=rangeCovered(capsTicked(EBK[b.eb]),b.pg[0],b.pg[1]);
-        if(capsRead&&!isDone(b)){SET("st:"+b.id,"done-auto");ch=true}
-        if(isDone(b)){
-          const viaAulas=G("st:"+b.id)==="done-auto"&&b.alt&&b.alt.length;
-          capsIn(b.eb,b.pg).forEach(c=>{if(c.pi>=b.pg[0]&&c.pf<=b.pg[1]){const k2="eb:"+b.eb+":"+c.n;if(!G(k2)){SET(k2,viaAulas?"auto":"grupo");ch=true}}});
-        }
-        // fallback (sem matriz N:N): mapa grosso alt do trecho
-        if(b.alt&&b.alt.length&&!EQ.length){
-          if(isDone(b)||capsRead)b.alt.forEach(a=>{const k="au:"+a.c+":"+a.n;if(!G(k)){SET(k,"auto");ch=true}});
-          if(!isDone(b)&&b.alt.every(a=>G("au:"+a.c+":"+a.n))){SET("st:"+b.id,"done-auto");ch=true}
+        const covered=rangeCovered(readIv(b.eb),b.pg[0],b.pg[1])&&
+          (!b.pg2||rangeCovered(readIv(b.eb2||b.eb),b.pg2[0],b.pg2[1]));
+        if(covered)add(parent,"done-auto");
+        if(!EQ.length&&b.alt?.length){
+          if(has(parent))b.alt.forEach(a=>add("au:"+a.c+":"+a.n,"auto"));
+          if(b.alt.every(a=>has("au:"+a.c+":"+a.n))){
+            add(parent,"done-auto");
+            capsIn(b.eb,b.pg).filter(c=>c.pi>=b.pg[0]&&c.pf<=b.pg[1])
+              .forEach(c=>add("eb:"+b.eb+":"+c.n,"auto"));
+          }
         }
       }
     });
-    // ---- revogacao: "auto" gravado por equivalencia antiga que nao se sustenta e desfeito ----
-    // (nunca toca no que voce marcou manualmente)
-    for(const ak in AULA2CAPS){ if(G("au:"+ak)!=="auto")continue;
-      const tot=capsDaAula(ak,true),todos=capsDaAula(ak,false);
-      const ok=(tot.length&&tot.some(x=>capLido(x.eb,x.cap)))||(todos.length&&todos.every(x=>capLido(x.eb,x.cap)));
-      if(!ok){SET("au:"+ak,null);ch=true} }
-    for(const ck in CAP2AULAS){ const ci=ck.lastIndexOf(":");const eb2=ck.slice(0,ci),cn=ck.slice(ci+1); if(G("eb:"+eb2+":"+cn)!=="auto")continue;
-      const tot=aulasDoCap(eb2,+cn,true),todos=aulasDoCap(eb2,+cn,false);
-      const ok=(tot.length&&tot.some(a=>G("au:"+a)))||(todos.length&&todos.every(a=>G("au:"+a)));
-      if(!ok){SET("eb:"+eb2+":"+cn,null);ch=true} }
-    // ---- informativo lido => juris citadas nele ficam dominadas ----
-    const manual=v=>v&&v!=="auto"&&v!=="done-auto"&&v!=="grupo";
-    // ---- gemeos de informativo: o MESMO julgado repetido em capitulos diferentes do material
-    // (texto identico, verificado item a item). Ticar um tica o outro; desfazer revoga. ----
-    const IG=DATA.infgem||{};
-    for(const id in IG){
-      if(manual(G("inf:"+id)))IG[id].forEach(g2=>{if(!G("inf:"+g2)){SET("inf:"+g2,"auto");ch=true}});
-    }
-    for(const id in IG){
-      if(G("inf:"+id)!=="auto")continue;   // "auto" em inf: so nasce de gemeo — revoga se nenhum gemeo segue manual
-      if(!IG[id].some(g2=>manual(G("inf:"+g2)))){SET("inf:"+id,null);ch=true}
-    }
-    INFOS.forEach(o=>{
-      if(!manual(G("inf:"+o.id))||!o.pids)return;   // so propaga a partir de marcacao MANUAL
-      o.pids.forEach(p=>{const k="jur:"+p;if(!G(k)){SET(k,"auto");ch=true}});
+    Object.values(EBK).forEach(bk=>{
+      const iv=manualIv(bk.k);
+      if(iv.length)bk.caps.forEach(c=>{
+        if(rangeCovered(iv,c.pi,c.pf))add("eb:"+bk.k+":"+c.n,"grupo");
+      });
     });
-    // ---- revogacao simetrica: juris "auto" sem nenhum informativo lido que a cite volta a pendente ----
-    (function(){
-      const porJuris={};
-      INFOS.forEach(o=>{(o.pids||[]).forEach(p=>{(porJuris[p]=porJuris[p]||[]).push(o.id)})});
-      for(const p in porJuris){
-        const k="jur:"+p;
-        if(G(k)!=="auto")continue;
-        if(!porJuris[p].some(id=>manual(G("inf:"+id)))){SET(k,null);ch=true}
-      }
-    })();
-    // ---- caminho inverso: todas as juris do item lidas => o item de informativo fica lido ----
-    // (regra de conjunto, igual a de aulas/capitulos: cobertura parcial nao tica)
-    INFOS.forEach(o=>{
-      if(!o.pids||!o.pids.length)return;
-      const k="inf:"+o.id,v=G(k);
-      const todas=o.pids.every(p=>manual(G("jur:"+p)));   // idem: cobertura conta leitura MANUAL
-      if(todas&&!v){SET(k,"auto");ch=true}
-      else if(!todas&&v==="auto"){SET(k,null);ch=true}   // revogacao; manual nunca e tocado
-    });
-    // ---- matriz N:N capitulo <-> aula ----
-    // capitulo lido => aula cujos capitulos-alvo (grau total) estao TODOS lidos fica assistida ("pela leitura")
-    // aula assistida => capitulo cujas aulas de grau total estao TODAS assistidas fica lido ("pela aula")
     if(EQ.length){
-      // AULA fica assistida quando: (a) algum capitulo que ela cobre INTEIRAMENTE ja foi lido, ou
-      // (b) TODOS os capitulos que ela cobre (mesmo parcialmente) foram lidos
       for(const ak in AULA2CAPS){
-        if(G("au:"+ak))continue;
-        const tot=capsDaAula(ak,true),todos=capsDaAula(ak,false);
-        const porTotal=tot.length&&tot.some(x=>capLido(x.eb,x.cap));
-        const porConjunto=todos.length&&todos.every(x=>capLido(x.eb,x.cap));
-        if(porTotal||porConjunto){SET("au:"+ak,"auto");ch=true}
+        const total=capsDaAula(ak,true),all=capsDaAula(ak,false);
+        const read=x=>has("eb:"+x.eb+":"+x.cap);
+        if(total.some(read)||(all.length&&all.every(read)))add("au:"+ak,"auto");
       }
-      // CAPITULO fica lido quando: (a) alguma aula que o cobre INTEIRAMENTE foi assistida, ou
-      // (b) TODAS as aulas ligadas a ele (mesmo parciais) foram assistidas
       for(const ck in CAP2AULAS){
-        const p=ck.split(":");const eb=p[0],cap=+p[1];
-        if(G("eb:"+eb+":"+cap))continue;
-        const tot=aulasDoCap(eb,cap,true),todas=aulasDoCap(eb,cap,false);
-        const porTotal=tot.length&&tot.some(a=>G("au:"+a));
-        const porConjunto=todas.length&&todas.every(a=>G("au:"+a));
-        if(porTotal||porConjunto){SET("eb:"+eb+":"+cap,"auto");ch=true}
+        const sep=ck.lastIndexOf(":"),eb=ck.slice(0,sep),cap=+ck.slice(sep+1);
+        const total=aulasDoCap(eb,cap,true),all=aulasDoCap(eb,cap,false);
+        const watched=a=>has("au:"+a);
+        if(total.some(watched)||(all.length&&all.every(watched)))add("eb:"+ck,"auto");
       }
     }
-    // revogacao previa: "auto" de lei que nao se sustenta mais sera reavaliado abaixo
-    // subsuncao entre grupos de lei: artigos lidos em QUALQUER grupo ticado (mesma lei, qualquer bloco/materia)
-    // cobrem automaticamente grupos menores contidos neles (ex.: LINDB integral cobre LINDB 20-30)
-    const leiRead={};
-    const manualLei=v=>!!v&&v!=="auto"&&v!=="grupo";   // so o que VOCE ticou; derivados nunca alimentam
-    allBlocks.forEach(b=>{
-      if(b.tipo!=="LEI"||!LG[b.id])return;
-      const blocoManual=G("st:"+b.id)==="done";   // "done-auto" NAO alimenta (era o furo que sustentava lixo antigo)
-      LG[b.id].forEach((g2,i)=>{
-        if(!g2.u||!g2.a||!g2.a.length)return;
-        if(g2.rev||g2.dir||g2.x)return;   // revisao/dirigida NAO conta como leitura plena (regra do usuario)
-        const vLido=G(lgKey(b.id,g2,LG[b.id]));
-        if(manualLei(vLido)||blocoManual){
-          if(g2.fa){const sibs=LG[b.id].filter(x=>x.fa===g2.fa&&x.u===g2.u);
-            if(!sibs.every(x=>manualLei(G("lg2:"+b.id+":"+x.id))||blocoManual))return}
-          const s2=leiRead[g2.u]=leiRead[g2.u]||new Set();g2.a.forEach(a=>s2.add(a))}
-      });
+    const twins=DATA.infgem||{};
+    for(const id in twins){
+      if(has("inf:"+id))twins[id].forEach(other=>add("inf:"+other,"auto"));
+      if(twins[id].some(other=>has("inf:"+other)))add("inf:"+id,"auto");
+    }
+    INFOS.forEach(o=>{
+      if(!o.pids?.length)return;
+      if(has("inf:"+o.id))o.pids.forEach(pid=>add("jur:"+pid,"auto"));
+      if(o.pids.every(pid=>has("jur:"+pid)))add("inf:"+o.id,"auto");
     });
-    allBlocks.forEach(b=>{
-      if(b.tipo!=="LEI"||!LG[b.id])return;
-      LG[b.id].forEach((g2,i)=>{
-        if(LG[b.id].length===1)return;
-        const k="lg2:"+b.id+":"+g2.id;
-        if(G(k)||!g2.u||!g2.a||!g2.a.length)return;
-        const rs=leiRead[g2.u];
-        if(rs&&g2.a.every(a=>rs.has(a))){SET(k,"auto");ch=true}
-      });
-      // revogacao: "auto" orfao (cobertura removida) volta a pendente; manual intocado
-      LG[b.id].forEach(g2=>{
-        const k="lg2:"+b.id+":"+g2.id;
-        if(G(k)!=="auto")return;
-        const rs=g2.u&&leiRead[g2.u];
-        if(!(rs&&g2.a&&g2.a.length&&g2.a.every(a=>rs.has(a)))){SET(k,null);ch=true}
-      });
-      // revogacao: "grupo" orfao (o bloco-pai nao esta mais concluido POR VOCE)
-      LG[b.id].forEach(g2=>{
-        const k="lg2:"+b.id+":"+g2.id;
-        if(G(k)==="grupo"&&G("st:"+b.id)!=="done"){SET(k,null);ch=true}
-      });
-      // revogacao: bloco LEI "done-auto" que nao se sustenta mais volta a pendente
-      if(G("st:"+b.id)==="done-auto"&&LG[b.id].length>1){
-        const ks=LG[b.id].map(g2=>"lg2:"+b.id+":"+g2.id);
-        if(!ks.every(k=>G(k))){SET("st:"+b.id,null);ch=true}
-      }
-      if(!isDone(b)&&LG[b.id].length===1){
-        const g2=LG[b.id][0];const rs=g2.u&&leiRead[g2.u];
-        if(rs&&g2.a&&g2.a.length&&g2.a.every(a=>rs.has(a))){SET("st:"+b.id,"done-auto");ch=true}
-      }
-      if(G("st:"+b.id)==="done-auto"&&LG[b.id].length===1){
-        const g2=LG[b.id][0];const rs=g2.u&&leiRead[g2.u];
-        if(!(rs&&g2.a&&g2.a.length&&g2.a.every(a=>rs.has(a)))){SET("st:"+b.id,null);ch=true}
-      }
-    });
-    if(!ch)break;
+  }while(changed);
+  const automatic=v=>v==="auto"||v==="grupo"||v==="done-auto";
+  for(const k in S.kv){
+    if(STUDY_KEY.test(k)&&automatic(G(k))&&!derived.has(k))SET(k,null);
   }
+  for(const [k,v] of derived)if(G(k)!==v)SET(k,v);
 }
 function fmt(dstr){const p=dstr.split("-");return p[2]+"/"+p[1]}
 function wdName(dstr){return["dom","seg","ter","qua","qui","sex","sáb"][new Date(dstr+"T12:00:00").getDay()]}
@@ -654,8 +618,10 @@ function stars(v){return v>=12?"★★★":v>=6?"★★":v>0?"★":""}
 // ---------- filtros TEC baseados no que foi ESTUDADO ----------
 function tecStudied(mat){
   // assuntos das atividades feitas (capitulos, aulas, grupos de lei) + dos blocos de questoes ja feitos
-  const st={};const add=(t,src)=>{if(!t)return;st[t]=st[t]||{n:0,tested:false,pcts:[]};st[t].n++};
+  const st={};const seen=new Set();const add=(t,src)=>{if(!t||seen.has(src+"\n"+t))return;seen.add(src+"\n"+t);st[t]=st[t]||{n:0,tested:false,pcts:[]};st[t].n++};
   allBlocks.forEach(b=>{if(mat&&b.mat!==mat)return;unitsOf(b).forEach(u=>{if(!unitDone(u))return;(TECMAP[u.key]||[]).forEach(t=>add(t,u.key))})});
+  // Capitulos estudados pela pagina da materia tambem contam quando estao fora das datas do plano.
+  Object.keys(TECMAP).filter(k=>k.startsWith("eb:")&&G(k)).forEach(k=>{if(!mat||EB2MAT[k.split(":")[1]]===mat)TECMAP[k].forEach(t=>add(t,k))});
   allBlocks.forEach(b=>{if(b.tipo!=="QUEST"||(mat&&b.mat!==mat))return;const p=G("pct:"+b.id);(b.tec||[]).forEach(t=>{if(!st[t])return;if(isDone(b)||p!=null){st[t].tested=true;if(p!=null)st[t].pcts.push(p)}})});
   return st;
 }
@@ -669,13 +635,114 @@ function tecPick(mat,modo){
   return arr.sort((a,b)=>(a.tested?1:0)-(b.tested?1:0)||((a.avg!=null&&a.avg<70)?-1:0)-((b.avg!=null&&b.avg<70)?-1:0)||b.n-a.n).map(x=>x.t);
 }
 function tecCopy(mat,modo){
-  let ass=[],head="";
-  if(modo==="fgv"){ass=tecPick(mat,"fgv").slice(0,8);head="TEC — 20 questões · banca FGV · área jurídica · 2021-2026\nAssuntos (o que você já estudou e ainda não testou primeiro):"}
-  else if(modo==="ceb"){ass=tecPick(mat,"fgv").slice(0,6);head="TEC — 10 questões · banca CEBRASPE · procuradorias (AGU/PGE/PGM) · 2021-2026\nAssuntos (ponte, sem competir com a prioridade FGV):"}
-  else{ass=tecPick(mat,"pior").slice(0,8);head="TEC — revisão · FGV + CEBRASPE · 2021-2026\nAssuntos com desempenho < 70% (piores primeiro):"}
-  if(!ass.length){toast(modo==="pior"?"Sem assuntos abaixo de 70% registrados — anote o % de acerto nos blocos de questões.":"Nada estudado ainda nesta matéria (tique capítulos, aulas ou leis).");return}
-  const txt=head+"\n"+ass.map(a=>"• "+a).join("\n");
-  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast("Filtro copiado ("+ass.length+" assuntos) — cole no TEC ao montar o caderno."),()=>toast(txt));else toast(txt);
+  matSel=mat;curTab="mats";render();const el=document.getElementById("tec-notebook");if(el)el.scrollIntoView({block:"start",behavior:"smooth"});
+}
+// Cadernos TEC: propostas nunca significam filtros aplicados. Eventos separados preservam o historico na sincronizacao.
+function tecRecords(prefix){
+  const out=[];for(const k in S.kv){if(!k.startsWith(prefix)||!G(k))continue;try{const o=JSON.parse(G(k));if(o&&o.v===1&&o.id)out.push(o)}catch(e){}}
+  return out;
+}
+// Uma tese pode pertencer a várias matérias, mas é uma única tarefa e uma única carga.
+// Não fundir julgados distintos apenas por título: o identificador permanente é a chave.
+function uniqueJurisUnits(units){
+  const out=[],seen=new Map();
+  units.forEach(u=>{
+    if(!/^(jur|js):/.test(u.key)){out.push(u);return}
+    const id=u.key.startsWith("js:")?jkey(+u.key.slice(3)):u.key;
+    const existing=seen.get(id);
+    if(existing){
+      if(u.b.mat&&!existing.jurisMats.includes(u.b.mat))existing.jurisMats.push(u.b.mat);
+    }else{
+      const item={...u,jurisMats:u.b.mat?[u.b.mat]:[]};seen.set(id,item);out.push(item);
+    }
+  });
+  return out;
+}
+function tecId(){return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10)}
+function tecUrl(value){try{const u=new URL(value);return u.protocol==="https:"&&(u.hostname==="tecconcursos.com.br"||u.hostname.endsWith(".tecconcursos.com.br"))&&!u.username&&!u.password?u.href:null}catch(e){return null}}
+function tecBooks(mat){return tecRecords("tecb:").filter(b=>b.mat===mat).sort((a,b)=>a.createdAt-b.createdAt||a.id.localeCompare(b.id))}
+function tecBook(mat){
+  const books=tecBooks(mat),active=G("tecactive:"+mat);
+  return books.find(b=>b.id===active)||books[0]||{v:1,id:"default:"+mat,mat,name:mat+" — FGV + CEBRASPE",url:"",createdAt:Date.now()};
+}
+function tecSaveBook(mat,name,url){
+  const b=tecBook(mat);name=String(name||"").trim();url=String(url||"").trim();
+  if(!name)throw new Error("Informe um nome para identificar este caderno.");
+  if(url){url=tecUrl(url);if(!url)throw new Error("Use um link HTTPS do site tecconcursos.com.br.")}
+  if(b.url&&b.url!==url&&tecGenerations(mat,b.id).length)throw new Error("Este caderno já tem histórico. Para outro link, use Novo caderno; os filtros anteriores ficarão preservados.");
+  const next={...b,name,url};SET("tecb:"+next.id,JSON.stringify(next));SET("tecactive:"+mat,next.id);return next;
+}
+function tecNewBook(mat){
+  const b={v:1,id:tecId(),mat,name:mat+" — caderno "+(tecBooks(mat).length+1),url:"",createdAt:Date.now()};
+  SET("tecb:"+b.id,JSON.stringify(b));SET("tecactive:"+mat,b.id);return b;
+}
+function tecSelectBook(mat,id){if(!tecBooks(mat).some(b=>b.id===id))throw new Error("Caderno não encontrado nesta matéria.");SET("tecactive:"+mat,id)}
+function tecGenerations(mat,bookId){return tecRecords("tecg:").filter(g=>g.mat===mat&&g.bookId===bookId&&Array.isArray(g.topics)&&g.base&&Array.isArray(g.base.years)&&Array.isArray(g.base.banks)).sort((a,b)=>b.createdAt-a.createdAt||(b.sequence||0)-(a.sequence||0)||b.id.localeCompare(a.id))}
+function tecApplications(mat,bookId){return tecRecords("teca:").filter(a=>a.mat===mat&&a.bookId===bookId&&Array.isArray(a.topics)).sort((a,b)=>b.appliedAt-a.appliedAt||b.id.localeCompare(a.id))}
+function tecApplied(mat,bookId){const set=new Set();tecApplications(mat,bookId).filter(a=>!G("tecaundo:"+a.id)).forEach(a=>a.topics.forEach(t=>set.add(t)));return set}
+function tecBase(){const y=new Date().getFullYear();return {banks:["FGV","CEBRASPE"],area:"Jurídica",years:Array.from({length:5},(_,i)=>y-4+i)}}
+function tecGenerate(mat){
+  const b=tecBook(mat);if(!G("tecb:"+b.id))SET("tecb:"+b.id,JSON.stringify(b));SET("tecactive:"+mat,b.id);
+  const applied=tecApplied(mat,b.id),topics=[...new Set(tecPick(mat,"fgv"))].filter(t=>!applied.has(t));
+  const sequence=tecGenerations(mat,b.id).reduce((n,g)=>Math.max(n,g.sequence||0),0)+1;
+  const g={v:1,id:tecId(),bookId:b.id,mat,createdAt:Date.now(),sequence,topics,base:tecBase()};
+  SET("tecg:"+g.id,JSON.stringify(g));return g;
+}
+function tecConfirm(mat,gid,topics,baseConfirmed){
+  const b=tecBook(mat),g=tecGenerations(mat,b.id).find(g=>g.id===gid);
+  if(!g)throw new Error("Geração não encontrada no caderno selecionado.");
+  if(!baseConfirmed)throw new Error("Confirme que conferiu também banca, área e anos no TEC.");
+  const applied=tecApplied(mat,b.id),selected=[...new Set(topics||[])];
+  if(selected.some(t=>!g.topics.includes(t)))throw new Error("A seleção contém um assunto que não pertence a esta geração.");
+  const pending=selected.filter(t=>!applied.has(t));if(!pending.length)throw new Error("Marque ao menos um filtro que você acabou de incluir no TEC.");
+  const a={v:1,id:tecId(),bookId:b.id,mat,generationId:gid,appliedAt:Date.now(),topics:pending,base:g.base};
+  SET("teca:"+a.id,JSON.stringify(a));return a;
+}
+function tecUndo(mat,id){const b=tecBook(mat);if(!tecApplications(mat,b.id).some(a=>a.id===id))throw new Error("Confirmação não encontrada neste caderno.");SET("tecaundo:"+id,Date.now())}
+function tecDate(ts){return new Date(ts).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"medium"})}
+function tecNotebookPanel(mat){
+  const panel=document.createElement("section");panel.id="tec-notebook";panel.className="card";panel.style.margin="12px 0";
+  const add=(tag,text,parent=panel)=>{const el=document.createElement(tag);if(text!=null)el.textContent=text;parent.appendChild(el);return el};
+  const note=(text,parent=panel)=>{const el=add("p",text,parent);el.className="note";return el};
+  const button=(text,fn,parent=panel)=>{const el=add("button",text,parent);el.type="button";el.addEventListener("click",()=>{try{fn()}catch(e){toast(e.message)}});return el};
+  const draw=()=>{
+    panel.replaceChildren();const b=tecBook(mat),books=tecBooks(mat),gens=tecGenerations(mat,b.id),applied=tecApplied(mat,b.id),studied=new Set(tecPick(mat,"fgv"));
+    add("h2","🧩 Caderno TEC — filtros incrementais");
+    note("Selecione os filtros manualmente no TEC. Aqui ficam o caderno, as gerações com dia e hora e as inclusões que você confirmar. Gerar não aplica filtros e não altera seu estudo.");
+    if(books.length>1){const label=add("label","Caderno: ");const sel=add("select",null,label);books.forEach(book=>{const o=add("option",book.name,sel);o.value=book.id});sel.value=b.id;sel.addEventListener("change",()=>{tecSelectBook(mat,sel.value);draw()});}
+    const labelName=add("label","Nome do caderno");labelName.style.display="block";const name=add("input",null,labelName);name.className="lnkinput";name.value=b.name;name.maxLength=160;
+    const labelUrl=add("label","Link do caderno no TEC (opcional)");labelUrl.style.display="block";const url=add("input",null,labelUrl);url.type="url";url.className="lnkinput";url.value=b.url;url.placeholder="https://www.tecconcursos.com.br/…";
+    const controls=add("div");controls.className="toolbar";
+    const save=()=>tecSaveBook(mat,name.value,url.value);
+    button("Salvar identificação",()=>{save();draw();toast("Identificação do caderno salva.")},controls);
+    button("Novo caderno",()=>{save();tecNewBook(mat);draw()},controls);
+    if(tecUrl(b.url)){const link=add("a","Abrir este caderno no TEC ↗",controls);link.href=tecUrl(b.url);link.target="_blank";link.rel="noopener noreferrer";}
+    const base=tecBase();note("Filtros base: bancas FGV e CEBRASPE · área jurídica · anos "+base.years.join(", ")+" (cinco anos civis, incluindo o atual). Confira esses campos no TEC antes de confirmar as inclusões.");
+    note("Assuntos: use os rótulos integrais abaixo na disciplina correspondente a "+mat+". São os nomes do mapeamento cadastrado no aplicativo; a árvore e os nomes atuais do TEC não são consultados automaticamente.");
+    const actions=add("div");actions.className="toolbar";
+    button("Gerar novos filtros do que estudei",()=>{save();tecGenerate(mat);draw()},actions);
+    note(studied.size+" assuntos estudados mapeados · "+applied.size+" já confirmados neste caderno · "+[...studied].filter(t=>!applied.has(t)).length+" novos para incluir.");
+    if(!studied.size)note("Ainda não há assuntos mapeados de atividades concluídas nesta matéria. Suas marcações e os dados antigos de questões serão preservados.");
+    if(gens.length){
+      const g=gens[0],pending=g.topics.filter(t=>!applied.has(t));add("h3","Última geração — "+tecDate(g.createdAt));
+      note(g.topics.length+" filtros propostos nessa geração · "+pending.length+" ainda não confirmados.");
+      if(pending.length){
+        const checks=[];const list=add("div");
+        pending.forEach(t=>{const label=add("label",null,list);label.style.cssText="display:flex;gap:8px;align-items:flex-start;margin:10px 0;overflow-wrap:anywhere";const check=add("input",null,label);check.type="checkbox";check.checked=false;check.style.marginTop="4px";add("span",mat+" › "+t+(!studied.has(t)?" — não consta mais como estudado; confira antes de incluir":""),label);checks.push({check,t});});
+        const label=add("label");label.style.display="block";const baseCheck=add("input",null,label);baseCheck.type="checkbox";add("span"," Conferi as bancas, a área e os anos desta geração no TEC: "+g.base.years.join(", ")+".",label);
+        button("Confirmar os filtros marcados como incluídos no TEC",()=>{tecConfirm(mat,g.id,checks.filter(o=>o.check.checked).map(o=>o.t),baseCheck.checked);draw();toast("Inclusões confirmadas e registradas com dia e hora.")});
+        note("Marque somente o que realmente incluiu. Você pode confirmar parte da lista e continuar depois. Para acrescentar conteúdos estudados após esta geração, gere novamente.");
+      }else note(g.topics.length?"Todos os filtros dessa geração já estão confirmados. Estude novos assuntos e gere novamente para receber somente as inclusões novas.":"Nenhum filtro novo nesta geração. O caderno e seu histórico foram mantidos.");
+    }
+    if(applied.size){const details=add("details");add("summary","Já incluídos neste caderno ("+applied.size+")",details);[...applied].forEach(t=>note(mat+" › "+t+(!studied.has(t)?" — marcação de estudo removida; não removemos filtros do TEC automaticamente":""),details));}
+    const history=add("details");add("summary","Histórico de gerações e confirmações ("+gens.length+" gerações)",history);
+    if(!gens.length)note("Nenhuma geração registrada neste caderno ainda.",history);
+    const apps=tecApplications(mat,b.id);
+    gens.forEach(g=>{const row=add("details",null,history);add("summary",tecDate(g.createdAt)+" — "+g.topics.length+" filtros propostos",row);note("Base dessa geração: "+g.base.banks.join(" + ")+" · "+g.base.area+" · "+g.base.years.join(", "),row);g.topics.forEach(t=>note(mat+" › "+t,row));
+      apps.filter(a=>a.generationId===g.id).forEach(a=>{const undone=G("tecaundo:"+a.id);note(tecDate(a.appliedAt)+" — "+a.topics.length+" inclusões confirmadas"+(undone?"; confirmação desfeita em "+tecDate(undone):""),row);a.topics.forEach(t=>note("✓ "+t,row));if(!undone)button("Desfazer esta confirmação",()=>{tecUndo(mat,a.id);draw();toast("Registro desfeito aqui. Nenhum filtro foi removido do TEC.")},row);});
+    });
+  };
+  draw();return panel;
 }
 // ---------- matriz de equivalencia capitulo <-> aula (N:N) ----------
 // DATA.equiv = [{eb, cap, aula:"curso:n", grau:"total"|"parcial"}]
@@ -1152,7 +1219,7 @@ function unitCard(u,showOrigin){
   const chips=isBlock?blockChips(b):u.chips;
   div.innerHTML='<div class="rowa"><input type="checkbox" class="ck" '+(dn?"checked":"")+' aria-label="Concluir atividade">'+
     '<div style="flex:1"><div class="bt">'+u.title+'</div>'+
-    '<div class="bmeta"><span class="tag">'+(TIPO_LABEL[b.tipo]||b.tipo)+'</span>'+(u.meta?'<span class="mmin">'+u.meta+'</span>':'<span class="mmin">'+u.min+'min</span>')+'<span class="mat">· '+esc(b.mat)+'</span>'+qphBadge(u)+
+    '<div class="bmeta"><span class="tag">'+(TIPO_LABEL[b.tipo]||b.tipo)+'</span>'+(u.meta?'<span class="mmin">'+u.meta+'</span>':'<span class="mmin">'+u.min+'min</span>')+'<span class="mat">· '+esc(u.jurisMats?.join(" · ")||b.mat)+'</span>'+qphBadge(u)+
     (prov?'<span class="badge-moved" style="background:var(--surface2);color:var(--muted)">⚙ '+prov+'</span>':"")+
     (moved&&showOrigin?'<span class="badge-moved">↻ de '+fmt(b.day)+'</span>':"")+'</div>'+
     (chips?'<div class="lrow">'+chips+'</div>':"")+
@@ -1818,12 +1885,8 @@ function vMats(root){
   const ferr=document.createElement("details");ferr.className="mais";ferr.style.display="block";ferr.style.margin="6px 0";
   ferr.innerHTML='<summary>🧰 ferramentas da matéria ▾</summary>';
   ferr.insertAdjacentHTML("beforeend",'<div class="note" style="margin:6px 0">q/h = questões esperadas na prova por hora de estudo (peso total = 80). Atividades sem dado de incidência aparecem por último, mas não são necessariamente dispensáveis. "semana N" = a semana do cronograma em que a atividade está agendada.</div>');
-  const tecBar=document.createElement("div");tecBar.className="toolbar";tecBar.style.margin="6px 0";
-  const mkT=(txt,modo)=>{const bt=document.createElement("button");bt.textContent=txt;bt.addEventListener("click",()=>tecCopy(m,modo));return bt};
-  tecBar.appendChild(mkT("20 questões FGV do que estudei","fgv"));
-  tecBar.appendChild(mkT("10 questões CEBRASPE — ponte procuradorias","ceb"));
-  tecBar.appendChild(mkT("Revisar meus assuntos com pior desempenho","pior"));
-  ferr.appendChild(tecBar);root.appendChild(ferr);
+  root.appendChild(ferr);
+  root.appendChild(tecNotebookPanel(m));
   // (barra de atalhos antiga removida: o indice fixo .secidx cumpre o papel)
   // e-books da matéria: cadastro de link direto (só aparece se não houver links por capítulo)
   const ebs=Object.keys(EB2MAT).filter(k=>EB2MAT[k]===m&&EBK[k]);
