@@ -8,6 +8,8 @@ Regenerar reconstrói todas as atividades pendentes, inclusive futuras, e preser
 
 O contador inclui todos os informativos, deduplica chaves repetidas e mantém créditos de equivalências distintas sem duplicar minutos. A migração de datas aguarda o primeiro carregamento da nuvem; falha de conexão não autoriza sobrescrever o plano remoto.
 
+A sugestão de questões acompanha as matérias efetivamente estudadas na data, mesmo fora de ordem; na ausência de conclusões, usa o plano regenerado. Não fica presa à matéria da grade original.
+
 ## Lei seca
 
 Foram recompostos 123 arquivos, correspondentes a todos os 467 grupos cadastrados, incluindo referências antigas não usadas como tarefas. São 4.072 ocorrências de dispositivos; 2.745 foram modificadas ou recompostas em relação ao conteúdo anterior. Isso não significa 2.745 alterações legislativas: inclui correções de extração, recortes e grupos sem texto.
@@ -25,3 +27,5 @@ Os DOCX anteriores do Google Drive não foram atualizados nesta entrega. Estão 
 Pesos, prioridades, mapas de incidência, conteúdo dos informativos e identificadores originais foram preservados. Em `DATA`, somente rótulos de leitura e endereços diretos de fontes foram acrescentados. Os testes comparam todo o restante à versão anterior.
 
 Suítes: `study-minutes.js`, `tec-notebooks.js`, `equivalence-regressions.js`, `scheduler-budget.js`, `startup-progress.js`, `law-interface.js`, `law-parser.py` e `law-content.py`. Usam o código real da página em DOM isolado e arquivos publicados, sem acessar ou modificar a conta do estudante.
+
+Conferência adicional no navegador, em perfil local sem sincronizar: Home de 11/09 com 90 minutos, sábado de 12/09 sem tarefas, leitura integral de informativo e leitor dos arts. 35–36 da LOMAN com fonte oficial e data da revisão. Nenhuma conclusão da conta foi marcada como teste.

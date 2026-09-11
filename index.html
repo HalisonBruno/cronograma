@@ -171,13 +171,13 @@ td input{width:64px;background:var(--surface);border:1px solid var(--line);borde
 <div class="wrap">
 <header class="top">
   <h1>Cronograma ENAM 2027.1</h1>
-  <div class="sub">Halison · reinício 13/08 · prova estimada 18/10 (confirmar no edital)</div>
+  <div class="sub">Halison · foco ENAM 2027.1 · 90 min de segunda a sexta · data da prova a confirmar</div>
   <div class="statrow">
     <div class="stat"><b id="stDays">—</b><span>dias p/ prova</span></div>
     <div class="stat"><b id="stDone">—</b><span>blocos feitos</span></div>
     <div class="stat"><b id="stPend">—</b><span>realocados</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
-    <button id="regen" title="Realoca tudo que ficou para trás, sem perder o que está feito">⟳ replanejar</button>
+    <button id="regen" title="Reconstrói todas as datas pendentes, inclusive futuras, preservando o que está feito">⟳ replanejar</button>
     <button id="syncpill" title="Estado da sincronização">—</button>
   </div>
   <nav class="tabs">
@@ -837,14 +837,15 @@ function qdTodos(){
 }
 function qdCard(dstr){
   const regs=qdRegs(dstr);
-  // sugestao TODO dia: bloco QUEST do plano > materias estudadas no dia > (dia livre) pior acerto registrado
-  const dd=(DATA.days||[]).find(x=>x.d===dstr)||{blocks:[]};
+  // A sugestão acompanha o estudo real e as novas datas, nunca a grade antiga.
   const okMat=m=>m&&MATLIST.indexOf(m)>=0&&m!=="Informativos 10x";
-  let matsHoje=[...new Set(dd.blocks.filter(b=>b.tipo==="QUEST").map(b=>b.mat))].filter(okMat);
-  let rotulo="O plano sugere questões de:";
+  const start=new Date(dstr+"T00:00:00").getTime(),end=new Date(dstr+"T00:00:00");end.setDate(end.getDate()+1);
+  const studied=planningUnits().filter(u=>{const e=S.kv[u.key];return e&&manualStudy(e[0])&&e[1]>=start&&e[1]<end.getTime()});
+  let matsHoje=[...new Set(studied.map(u=>u.b.mat))].filter(okMat);
+  let rotulo="Faça questões do que você estudou nesta data:";
   if(!matsHoje.length){
-    matsHoje=[...new Set(dd.blocks.map(b=>b.mat))].filter(okMat).slice(0,4);
-    if(matsHoje.length)rotulo="Faça questões do que você estudou hoje:";
+    matsHoje=[...new Set(unitsOn(dstr).map(u=>u.b.mat))].filter(okMat);
+    if(matsHoje.length)rotulo="Depois das leituras do plano atual, pratique:";
   }
   if(!matsHoje.length){
     const agg={};qdTodos().forEach(o=>{if(!okMat(o.mat))return;agg[o.mat]=agg[o.mat]||{n:0,ac:0};agg[o.mat].n+=+o.n||0;agg[o.mat].ac+=+o.ac||0});
@@ -852,10 +853,8 @@ function qdCard(dstr){
     if(fraca){matsHoje=[fraca];rotulo="Ataque sua matéria mais fraca:"}
   }
   if(!matsHoje.length){
-    // ultimo recurso (simulado/vespera): materias estudadas na mesma semana
-    const wk=dd.wk;
-    matsHoje=[...new Set((DATA.days||[]).filter(x=>x.wk===wk).flatMap(x=>(x.blocks||[]).map(b=>b.mat)))].filter(okMat).slice(0,4);
-    rotulo=matsHoje.length?"Questões do que você estudou na semana:":"Mantenha a meta de 30 questões — qualquer matéria:";
+    matsHoje=[...new Set(planningUnits().filter(u=>{const e=S.kv[u.key];return e&&manualStudy(e[0])&&e[1]>=start-7*86400000&&e[1]<end.getTime()}).map(u=>u.b.mat))].filter(okMat);
+    rotulo=matsHoje.length?"Questões das matérias estudadas nos últimos dias:":"Questões à parte dos 90 minutos — escolha a matéria:";
   }
   const tot=regs.reduce((a,r)=>a+(+r.n||0),0);
   const ac=regs.reduce((a,r)=>a+(+r.ac||0),0);
@@ -1946,7 +1945,7 @@ function appendItems(root,items){
 function vMats(root){
   if(!matSel){
     const lg=legendaPrio();
-    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. Feitas e capítulos já cobertos por vídeo caem para o fim.</div>');
+    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. As conclusões e equivalências não alteram os pesos das pesquisas. Equivalências avançam os blocos sem duplicar minutos.</div>');
     const g=document.createElement("div");g.className="matgrid";
     gradeBusca(root);
     const PM=progressoPorMateria();

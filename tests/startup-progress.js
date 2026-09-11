@@ -4,7 +4,7 @@ const path = require('node:path');
 
 const harness = fs.readFileSync(path.join(__dirname, 'study-minutes.js'), 'utf8')
   .split('async function main()')[0]
-  .replace('updateStats, unitCard,', 'updateStats, jurisSemBloco, jkey, unitDone, unitsOn, minRestante, coreStudyMinutesOn, unitCard,');
+  .replace('updateStats, unitCard,', 'updateStats, jurisSemBloco, jkey, unitDone, unitsOn, minRestante, coreStudyMinutesOn, qdCard, unitCard,');
 const {loadApp} = new Function('require', '__dirname', harness + '\nreturn {loadApp};')(require, __dirname);
 const DAY = '2026-09-08';
 const now = new Date(DAY + 'T12:00:00').getTime();
@@ -14,6 +14,18 @@ const progress = t => { t.app.syncEquiv(); t.app.updateStats(); return t.nodes.g
 let cases = 0;
 
 async function main() {
+  {
+    const t=loadApp();
+    const a=t.app;
+    const civil=a.allBlocks.filter(b=>b.mat==='Civil').flatMap(b=>a.unitsOf(b)).find(u=>u.key.startsWith('eb:'));
+    assert(civil);
+    a.SET(civil.key,1);
+    const note=a.qdCard(DAY).innerHTML.match(/<div class="note"[^>]*>([\s\S]*?)<\/div>/)[1];
+    assert(note.includes('estudou nesta data'));
+    assert(note.includes('Civil'));
+    assert(!note.includes('Proc. Civil'), 'a sugestão não fica presa à matéria do calendário antigo');
+    cases++;
+  }
   {
     const t = loadApp();
     const a = t.app;
