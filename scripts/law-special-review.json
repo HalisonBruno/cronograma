@@ -1,0 +1,384 @@
+{
+  "https://www.planalto.gov.br/ccivil_03/decreto/1950-1969/anexo/an57663-66.pdf": {
+    "sourceUrl": "https://www2.camara.leg.br/legin/fed/decleg/1960-1969/decretolegislativo-54-8-setembro-1964-350064-anexo-pl.pdf",
+    "checkedAt": "2026-09-10",
+    "method": "Transcrição conferida visualmente no Anexo I da publicação oficial digitalizada da Câmara dos Deputados; páginas físicas 16, 17 e 19 (páginas 1/2, 3 e 5 do PDF). Acentuação e quebras de linha normalizadas; não utilizada extração OCR sem revisão.",
+    "notes": [
+      "O trecho de leitura é o Anexo I — Lei Uniforme relativa às letras de câmbio e notas promissórias —, arts. 1–20 e 75–78. Não confundir esses números com os artigos da Convenção ou do Anexo II.",
+      "A incorporação brasileira contém reservas ao Anexo II; o texto literal do Anexo I não dispensa a leitura das reservas brasileiras e da legislação nacional pertinente. Fonte de promulgação: Decreto nº 57.663/1966.",
+      "Os textos foram recompostos no escopo exato cadastrado. O conjunto anterior de 26 artigos selecionados não correspondia ao título do bloco."
+    ],
+    "specialArticles": [
+      {
+        "n": "1",
+        "t": "Artigo 1.\nA letra contém:\n1. a palavra ‘letra’ inserta no próprio texto do título e expressa na língua empregada para a redação desse título;\n2. o mandato puro e simples de pagar uma quantia determinada;\n3. o nome daquele que deve pagar (sacado);\n4. a época do pagamento;\n5. a indicação do lugar em que se deve efetuar o pagamento;\n6. o nome da pessoa a quem ou à ordem de quem deve ser paga;\n7. a indicação da data em que, e do lugar onde a letra é passada;\n8. a assinatura de quem passa a letra (sacador).",
+        "v": []
+      },
+      {
+        "n": "2",
+        "t": "Artigo 2.\nO escrito em que faltar algum dos requisitos indicados no artigo anterior não produzirá efeito como letra, salvo nos casos determinados nas alíneas seguintes:\nA letra em que se não indique a época do pagamento entende-se pagável à vista.\nNa falta de indicação especial, o lugar designado ao lado do nome do sacado considera-se como sendo o lugar do pagamento e, ao mesmo tempo, o lugar do domicílio do sacado.\nA letra sem indicação do lugar onde foi passada considera-se como tendo-o sido no lugar designado ao lado do nome do sacador.",
+        "v": []
+      },
+      {
+        "n": "3",
+        "t": "Artigo 3.\nA letra pode ser à ordem do próprio sacador.\nPode ser sacada sobre o próprio sacador.\nPode ser sacada por ordem e conta de terceiro.",
+        "v": []
+      },
+      {
+        "n": "4",
+        "t": "Artigo 4.\nA letra pode ser pagável no domicílio de terceiro, quer na localidade onde o sacado tem o seu domicílio, quer noutra localidade.",
+        "v": []
+      },
+      {
+        "n": "5",
+        "t": "Artigo 5.\nNuma letra pagável à vista ou a um certo termo de vista, pode o sacador estipular que a sua importância vencerá juros. Em qualquer outra espécie de letra a estipulação de juros será considerada como não escrita.\nA taxa de juro deve ser indicada na letra; na falta de indicação, a cláusula de juros é considerada como não escrita.\nOs juros contam-se da data da letra, se outra data não for indicada.",
+        "v": []
+      },
+      {
+        "n": "6",
+        "t": "Artigo 6.\nSe na letra a indicação da quantia a satisfazer se achar feita por extenso e em algarismos, e houver divergência entre uma e outra, prevalece a que estiver feita por extenso.\nSe na letra a indicação da quantia a satisfazer se achar feita por mais de uma vez, quer por extenso, quer em algarismos, se houver divergências entre as diversas indicações, prevalecerá a que se achar feita pela quantia inferior.",
+        "v": []
+      },
+      {
+        "n": "7",
+        "t": "Artigo 7.\nSe a letra contém assinaturas de pessoas incapazes de se obrigarem por letras, assinaturas falsas, assinaturas de pessoas fictícias, ou assinaturas que por qualquer outra razão não poderiam obrigar as pessoas que assinaram a letra ou em nome das quais ela foi assinada, as obrigações dos outros signatários nem por isso deixam de ser válidas.",
+        "v": []
+      },
+      {
+        "n": "8",
+        "t": "Artigo 8.\nTodo aquele que apuser a sua assinatura numa letra, como representante duma pessoa, para representar a qual não tinha de fato poderes, fica obrigado em virtude da letra e, se a pagar, tem os mesmos direitos que o pretendido representado. A mesma regra se aplica ao representante que tenha excedido os seus poderes.",
+        "v": []
+      },
+      {
+        "n": "9",
+        "t": "Artigo 9.\nO sacador é garante tanto da aceitação como do pagamento da letra.\nO sacador pode exonerar-se da garantia da aceitação; toda e qualquer cláusula pela qual ele se exonere da garantia do pagamento considera-se como não escrita.",
+        "v": []
+      },
+      {
+        "n": "10",
+        "t": "Artigo 10.\nSe uma letra incompleta no momento de ser passada tiver sido completada contrariamente aos acordos realizados, não pode a inobservância desses acordos ser motivo de oposição ao portador, salvo se este tiver adquirido a letra de má-fé ou, adquirindo-a, tenha cometido uma falta grave.",
+        "v": []
+      },
+      {
+        "n": "11",
+        "t": "Artigo 11.\nToda letra de câmbio, mesmo que não envolva expressamente a cláusula à ordem, é transmissível por via de endosso.\nQuando o sacador tiver inserido na letra as palavras ‘não à ordem’, ou uma expressão equivalente, a letra só é transmissível pela forma e com os efeitos de uma cessão ordinária de créditos.\nO endosso pode ser feito mesmo a favor do sacado, aceitando ou não, do sacador, ou de qualquer outro coobrigado. Estas pessoas podem endossar novamente a letra.",
+        "v": []
+      },
+      {
+        "n": "12",
+        "t": "Artigo 12.\nO endosso deve ser puro e simples. Qualquer condição a que ele seja subordinado considera-se como não escrita.\nO endosso parcial é nulo.\nO endosso ao portador vale como endosso em branco.",
+        "v": []
+      },
+      {
+        "n": "13",
+        "t": "Artigo 13.\nO endosso deve ser escrito na letra ou numa folha ligada a esta (anexo). Deve ser assinado pelo endossante.\nO endosso pode não designar o beneficiário, ou consistir simplesmente na assinatura do endossante (endosso em branco). Neste último caso, o endosso para ser válido deve ser escrito no verso da letra ou na folha anexa.",
+        "v": []
+      },
+      {
+        "n": "14",
+        "t": "Artigo 14.\nO endosso transmite todos os direitos emergentes da letra.\nSe o endosso for em branco, o portador pode:\n1º) preencher o espaço em branco, quer com o seu nome, quer com o nome de outra pessoa;\n2º) endossar de novo a letra em branco ou a favor de outra pessoa;\n3º) remeter a letra a um terceiro, sem preencher o espaço em branco e sem a endossar.",
+        "v": []
+      },
+      {
+        "n": "15",
+        "t": "Artigo 15.\nO endossante, salvo cláusula em contrário, é garante tanto da aceitação como do pagamento da letra.\nO endossante pode proibir um novo endosso e, neste caso, não garante o pagamento às pessoas a quem a letra for posteriormente endossada.",
+        "v": []
+      },
+      {
+        "n": "16",
+        "t": "Artigo 16.\nO detentor de uma letra é considerado portador legítimo se justifica o seu direito por uma série ininterrupta de endossos, mesmo se o último for em branco. Os endossos riscados consideram-se, para este efeito, como não escritos. Quando um endosso em branco é seguido de um outro endosso, presume-se que o signatário deste adquiriu a letra pelo endosso em branco.\nSe uma pessoa foi por qualquer maneira desapossada de uma letra, o portador dela, desde que justifique o seu direito pela maneira indicada na alínea precedente, não é obrigado a restituí-la, salvo se a adquiriu de má-fé ou se, adquirindo-a, cometeu uma falta grave.",
+        "v": []
+      },
+      {
+        "n": "17",
+        "t": "Artigo 17.\nAs pessoas acionadas em virtude de uma letra não podem opor ao portador exceções fundadas sobre as relações pessoais delas com o sacador ou com os portadores anteriores, a menos que o portador, ao adquirir a letra, tenha procedido conscientemente em detrimento do devedor.",
+        "v": []
+      },
+      {
+        "n": "18",
+        "t": "Artigo 18.\nQuando o endosso contém a menção \"valor a cobrar\" (valeur en recouvrement), \"para cobrança\" (pour encaissement), \"Por procuração\" (par procuration), ou qualquer outra menção que implique um simples mandato, o portador pode exercer todos os direitos emergentes da letra, mas só pode endossá-la na qualidade de procurador.\nOs coobrigados, neste caso, só podem invocar contra o portador as exceções que eram oponíveis ao endossante.\nO mandato que resulta de um endosso por procuração não se extingue por morte ou sobrevinda incapacidade legal do mandatário.",
+        "v": []
+      },
+      {
+        "n": "19",
+        "t": "Artigo 19.\nQuando o endosso contém a menção \"valor em garantia\", \"valor em penhor\" ou qualquer outra menção que implique uma caução, o portador pode exercer todos os direitos emergentes da letra, mas um endosso feito por ele só vale como endosso a título de procuração.\nOs coobrigados não podem invocar contra o portador as exceções fundadas sobre as relações pessoais deles com o endossante, a menos que o portador, ao receber a letra, tenha procedido conscientemente em detrimento do devedor.",
+        "v": []
+      },
+      {
+        "n": "20",
+        "t": "Artigo 20.\nO endosso posterior ao vencimento tem os mesmos efeitos que o endosso anterior. Todavia, o endosso posterior ao protesto por falta de pagamento, ou feito depois de expirado o prazo fixado para se fazer o protesto, produz apenas os efeitos de uma cessão ordinária de créditos.\nSalvo prova em contrário, presume-se que um endosso sem data foi feito antes de expirado o prazo fixado para se fazer o protesto.",
+        "v": []
+      },
+      {
+        "n": "75",
+        "t": "Artigo 75.\nA nota promissória contém:\n1. denominação ‘nota promissória’ inserta no próprio texto do título e expressa na língua empregada para a redação desse título;\n2. a promessa pura e simples de pagar uma quantia determinada;\n3. a época do pagamento;\n4. a indicação do lugar em que se efetuar o pagamento;\n5. o nome da pessoa a quem ou à ordem de quem deve ser paga;\n6. a indicação da data em que e do lugar onde a nota promissória é passada;\n7. a assinatura de quem passa a nota promissória (subscritor).",
+        "v": []
+      },
+      {
+        "n": "76",
+        "t": "Artigo 76.\nO título em que faltar algum dos requisitos indicados no artigo anterior não produzirá efeito como nota promissória, salvo nos casos determinados das alíneas seguintes.\nA nota promissória em que se não indique a época do pagamento será considerada pagável à vista.\nNa falta de indicação especial, o lugar onde o título foi passado considera-se como sendo o lugar do pagamento e, ao mesmo tempo, o lugar do domicílio do subscritor da nota promissória.\nA nota promissória que não contenha indicação do lugar onde foi passada considera-se como tendo-o sido no lugar designado ao lado do nome do subscritor.",
+        "v": []
+      },
+      {
+        "n": "77",
+        "t": "Artigo 77.\nSão aplicáveis às notas promissórias, na parte em que não sejam contrárias à natureza deste título, as disposições relativas às letras e concernentes: endosso (artigos 11 a 20); vencimento (artigos 33 a 37); pagamento (artigos 38 a 42); direito de ação por falta de pagamento (artigos 43 a 50 e 52 a 54); pagamento por intervenção (artigos 55 e 59 a 63); cópias (artigos 67 e 68); alterações (artigo 69); prescrição (artigos 70 e 71); dias feriados, contagem de prazos e interdição de dias de perdão (artigos 72 a 74).\nSão igualmente aplicáveis às notas promissórias as disposições relativas às letras pagáveis no domicílio de terceiro ou numa localidade diversa da do domicílio do sacado (artigos 4º e 27), a estipulação de juros (artigo 5º), as divergências das indicações da quantia a pagar (artigo 6º), as consequências da aposição de uma assinatura nas condições indicadas no artigo 7º, as da assinatura de uma pessoa que age sem poderes ou excedendo os seus poderes (artigo 8º) e a letra em branco (artigo 10).\nSão também aplicáveis às notas promissórias as disposições relativas ao aval (artigos 30 a 32); no caso previsto na última alínea do artigo 31, se o aval não indicar a pessoa por quem é dado, entender-se-á ser pelo subscritor da nota promissória.",
+        "v": []
+      },
+      {
+        "n": "78",
+        "t": "Artigo 78.\nO subscritor de uma nota promissória é responsável da mesma forma que o aceitante de uma letra.\nAs notas promissórias pagáveis a certo termo de vista devem ser presentes ao visto dos subscritores nos prazos fixados no artigo 23. O termo de vista conta-se da data do visto dado pelo subscritor. A recusa do subscritor a dar o seu visto é comprovada por um protesto (artigo 25), cuja data serve de início ao termo de vista.",
+        "v": []
+      }
+    ]
+  },
+  "https://www.tst.jus.br/documents/d/guest/livrointernet-12-pdf": {
+    "sourceUrl": "https://www.tst.jus.br/documents/d/guest/livrointernet-12-pdf",
+    "checkedAt": "2026-09-10",
+    "method": "Conferência dos enunciados no livro oficial do TST, edição 2025, páginas PDF 109 (Súmula 331) e 154 (Súmula 425), consultado em 10/09/2026.",
+    "notes": [
+      "O item I da Súmula 331 foi cancelado pela Resolução TST nº 225/2025, por perda de eficácia a partir de 11/11/2017. Seu texto aparece apenas como registro histórico e está explicitamente marcado como cancelado.",
+      "Os demais itens da Súmula 331 e a Súmula 425 são transcritos conforme o livro oficial. Referências internas às Leis nº 7.102/1983 e nº 8.666/1993 são literais do enunciado e não foram reescritas como se o TST tivesse alterado sua redação.",
+      "Súmulas não são artigos de lei: este material mantém o bloco já cadastrado, com natureza jurisprudencial e fonte oficial identificadas."
+    ],
+    "groupIds": [
+      "1dd01e"
+    ],
+    "specialArticles": [
+      {
+        "n": "331",
+        "t": "Súmula 331 do TST.\nCONTRATO DE PRESTAÇÃO DE SERVIÇOS. LEGALIDADE\nItem I cancelado por perda de eficácia a partir de 11/11/2017 — Res. 225/2025, DEJT divulgado em 30/06, 01 e 02/07/2025.\nI — A contratação de trabalhadores por empresa interposta é ilegal, formando-se o vínculo diretamente com o tomador dos serviços, salvo no caso de trabalho temporário (Lei nº 6.019, de 03/01/1974). [ITEM CANCELADO]\nII — A contratação irregular de trabalhador, mediante empresa interposta, não gera vínculo de emprego com os órgãos da Administração Pública direta, indireta ou fundacional (art. 37, II, da CF/1988).\nIII — Não forma vínculo de emprego com o tomador a contratação de serviços de vigilância (Lei nº 7.102, de 20/06/1983) e de conservação e limpeza, bem como a de serviços especializados ligados à atividade-meio do tomador, desde que inexistente a pessoalidade e a subordinação direta.\nIV — O inadimplemento das obrigações trabalhistas, por parte do empregador, implica a responsabilidade subsidiária do tomador dos serviços quanto àquelas obrigações, desde que haja participado da relação processual e conste também do título executivo judicial.\nV — Os entes integrantes da Administração Pública direta e indireta respondem subsidiariamente, nas mesmas condições do item IV, caso evidenciada a sua conduta culposa no cumprimento das obrigações da Lei nº 8.666, de 21/06/1993, especialmente na fiscalização do cumprimento das obrigações contratuais e legais da prestadora de serviço como empregadora. A aludida responsabilidade não decorre de mero inadimplemento das obrigações trabalhistas assumidas pela empresa regularmente contratada.\nVI — A responsabilidade subsidiária do tomador de serviços abrange todas as verbas decorrentes da condenação referentes ao período da prestação laboral.",
+        "v": []
+      },
+      {
+        "n": "425",
+        "t": "Súmula 425 do TST.\nJUS POSTULANDI NA JUSTIÇA DO TRABALHO. ALCANCE\nO jus postulandi das partes, estabelecido no art. 791 da CLT, limita-se às Varas do Trabalho e aos Tribunais Regionais do Trabalho, não alcançando a ação rescisória, a ação cautelar, o mandado de segurança e os recursos de competência do Tribunal Superior do Trabalho.",
+        "v": []
+      }
+    ]
+  },
+  "https://atos.cnj.jus.br/atos/detalhar/127": {
+    "sourceUrl": "https://atos.cnj.jus.br/atos/detalhar/127",
+    "checkedAt": "2026-09-10",
+    "method": "Texto consolidado oficial do CNJ em UTF-8. Nos arts. 1º e 2º foi selecionado o segundo candidato, pertencente ao Código anexo, e não o texto da Resolução nº 60/2008 instituidora.",
+    "notes": [
+      "O Código de Ética da Magistratura Nacional contém 42 artigos; os arts. 1º e 2º da Resolução instituidora são textos diferentes e não integram a numeração do Código anexo.",
+      "O art. 39 contém a redação dada pela Resolução CNJ nº 538/2023 e o parágrafo único nela incluído, relativos a assédio, discriminação e violência contra a mulher. A redação anterior tachada não é apresentada como texto atual.",
+      "Fonte oficial consolidada em PDF: https://atos.cnj.jus.br/files/compilado173213202312186580821d6fd5c.pdf"
+    ],
+    "amendmentUrls": [
+      "https://atos.cnj.jus.br/atos/detalhar/5386"
+    ],
+    "specialArticles": [
+      {
+        "n": "1",
+        "t": "Art. 1º O exercício da magistratura exige conduta compatível com os preceitos deste Código e do Estatuto da Magistratura, norteando-se pelos princípios da independência, da imparcialidade, do conhecimento e capacitação, da cortesia, da transparência, do segredo profissional, da prudência, da diligência, da integridade profissional e pessoal, da dignidade, da honra e do decoro.",
+        "v": []
+      },
+      {
+        "n": "2",
+        "t": "Art. 2º Ao magistrado impõe-se primar pelo respeito à Constituição da República e às leis do País, buscando o fortalecimento das instituições e a plena realização dos valores democráticos.",
+        "v": []
+      },
+      {
+        "n": "3",
+        "t": "Art. 3º A atividade judicial deve desenvolver-se de modo a garantir e fomentar a dignidade da pessoa humana, objetivando assegurar e promover a solidariedade e a justiça na relação entre as pessoas.",
+        "v": []
+      },
+      {
+        "n": "4",
+        "t": "Art. 4º Exige-se do magistrado que seja eticamente independente e que não interfira, de qualquer modo, na atuação jurisdicional de outro colega, exceto em respeito às normas legais.",
+        "v": []
+      },
+      {
+        "n": "5",
+        "t": "Art. 5º Impõe-se ao magistrado pautar-se no desempenho de suas atividades sem receber indevidas influências externas e estranhas à justa convicção que deve formar para a solução dos casos que lhe sejam submetidos.",
+        "v": []
+      },
+      {
+        "n": "6",
+        "t": "Art. 6º É dever do magistrado denunciar qualquer interferência que vise a limitar sua independência.",
+        "v": []
+      },
+      {
+        "n": "7",
+        "t": "Art. 7º A independência judicial implica que ao magistrado é vedado participar de atividade político-partidária.",
+        "v": []
+      },
+      {
+        "n": "8",
+        "t": "Art. 8º O magistrado imparcial é aquele que busca nas provas a verdade dos fatos, com objetividade e fundamento, mantendo ao longo de todo o processo uma distância equivalente das partes, e evita todo o tipo de comportamento que possa refletir favoritismo, predisposição ou preconceito.",
+        "v": []
+      },
+      {
+        "n": "9",
+        "t": "Art. 9º Ao magistrado, no desempenho de sua atividade, cumpre dispensar às partes igualdade de tratamento, vedada qualquer espécie de injustificada discriminação.\nParágrafo único. Não se considera tratamento discriminatório injustificado:\nI - a audiência concedida a apenas uma das partes ou seu advogado, contanto que se assegure igual direito à parte contrária, caso seja solicitado;\nII - o tratamento diferenciado resultante de lei.",
+        "v": []
+      },
+      {
+        "n": "10",
+        "t": "Art. 10. A atuação do magistrado deve ser transparente, documentando-se seus atos, sempre que possível, mesmo quando não legalmente previsto, de modo a favorecer sua publicidade, exceto nos casos de sigilo contemplado em lei.",
+        "v": []
+      },
+      {
+        "n": "11",
+        "t": "Art. 11. O magistrado, obedecido o segredo de justiça, tem o dever de informar ou mandar informar aos interessados acerca dos processos sob sua responsabilidade, de forma útil, compreensível e clara.",
+        "v": []
+      },
+      {
+        "n": "12",
+        "t": "Art. 12. Cumpre ao magistrado, na sua relação com os meios de comunicação social, comportar-se de forma prudente e eqüitativa, e cuidar especialmente:\nI - para que não sejam prejudicados direitos e interesses legítimos de partes e seus procuradores;\nII - de abster-se de emitir opinião sobre processo pendente de julgamento, seu ou de outrem, ou juízo depreciativo sobre despachos, votos, sentenças ou acórdãos, de órgãos judiciais, ressalvada a crítica nos autos, doutrinária ou no exercício do magistério.",
+        "v": []
+      },
+      {
+        "n": "13",
+        "t": "Art. 13. O magistrado deve evitar comportamentos que impliquem a busca injustificada e desmesurada por reconhecimento social, mormente a autopromoção em publicação de qualquer natureza.",
+        "v": []
+      },
+      {
+        "n": "14",
+        "t": "Art. 14. Cumpre ao magistrado ostentar conduta positiva e de colaboração para com os órgãos de controle e de aferição de seu desempenho profissional.",
+        "v": []
+      },
+      {
+        "n": "15",
+        "t": "Art. 15. A integridade de conduta do magistrado fora do âmbito estrito da atividade jurisdicional contribui para uma fundada confiança dos cidadãos na judicatura.",
+        "v": []
+      },
+      {
+        "n": "16",
+        "t": "Art. 16. O magistrado deve comportar-se na vida privada de modo a dignificar a função, cônscio de que o exercício da atividade jurisdicional impõe restrições e exigências pessoais distintas das acometidas aos cidadãos em geral.",
+        "v": []
+      },
+      {
+        "n": "17",
+        "t": "Art. 17. É dever do magistrado recusar benefícios ou vantagens de ente público, de empresa privada ou de pessoa física que possam comprometer sua independência funcional.",
+        "v": []
+      },
+      {
+        "n": "18",
+        "t": "Art. 18. Ao magistrado é vedado usar para fins privados, sem autorização, os bens públicos ou os meios disponibilizados para o exercício de suas funções.",
+        "v": []
+      },
+      {
+        "n": "19",
+        "t": "Art. 19. Cumpre ao magistrado adotar as medidas necessárias para evitar que possa surgir qualquer dúvida razoável sobre a legitimidade de suas receitas e de sua situação econômico-patrimonial.",
+        "v": []
+      },
+      {
+        "n": "20",
+        "t": "Art. 20. Cumpre ao magistrado velar para que os atos processuais se celebrem com a máxima pontualidade e para que os processos a seu cargo sejam solucionados em um prazo razoável, reprimindo toda e qualquer iniciativa dilatória ou atentatória à boa-fé processual.",
+        "v": []
+      },
+      {
+        "n": "21",
+        "t": "Art. 21. O magistrado não deve assumir encargos ou contrair obrigações que perturbem ou impeçam o cumprimento apropriado de suas funções específicas, ressalvadas as acumulações permitidas constitucionalmente.\n§ 1º O magistrado que acumular, de conformidade com a Constituição Federal, o exercício da judicatura com o magistério deve sempre priorizar a atividade judicial, dispensando-lhe efetiva disponibilidade e dedicação.\n§ 2º O magistrado, no exercício do magistério, deve observar conduta adequada à sua condição de juiz, tendo em vista que, aos olhos de alunos e da sociedade, o magistério e a magistratura são indissociáveis, e faltas éticas na área do ensino refletirão necessariamente no respeito à função judicial.",
+        "v": []
+      },
+      {
+        "n": "22",
+        "t": "Art. 22. O magistrado tem o dever de cortesia para com os colegas, os membros do Ministério Público, os advogados, os servidores, as partes, as testemunhas e todos quantos se relacionem com a administração da Justiça.\nParágrafo único. Impõe-se ao magistrado a utilização de linguagem escorreita, polida, respeitosa e compreensível.",
+        "v": []
+      },
+      {
+        "n": "23",
+        "t": "Art. 23. A atividade disciplinar, de correição e de fiscalização serão exercidas sem infringência ao devido respeito e consideração pelos correicionados.",
+        "v": []
+      },
+      {
+        "n": "24",
+        "t": "Art. 24. O magistrado prudente é o que busca adotar comportamentos e decisões que sejam o resultado de juízo justificado racionalmente, após haver meditado e valorado os argumentos e contra-argumentos disponíveis, à luz do Direito aplicável.",
+        "v": []
+      },
+      {
+        "n": "25",
+        "t": "Art. 25. Especialmente ao proferir decisões, incumbe ao magistrado atuar de forma cautelosa, atento às conseqüências que pode provocar.",
+        "v": []
+      },
+      {
+        "n": "26",
+        "t": "Art. 26. O magistrado deve manter atitude aberta e paciente para receber argumentos ou críticas lançados de forma cortês e respeitosa, podendo confirmar ou retificar posições anteriormente assumidas nos processos em que atua.",
+        "v": []
+      },
+      {
+        "n": "27",
+        "t": "Art. 27. O magistrado tem o dever de guardar absoluta reserva, na vida pública e privada, sobre dados ou fatos pessoais de que haja tomado conhecimento no exercício de sua atividade.",
+        "v": []
+      },
+      {
+        "n": "28",
+        "t": "Art. 28. Aos juízes integrantes de órgãos colegiados impõe-se preservar o sigilo de votos que ainda não hajam sido proferidos e daqueles de cujo teor tomem conhecimento, eventualmente, antes do julgamento.",
+        "v": []
+      },
+      {
+        "n": "29",
+        "t": "Art. 29. A exigência de conhecimento e de capacitação permanente dos magistrados tem como fundamento o direito dos jurisdicionados e da sociedade em geral à obtenção de um serviço de qualidade na administração de Justiça.",
+        "v": []
+      },
+      {
+        "n": "30",
+        "t": "Art. 30. O magistrado bem formado é o que conhece o Direito vigente e desenvolveu as capacidades técnicas e as atitudes éticas adequadas para aplicá-lo corretamente.",
+        "v": []
+      },
+      {
+        "n": "31",
+        "t": "Art. 31. A obrigação de formação contínua dos magistrados estende-se tanto às matérias especificamente jurídicas quanto no que se refere aos conhecimentos e técnicas que possam favorecer o melhor cumprimento das funções judiciais.",
+        "v": []
+      },
+      {
+        "n": "32",
+        "t": "Art. 32. O conhecimento e a capacitação dos magistrados adquirem uma intensidade especial no que se relaciona com as matérias, as técnicas e as atitudes que levem à máxima proteção dos direitos humanos e ao desenvolvimento dos valores constitucionais.",
+        "v": []
+      },
+      {
+        "n": "33",
+        "t": "Art. 33. O magistrado deve facilitar e promover, na medida do possível, a formação dos outros membros do órgão judicial.",
+        "v": []
+      },
+      {
+        "n": "34",
+        "t": "Art. 34. O magistrado deve manter uma atitude de colaboração ativa em todas as atividades que conduzem à formação judicial.",
+        "v": []
+      },
+      {
+        "n": "35",
+        "t": "Art.35. O magistrado deve esforçar-se para contribuir com os seus conhecimentos teóricos e práticos ao melhor desenvolvimento do Direito e à administração da Justiça.",
+        "v": []
+      },
+      {
+        "n": "36",
+        "t": "Art. 36. É dever do magistrado atuar no sentido de que a instituição de que faz parte ofereça os meios para que sua formação seja permanente.",
+        "v": []
+      },
+      {
+        "n": "37",
+        "t": "Art. 37. Ao magistrado é vedado procedimento incompatível com a dignidade, a honra e o decoro de suas funções.",
+        "v": []
+      },
+      {
+        "n": "38",
+        "t": "Art. 38. O magistrado não deve exercer atividade empresarial, exceto na condição de acionista ou cotista e desde que não exerça o controle ou gerência.",
+        "v": []
+      },
+      {
+        "n": "39",
+        "t": "Art. 39. É atentatório à dignidade do cargo qualquer ato ou comportamento do(a) magistrado(a), no exercício profissional ou em razão dele, que configure assédio moral, assédio sexual ou implique discriminação injusta ou arbitrária. ( redação dada pela Resolução n. 538, de 13.12.2023 )\nParágrafo único. enquadra-se na conduta descrita no caput a violência contra a mulher praticada por magistrado, ainda que dissociada do exercício profissional. ( incluído pela Resolução n. 538, de 13.12.2023 )",
+        "v": []
+      },
+      {
+        "n": "40",
+        "t": "Art. 40. Os preceitos do presente Código complementam os deveres funcionais dos juízes que emanam da Constituição Federal, do Estatuto da Magistratura e das demais disposições legais.",
+        "v": []
+      },
+      {
+        "n": "41",
+        "t": "Art. 41. Os Tribunais brasileiros, por ocasião da posse de todo Juiz, entregar-lhe-ão um exemplar do Código de Ética da Magistratura Nacional, para fiel observância durante todo o tempo de exercício da judicatura.",
+        "v": []
+      },
+      {
+        "n": "42",
+        "t": "Art. 42. Este Código entra em vigor, em todo o território nacional, na data de sua publicação, cabendo ao Conselho Nacional de Justiça promover-lhe ampla divulgação.",
+        "v": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "71ba5c": {"readTitle":"CF · art. 153, § 6º, incisos I–VII", "fragment":{"start":"§6","end":"§6/VII"}, "notes":["Recorte identificado pelo § 6º (imposto seletivo), não pelos incisos I–VII do caput."]},
+  "f0e889": {"readTitle":"CF · art. 155, § 2º, VIII–XII; §§ 3º–5º; § 6º, caput e I", "fragment":{"start":"§2/VIII","end":"§6/I"}},
+  "c17c5d": {"readTitle":"CF · art. 155, § 6º, incisos II–III e alíneas", "fragment":{"start":"§6/II","end":"§6/III"}},
+  "2d6fce": {"readTitle":"Lei 8.072 · art. 1º, parágrafo único, incisos I–VIII", "fragment":{"start":"Parágrafoúnico/I","end":"Parágrafoúnico/VIII"}},
+  "4cb7e4": {"readTitle":"Lei 14.711 · art. 6º, trecho final — DL 911, art. 8º-C, § 11, e arts. 8º-D–8º-E", "fragment":{"start":"§11","startOccurrence":2,"end":"Parágrafoúnico"}, "notes":["Os números 8º-C a 8º-E identificam os dispositivos alterados do Decreto-Lei 911, transcritos no art. 6º da Lei 14.711."]},
+  "d56e47": {"readTitle":"Lei 12.846 · arts. 16–17 — acordo de leniência", "omit":["17-A","17-B"], "notes":["Os arts. 17-A e 17-B haviam sido introduzidos pela MP 703/2015, cuja vigência foi encerrada. Não são apresentados como artigos vigentes. Fonte: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/mpv/mpv703.htm"]},
+  "ad71ab": {"readTitle":"Código Penal · art. 159 — extorsão mediante sequestro", "readSource":"https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm", "notes":["O art. 159 é do Código Penal, citado pela Lei dos Crimes Hediondos; corrigida a identificação da norma."]},
+  "dc1f06": {"readTitle":"Código Penal · art. 213; arts. 214 e 223 revogados", "readSource":"https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm", "notes":["Esses artigos pertencem ao Código Penal, não à Lei 8.072. Dispositivos revogados são identificados conforme a fonte consolidada."]},
+  "9a1620": {"readTitle":"Código Penal · arts. 267 e 270 — crimes contra a saúde pública", "readSource":"https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm"},
+  "e97510": {"readTitle":"Lei 14.994 · arts. 1–10, incluindo as alterações citadas do Código Penal", "omit":["121-A","129","141","147"], "notes":["Os arts. 121-A, 129, 141 e 147 são dispositivos do Código Penal citados dentro da lei alteradora; suas citações permanecem no artigo alterador correto, sem numeração falsa nem duplicação."]},
+  "4a026f": {"readTitle":"Estatuto da Pessoa com Deficiência · arts. 1–127 e artigos acrescidos", "omit":["1783-A"], "notes":["O art. 1.783-A é do Código Civil, citado no art. 116 do EPD. Sua transcrição permanece no art. 116, e não como artigo 1.783-A do Estatuto."]},
+  "35db7f": {"readTitle":"Lei 12.850 · arts. 10–12 e 18–27, incluindo artigos acrescidos", "omit":["288"], "notes":["O art. 288 é do Código Penal e permanece citado no dispositivo alterador da Lei 12.850."]},
+  "1fa467": {"readTitle":"Lei 14.711 · arts. 2–19 — marco legal das garantias", "omit":["8-E","11-A","26-A","853-A"], "notes":["A numeração das leis alteradas permanece dentro das respectivas citações. Não existem arts. 26-A ou 853-A próprios da Lei 14.711."]}
+}

@@ -24,7 +24,7 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = {"www.planalto.gov.br", "planalto.gov.br", "atos.cnj.jus.br", "www2.camara.leg.br", "www.tst.jus.br"}
-ARTICLE = re.compile(r"^(?:Art(?:igo)?\.?\s*)(\d+(?:\.\d{3})*(?:\s*[-–]\s*[A-Z]{1,2})?)[º°o.]?(?:\s|[-–:]|$)", re.I)
+ARTICLE = re.compile(r"^(?:Art(?:igo)?\s*\.?\s*)(\d+(?:\.\d{3})*(?:[º°o])?(?:[-–][A-Z]{1,2})*)[º°o.]?(?:\s|[-–:]|$)", re.I)
 HEADING = re.compile(r"^(?:PARTE|LIVRO|T[ÍI]TULO|CAP[ÍI]TULO|SE[ÇC][ÃA]O|SUBSE[ÇC][ÃA]O|ANEXO)\b", re.I)
 
 
@@ -33,11 +33,11 @@ def digest(value: bytes | str) -> str:
 
 
 def normalized(value: str) -> str:
-    return re.sub(r"\s+", " ", value.replace("\xa0", " ")).strip()
+    return re.sub(r"\s+", " ", value.replace("\xa0", " ").replace("\ufeff", "").replace("\u200b", "")).strip()
 
 
 def number(value: str) -> str:
-    return re.sub(r"[.\s]", "", value).replace("–", "-").upper()
+    return re.sub(r"[.\sº°o]", "", value).replace("–", "-").upper()
 
 
 def read_inventory(root: Path = ROOT) -> dict:
@@ -60,9 +60,9 @@ def read_inventory(root: Path = ROOT) -> dict:
     metadata_missing = []
     for block, metas in data.get("leigroups", {}).items():
         for group in metas:
-            # Tilde blocks in the calendar load the base-date JSON in the app.
-            resolved = block.split("~")[0]
-            if (block, group["id"]) in disk_by_id or (resolved, group["id"]) in disk_by_id:
+            # The app loads the exact block ID, including its ~ suffix.
+            resolved = block
+            if (block, group["id"]) in disk_by_id:
                 continue
             item = {"file": None, "blockId": block, "resolvedBlockId": resolved, "groupId": group["id"], "url": group.get("u", ""), "scope": group.get("sub", group.get("r", "")), "origin": "metadata-only", "articleCount": len(group.get("a", []))}
             groups.append(item)
@@ -127,40 +127,72 @@ def parse_html(raw: bytes, url: str) -> dict:
     if "atos.cnj.jus.br" in url:
         # Exact page selectors are optional: fallback still requires article IDs.
         content = soup.select_one(".integra, #integra, .ato-conteudo, .conteudo-ato") or soup
-    paragraphs = content.find_all(["p"])
+    # Some Camara originals put the entire law in a single DIV with BRs,
+    # whereas consolidated texts use P. Preserve both structures, not just P.
+    separator = "\n\u241e\n"
+    anchors = content.find_all("a", href=True)
+    all_links = [{"text": normalized(a.get_text(" ")), "url": urljoin(url, a["href"])} for a in anchors]
+    for i, anchor in enumerate(anchors):
+        anchor.insert_after(f'\u241f{i}\u241f')
+    for node in list(content.find_all(["br", "p", "div", "dir", "tr", "li", "blockquote", "h1", "h2", "h3", "h4", "h5", "h6"])):
+        node.insert_before(separator)
+        node.insert_after(separator)
+    paragraphs = content.get_text("").split("\u241e")
     lines = []
     for paragraph in paragraphs:
-        # Nested p tags from invalid official HTML must not duplicate children.
-        if paragraph.find("p"):
-            continue
-        text = normalized(paragraph.get_text(" "))
+        link_ids = [int(i) for i in re.findall(r'\u241f(\d+)\u241f', paragraph)]
+        text = normalized(re.sub(r'\u241f\d+\u241f', '', paragraph))
+        # SUP/FONT boundaries in legacy Planalto HTML may introduce spaces
+        # inside an ordinal/suffix or even a two-digit article number.
+        text = re.sub(r'^(Art(?:igo)?\.?\s*\d+(?:\.\d{3})*)\s+([oº°])\s*(-[A-Z])', r'\1\2\3', text)
+        text = re.sub(r'^(Art(?:igo)?\.?\s*\d)\s+(\d+[.º°])', r'\1\2', text)
         if text:
-            links = [{"text": normalized(a.get_text(" ")), "url": urljoin(url, a.get("href", ""))} for a in paragraph.find_all("a", href=True)]
+            links = [all_links[i] for i in link_ids]
             lines.append((text, links))
     if not lines:
         lines = [(normalized(line), []) for line in content.get_text("\n").splitlines() if normalized(line)]
     articles = defaultdict(list)
     current = None
     section = "main"
+    quoted = False
     for text, links in lines:
-        if re.match(r"^ATO DAS DISPOSI[ÇC][ÕO]ES CONSTITUCIONAIS TRANSIT[ÓO]RIAS", text, re.I):
+        if articles and re.match(r"^ATO DAS DISPOSI[ÇC][ÕO]ES CONSTITUCIONAIS TRANSIT[ÓO]RIAS", text, re.I):
             current = None
             section = "adct"
-        if re.match(r"^(?:CONVEN[ÇC][ÃA]O AMERICANA SOBRE DIREITOS HUMANOS|PACTO INTERNACIONAL SOBRE DIREITOS CIVIS E POL[ÍI]TICOS)", text, re.I):
+        if articles and re.match(r"^(?:CONVEN[ÇC][ÃA]O AMERICANA SOBRE DIREITOS HUMANOS|PACTO INTERNACIONAL SOBRE DIREITOS CIVIS E POL[ÍI]TICOS)", text, re.I):
             current = None
             section = "treaty"
-        match = ARTICLE.match(text)
+        if articles and re.match(r"^C[ÓO]DIGO DE [ÉE]TICA DA MAGISTRATURA NACIONAL$", text, re.I):
+            current = None
+            section = "ethics"
+        # Quoted redactions belong to the amending article, NOT to this law's
+        # article index (e.g. CC 1.783-A quoted inside EPD art. 116).
+        opens_quote = bool(re.match(r'^[“"«]', text))
+        was_quoted = quoted or opens_quote
+        if opens_quote:
+            quoted = True
+        closes_quote = bool(re.search(r'[”»]|"\s*\(NR\)|"\s*[.;]?\s*$', text)) or (opens_quote and text.startswith('"') and text.count('"') % 2 == 0)
+        # The official HTML omits a closing quotation immediately before these
+        # outer articles. Their own article anchors and legal sequence identify
+        # the boundary; quoted inner Art. 44 uses an HREF, not that own anchor.
+        forced_outer = bool((re.search(r'l14195(?:compilad[ao])?\.htm', url, re.I) and re.match(r'^Art\. 44\.',text)) or (re.search(r'l14711(?:compilad[ao])?\.htm',url,re.I) and re.match(r'^Art\. 7[º°.]',text)))
+        if forced_outer:
+            quoted = False
+            was_quoted = False
+        match = ARTICLE.match(text) if not was_quoted else None
         if match:
             n = number(match[1])
             current = {"number": n, "section": section, "lines": [text], "links": links[:], "warnings": []}
             articles[n].append(current)
             continue
         if current:
-            if HEADING.match(text) or re.match(r"^(?:Bras[íi]lia,|Este texto n[ãa]o substitui|©|Presid[êe]ncia da Rep[úu]blica)", text, re.I):
+            if not was_quoted and (HEADING.match(text) or re.match(r"^(?:Bras[íi]lia,|Rio de Janeiro,|Pal[áa]cio|Este texto n[ãa]o substitui|©|Presid[êe]ncia da Rep[úu]blica)", text, re.I)):
                 current = None
                 continue
             current["lines"].append(text)
             current["links"].extend(links)
+        if closes_quote:
+            quoted = False
     for candidates in articles.values():
         for candidate in candidates:
             candidate["text"] = "\n".join(candidate.pop("lines"))
@@ -184,6 +216,8 @@ def select_candidate(parsed: dict, occurrence: dict) -> tuple[dict | None, str]:
         candidates = [c for c in candidates if c["section"] == section]
     elif re.search(r"d0(?:678|592)\.htm", url, re.I):
         candidates = [c for c in candidates if c["section"] == "treaty"]
+    elif "atos.cnj.jus.br/atos/detalhar/127" in url:
+        candidates = [c for c in candidates if c["section"] == "ethics"]
     if not candidates:
         return None, "article-not-found-or-nested-amendment"
     if len(candidates) != 1:

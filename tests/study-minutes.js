@@ -50,9 +50,11 @@ class Element {
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const source = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert(source, "script principal não encontrado");
-function loadApp(initial = {}) {
+function loadApp(initial = {}, options = {}) {
   const nodes = new Map();
   const storage = new Map([["enam-cron-v2", JSON.stringify({ kv: initial })]]);
+  if(options.localMode !== false) storage.set("enam-local-mode", "1");
+  if(options.token) storage.set("enam-sync-token", options.token);
   const document = {
     body: new Element(), documentElement: new Element(), visibilityState: "visible",
     getElementById(id) {
@@ -69,7 +71,7 @@ function loadApp(initial = {}) {
     matchMedia: () => ({ matches: false, addEventListener() {} }),
     addEventListener() {}, setInterval: () => 1, clearInterval() {},
     setTimeout: () => 1, clearTimeout() {}, queueMicrotask,
-    fetch: async () => ({ ok: false, json: async () => ({}) }),
+    fetch: options.fetch || (async () => ({ ok: false, json: async () => ({}) })),
     confirm: () => false, prompt: () => null, alert() {}, scrollTo() {}, scrollY: 0,
     URL, Blob, Date: TestDate, Math, JSON, Set, Map, Intl, Promise, encodeURIComponent,
   };
@@ -77,7 +79,7 @@ function loadApp(initial = {}) {
   vm.runInNewContext(source + `
     ;globalThis.app = {
       studyMinutesOn, SET, G, S, unitsOf, allBlocks, INFOS, DATA, LG, EBK,
-      updateStats, unitCard, pitem, syncEquiv, render, abrirFoco,
+      updateStats, unitCard, pitem, syncEquiv, render, abrirFoco, pull, push,
       setFocusDate: d => { curDate = d; }
     };`, context, { filename: "index.html" });
   return { app: context.app, nodes, storage, document };
