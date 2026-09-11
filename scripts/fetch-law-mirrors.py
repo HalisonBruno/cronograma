@@ -138,6 +138,12 @@ def fetch(url, out, explicit=None):
         else:
             target, source_kind, norm, query = discover(url)
         r = get(target)
+        if not r.content.startswith(b'%PDF'):
+            compilations = [urljoin(r.url,a['href']) for a in soup_of(r).select('a[href]')
+                            if re.search(r'texto\s+compilado',a.get_text(' ',strip=True),re.I)]
+            compilations = list(dict.fromkeys(u for u in compilations if urlparse(u).hostname in HOSTS and u.lower()!=r.url.lower()))
+            if len(compilations)==1:
+                r = get(compilations[0])
         raw = r.content
         identity = validate_content(url, r.url, raw)
         ext = '.pdf' if raw.startswith(b'%PDF') else '.html'
@@ -175,6 +181,12 @@ def fetch_direct(url, out):
             raise ValueError('Special source without URL')
         target = url.replace('l7347orig.htm', 'l7347compilada.htm')
         r = get(target)
+        if not r.content.startswith(b'%PDF'):
+            compilations = [urljoin(r.url,a['href']) for a in soup_of(r).select('a[href]')
+                            if re.search(r'texto\s+compilado',a.get_text(' ',strip=True),re.I)]
+            compilations = list(dict.fromkeys(u for u in compilations if urlparse(u).hostname in HOSTS and u.lower()!=r.url.lower()))
+            if len(compilations)==1:
+                r = get(compilations[0])
         raw = r.content
         if len(raw) < 300 or re.search(br'(?:<title>|<h1>)\s*(?:50[0-9]|40[0-9]|Gateway|Access Denied)', raw, re.I):
             raise ValueError('Error payload instead of legislation')
