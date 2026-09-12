@@ -177,7 +177,7 @@ td input{width:64px;background:var(--surface);border:1px solid var(--line);borde
     <div class="stat"><b id="stDone">—</b><span>blocos feitos</span></div>
     <div class="stat"><b id="stPend">—</b><span>realocados</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
-    <button id="regen" title="Reconstrói todas as datas pendentes, inclusive futuras, preservando o que está feito">⟳ replanejar</button>
+    <button id="regen" title="Reconstrói os dias úteis a partir de amanhã, preservando hoje e tudo que já está feito">⟳ replanejar</button>
     <button id="syncpill" title="Estado da sincronização">—</button>
   </div>
   <nav class="tabs">
@@ -406,22 +406,34 @@ function scheduleAlternative(u,selected){
   if((u.key.startsWith("jur:")||u.key.startsWith("js:"))&&selected.has("covers:"+u.key))return "Julgado incluído no informativo agendado; a leitura atualizará ambos os blocos.";
   return "";
 }
-function planRegen(){
-  // Reconstrução INTEGRAL: nenhuma data futura pendente entra como carga fixa.
-  const hoje=todayStr(),days=studyDays(hoje),cap=capMin(),load={},initialLoad={},moves=[],fila=[],library=[],selected=new Set();
-  days.forEach(d=>{load[d]=initialLoad[d]=Math.min(cap,coreStudyMinutesOn(d))});
+function regenState(){return todayStr()+"|"+JSON.stringify(S.kv)}
+function planRegen(options={}){
+  // Atualiza a cobertura antes da coleta, inclusive quando o clique vem logo
+  // depois de antecipar uma aula, capítulo ou informativo equivalente.
+  syncEquiv();
+  const hoje=todayStr(),includeToday=options.includeToday===true;
+  // Hoje fica intacto no botão Replanejar. Apenas a migração/configuração do
+  // teto inclui hoje. Datas futuras concluídas não consomem a capacidade futura.
+  const days=studyDays(hoje).filter(d=>includeToday||d>hoje),cap=capMin(),load={},initialLoad={},moves=[],fila=[],library=[],selected=new Set();
+  days.forEach(d=>{load[d]=initialLoad[d]=d===hoje?Math.min(cap,coreStudyMinutesOn(d)):0});
   const perf={},agg={};
   qdTodos().forEach(o=>{const a=agg[o.mat]=agg[o.mat]||{n:0,ac:0};a.n+=+o.n||0;a.ac+=+o.ac||0});
   for(const m in agg)if(agg[m].n>=10)perf[m]=Math.round(agg[m].ac/agg[m].n*100);
   allBlocks.filter(b=>b.tipo==="QUEST").sort((a,b)=>a.day.localeCompare(b.day)).forEach(b=>{const p=G("pct:"+b.id);if(p!=null&&perf[b.mat]==null)perf[b.mat]=p});
-  const all=planningUnits(),pending=all.filter(u=>!unitDone(u));
+  const all=planningUnits(),undone=all.filter(u=>!unitDone(u));
+  const todayKeys=new Set(unitsOn(hoje).map(u=>u.key));
+  const preservedToday=includeToday||!isStudyDay(hoje)?[]:undone.filter(u=>todayKeys.has(u.key));
+  const keptKeys=new Set(preservedToday.map(u=>u.key)),pending=undone.filter(u=>!keptKeys.has(u.key));
   const item=u=>({key:u.key,from:unitDate(u)||"",label:u.b.t||u.key,mat:u.b.mat,min:Math.max(1,Math.ceil(+minRestante(u)||0)),tipo:u.b.tipo});
-  const place=(u,d)=>{const m=item(u);load[d]+=m.min;moves.push({...m,to:d});selected.add(u.key);if(u.key.startsWith("inf:"))(INFO_BY_ID[u.key.slice(4)]?.pids||[]).forEach(pid=>selected.add("covers:jur:"+pid))};
+  const remember=u=>{selected.add(u.key);if(u.key.startsWith("inf:"))(INFO_BY_ID[u.key.slice(4)]?.pids||[]).forEach(pid=>selected.add("covers:jur:"+pid))};
+  preservedToday.forEach(remember);
+  const place=(u,d)=>{const m=item(u);load[d]+=m.min;moves.push({...m,to:d});remember(u)};
   // Um simulado de cinco horas não vira tarefa obrigatória de um dia de 90 minutos.
-  // Sessões curtas já fixadas em dia útil mantêm a data, se couberem no teto.
+  // Sessões curtas também entram na reconstrução: a antiga data de estudo
+  // não pode manter um dia vazio enquanto há um simulado pendente que cabe.
   const sim=pending.filter(u=>u.b.tipo==="SIM");
-  sim.forEach(u=>{const m=item(u),event=/PROVA/.test(u.b.t||""),original=unitDate(u);
-    const d=!event&&m.min<=cap?(days.includes(original)&&m.min<=cap-load[original]?original:days.find(x=>m.min<=cap-load[x])):null;
+  sim.forEach(u=>{const m=item(u),event=/PROVA/.test(u.b.t||"");
+    const d=!event&&m.min<=cap?days.find(x=>m.min<=cap-load[x]):null;
     if(d)place(u,d);else library.push({...m,reason:event?"Evento de prova — confirme a data no edital; não é uma tarefa de estudo.":"Sessão de "+m.min+" min: exige planejamento próprio e não foi imposta ao dia de 90 min."})});
   // Reserva diária calculada pela demanda REAL de todos os informativos pendentes.
   const infos=pending.filter(u=>u.b.tipo==="INFO"),infoTotal=infos.reduce((s,u)=>s+item(u).min,0);
@@ -444,9 +456,27 @@ function planRegen(){
     const d=days.find(day=>load[day]+m.min<=cap);
     if(d)place(u,d);else fila.push({...m,reason:m.min>cap?"Bloco de "+m.min+" min excede a sessão de "+cap+" min; requer divisão ou leitura parcial registrada.":"Sem espaço antes da prova após a reserva obrigatória dos informativos e as prioridades do acervo."});
   });
-  return {moves,fila,library,cap,perf,load,initialLoad,days,generatedAt:Date.now(),info:{total:infos.length,minutes:infoTotal,scheduled:infos.length-waiting.length,unscheduled:waiting.length},pending:pending.length};
+  // Não basta caber no teto: dias com conclusões antecipadas precisam de
+  // trabalho PENDENTE. Espalha a carga já selecionada, sem mudar prioridades,
+  // duplicar equivalentes ou ultrapassar 90 min. Nunca esvazia o dia doador.
+  const count={};days.forEach(d=>count[d]=0);moves.forEach(m=>count[m.to]++);
+  days.filter(d=>!count[d]).forEach(d=>{
+    const candidates=moves.filter(m=>count[m.to]>1&&load[d]+m.min<=cap);
+    // Preenche lacunas com o próximo trabalho; para uma cauda vazia, transfere
+    // o último trabalho do último dia carregado. Simulados são a última opção.
+    candidates.sort((a,b)=>(a.tipo==="SIM")-(b.tipo==="SIM")||
+      (a.to>d?0:1)-(b.to>d?0:1)||(a.to>d?a.to.localeCompare(b.to):b.to.localeCompare(a.to))||moves.indexOf(b)-moves.indexOf(a));
+    const m=candidates[0];if(!m)return;
+    count[m.to]--;load[m.to]-=m.min;m.to=d;count[d]++;load[d]+=m.min;
+  });
+  moves.sort((a,b)=>a.to.localeCompare(b.to));
+  return {moves,fila,library,cap,perf,load,initialLoad,days,includeToday,preservedToday:preservedToday.map(item),emptyDays:days.filter(d=>!count[d]),sourceState:regenState(),generatedAt:Date.now(),info:{total:infos.length,minutes:infoTotal,scheduled:infos.length-waiting.length,unscheduled:waiting.length},pending:pending.length};
 }
 function applyRegen(plan){
+  syncEquiv();
+  // Uma prévia não congela o progresso: se houve marcação, importação, sync ou
+  // virada do dia, reconstrói novamente em vez de só pular o item já concluído.
+  if(plan.sourceState!==regenState())plan=planRegen({includeToday:plan.includeToday});
   const snap={},now=Date.now(),entries=[...plan.moves,...plan.fila.map(m=>({...m,to:"fila"})),...(plan.library||[]).map(m=>({...m,to:"biblioteca"}))];
   let n=0;
   entries.forEach(m=>{if(G(m.key))return;const k="mvu:"+m.key;snap[k]=G(k);S.kv[k]=[m.to,now];n++});
@@ -461,17 +491,27 @@ function ensureStudyProfile(){
   // As conclusões, os tempos e as prioridades não são reescritos.
   const now=Date.now();S.kv["profile:previous-cap"]=[G("cfg:cap"),now];S.kv["cfg:cap"]=[90,now];
   S.kv["profile:90-weekdays:v1"]=[1,now];
-  applyRegen(planRegen());
+  applyRegen(planRegen({includeToday:true}));
 }
 function undoRegen(){const raw=G("regen:undo");if(!raw){toast("Nada para desfazer.");return}try{const snap=JSON.parse(raw);for(const k in snap)SET(k,snap[k]);SET("regen:undo",null);render();toast("Replanejamento desfeito.")}catch(e){toast("Não foi possível desfazer.")}}
 function showRegenPreview(plan){
   const ov=document.createElement("div");ov.className="overlay";
   const byDay={};plan.moves.forEach(m=>{(byDay[m.to]=byDay[m.to]||[]).push(m)});
   const daysHtml=Object.keys(byDay).sort().map(d=>'<div style="margin:6px 0"><b>'+wdName(d)+' '+fmt(d)+'</b> <span class="mmin">('+byDay[d].reduce((a,m)=>a+m.min,0)+'min)</span><br>'+byDay[d].map(m=>'<span class="mmin">· '+esc(m.mat)+': '+esc(String(m.label).slice(0,60))+'</span>').join("<br>")+'</div>').join("");
-  ov.innerHTML='<div class="modal" style="max-width:560px;max-height:85vh;overflow:auto"><h2>Reconstruir todo o futuro</h2><p>'+plan.moves.length+' atividades receberão datas, de segunda a sexta, até '+plan.cap+' min/dia. Questões ficam fora desse teto. Todas as atividades pendentes entram na análise, inclusive as futuras. Nada concluído é alterado.</p><p><b>Informativos: '+plan.info.scheduled+'/'+plan.info.total+' pendentes com data</b> · '+Math.round(plan.info.minutes/60*10)/10+' horas reais.'+(plan.info.unscheduled?' <b>'+plan.info.unscheduled+' obrigatórios ainda não cabem antes da prova.</b>':" Todos os pendentes cabem e permanecem obrigatórios.")+'</p><p class="mmin">'+plan.fila.length+' atividades aguardam capacidade na biblioteca; '+plan.library.length+' alternativas ou sessões especiais ficam disponíveis sem sobrecarregar o dia. Pesos e prioridades das pesquisas foram preservados; desempenho só desempata.</p><div style="font-size:.8rem;max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px">'+(daysHtml||"<i>Nenhuma atividade cabe na janela atual.</i>")+'</div><div class="btns" style="margin-top:12px"><button class="primary" id="rgOk">Aplicar</button><button class="ghost" id="rgNo">Cancelar</button></div></div>';
+  const start=plan.days.length?wdName(plan.days[0])+" "+fmt(plan.days[0]):"sem dias úteis restantes antes da prova";
+  const scope=plan.includeToday?"Inclui as pendências de hoje.":"Hoje fica preservado ("+plan.preservedToday.length+" pendentes). Todas as datas futuras pendentes serão reconstruídas, incluindo atrasos e fila.";
+  const coverage=plan.emptyDays.length?plan.emptyDays.length+" dias úteis sem tarefa: não há blocos distintos elegíveis suficientes para ocupar todos os dias sem repetir conteúdos ou ultrapassar o teto.":"Todos os "+plan.days.length+" dias úteis da janela terão atividades pendentes.";
+  ov.innerHTML='<div class="modal" style="max-width:560px;max-height:85vh;overflow:auto"><h2>Reconstruir todo o futuro</h2><p><b>Início: '+start+'</b>. '+scope+' Nada concluído é alterado.</p><p>'+plan.moves.length+' atividades receberão datas, de segunda a sexta, até '+plan.cap+' min/dia. Questões ficam fora desse teto. '+coverage+'</p><p><b>Informativos a reprogramar: '+plan.info.scheduled+'/'+plan.info.total+' pendentes com data</b> · '+Math.round(plan.info.minutes/60*10)/10+' horas reais.'+(plan.info.unscheduled?' <b>'+plan.info.unscheduled+' obrigatórios ainda não cabem antes da prova.</b>':" Todos os pendentes desta reconstrução cabem e permanecem obrigatórios.")+'</p><p class="mmin">'+plan.fila.length+' atividades aguardam capacidade na biblioteca; '+plan.library.length+' alternativas ou sessões especiais ficam disponíveis sem sobrecarregar o dia. Pesos e prioridades das pesquisas foram preservados; desempenho só desempata.</p><div style="font-size:.8rem;max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px">'+(daysHtml||"<i>Nenhuma atividade cabe na janela atual.</i>")+'</div><div class="btns" style="margin-top:12px"><button class="primary" id="rgOk">Aplicar</button><button class="ghost" id="rgNo">Cancelar</button></div></div>';
   document.body.appendChild(ov);
   ov.querySelector("#rgNo").addEventListener("click",()=>ov.remove());
-  ov.querySelector("#rgOk").addEventListener("click",()=>{const n=applyRegen(plan);ov.remove();render();toast(n?n+" atividades replanejadas. Desfazer em Ajustes.":"Você está em dia: nada para replanejar.")});
+  ov.querySelector("#rgOk").addEventListener("click",()=>{
+    syncEquiv();
+    if(plan.sourceState!==regenState()){
+      ov.remove();showRegenPreview(planRegen({includeToday:plan.includeToday}));
+      toast("Seu progresso mudou. Prévia atualizada; confira e aplique o novo plano.");return;
+    }
+    const n=applyRegen(plan);ov.remove();render();toast(n?n+" atividades replanejadas. Desfazer em Ajustes.":"Nenhuma atividade pendente foi reprogramada nesta janela.");
+  });
 }
 document.getElementById("regen").addEventListener("click",()=>{showRegenPreview(planRegen())});
 if(false)(()=>{
@@ -1617,17 +1657,13 @@ function vHoje(root){
   if(tiposDia.size>=2)root.insertAdjacentHTML("beforeend",'<div class="note" style="margin:2px 0 8px">Os cards cabem no teto diário e incluem a reserva dos informativos. Vídeo e texto equivalentes são alternativas, sem carga duplicada. Estudou fora de ordem? <b>Replanejar</b> recompõe todas as datas futuras sem apagar suas conclusões.</div>');
   nav.querySelector("#pv").addEventListener("click",()=>{if(di>0){curDate=CALENDAR[di-1].d;render()}});
   nav.querySelector("#nx").addEventListener("click",()=>{if(di<CALENDAR.length-1){curDate=CALENDAR[di+1].d;render()}});
-  let units=unitsOn(curDate);
-  const totalU=units.length;
-  if(nucleoOnly)units=units.filter(u=>isNucleo(u)||unitDone(u)||!pesoOf(u)&&u.b.tipo==="SIM");
-  if(!units.length){root.insertAdjacentHTML("beforeend",'<div class="empty">'+(totalU?"Nada do núcleo hoje — desligue o filtro para ver as "+totalU+" atividades.":"Dia livre. Descanse — faz parte do plano.")+'</div>');if(isStudyDay(curDate))root.appendChild(qdCard(curDate));return}
+  // O filtro de incidência vale para o acervo, nunca para esconder o trabalho
+  // já escolhido para este dia pelo planejador.
+  const units=unitsOn(curDate);
+  if(!units.length){root.insertAdjacentHTML("beforeend",'<div class="empty">'+(isStudyDay(curDate)?"Nenhuma atividade agendada. Use Replanejar para distribuir as pendências a partir do próximo dia útil.":"Dia livre. Descanse — faz parte do plano.")+'</div>');if(isStudyDay(curDate))root.appendChild(qdCard(curDate));return}
   let mins=0,dn=0;
   units.forEach(u=>{if(unitDone(u))dn++;else mins+=minRestante(u);root.appendChild(unitCard(u,true))});
-  if(nucleoOnly&&totalU>units.length){
-    const ocultas=unitsOn(curDate).filter(u=>units.indexOf(u)<0);
-    const semDado=ocultas.filter(u=>!pesoOf(u)).length,baixo=ocultas.length-semDado;
-    root.insertAdjacentHTML("beforeend",'<div class="note">Ocultas: <b>'+baixo+'</b> de baixo rendimento'+(semDado?' e <b>'+semDado+'</b> sem dado de incidência (o app não sabe quanto rendem — decida você)':"")+'.</div>');
-  }
+  if(nucleoOnly)root.insertAdjacentHTML("beforeend",'<div class="note">O filtro do núcleo não oculta tarefas agendadas: todas as atividades deste dia estão visíveis.</div>');
   root.appendChild(qdCard(curDate));   // Questoes do dia: sempre presente, NAO conta como atividade
   const foot=document.createElement("div");foot.className="dayfoot";
   const nq=qdRegs(curDate).reduce((a,r)=>a+(+r.n||0),0);
@@ -2184,7 +2220,7 @@ function vAjustes(root){
     toast(mats.length+" matérias exportadas.");
   }));
   const capIn=document.createElement("input");capIn.type="number";capIn.min="15";capIn.max="90";capIn.value=capMin();capIn.className="pct";capIn.style.width="90px";capIn.title="Até 90 minutos de estudo, de segunda a sexta; questões à parte";
-  capIn.addEventListener("change",e=>{SET("cfg:cap",Math.max(15,Math.min(90,+e.target.value||90)));e.target.value=capMin();showRegenPreview(planRegen())});
+  capIn.addEventListener("change",e=>{SET("cfg:cap",Math.max(15,Math.min(90,+e.target.value||90)));e.target.value=capMin();showRegenPreview(planRegen({includeToday:true}))});
   const capL=document.createElement("span");capL.className="mmin";capL.textContent=" min/dia · seg–sex · questões à parte ";
   tb.appendChild(capIn);tb.appendChild(capL);
   tb.appendChild(mkb("Sincronizar agora",()=>{pull().then(()=>push())}));

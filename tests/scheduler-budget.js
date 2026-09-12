@@ -19,7 +19,9 @@ cases++;
 
 const dataBefore = JSON.stringify(app.DATA);
 const infoCount = app.INFOS.length;
-let plan = app.planRegen();
+// This suite checks the full budget rebuild used by migration/settings.
+// The toolbar's tomorrow-only behavior has its own regression suite.
+let plan = app.planRegen({includeToday:true});
 assert(plan.days.length > 100);
 assert(plan.days.includes('2027-03-04'), 'missing calendar weeks restored without changing DATA');
 assert(plan.days.every(app.isStudyDay));
@@ -58,7 +60,7 @@ app.syncEquiv();
 const completion = JSON.stringify(app.S.kv[future.key]);
 const oldDate = app.G('mvu:' + future.key);
 const oldPlan = JSON.stringify(app.G('planner:details'));
-const newPlan = app.planRegen();
+const newPlan = app.planRegen({includeToday:true});
 assert(!newPlan.moves.some(m => m.key === future.key), 'future activity already studied is not rescheduled');
 assert(newPlan.moves.some(m => m.from > m.to), 'future pending activities are pulled forward into gaps');
 app.applyRegen(newPlan);
@@ -69,9 +71,9 @@ assert.equal(JSON.stringify(app.G('planner:details')), oldPlan, 'undo restores t
 assert.equal(JSON.stringify(app.S.kv[future.key]), completion, 'undo never erases completion');
 cases++;
 
-const beforeQuestions = app.planRegen();
+const beforeQuestions = app.planRegen({includeToday:true});
 app.SET('qd:' + DAY + ':1', JSON.stringify({mat:'Civil', banca:'FGV', n:30, ac:20}));
-const afterQuestions = app.planRegen();
+const afterQuestions = app.planRegen({includeToday:true});
 assert.equal(app.coreStudyMinutesOn(DAY), future.min, '60 minutes of questions remain outside 90 minutes');
 assert.equal(afterQuestions.initialLoad[DAY], beforeQuestions.initialLoad[DAY]);
 cases++;
@@ -82,13 +84,13 @@ cases++;
 // Existing future and overdue cards may be arbitrarily overloaded in legacy state.
 app.SET('mvu:' + newPlan.moves[10].key, '2026-09-12');
 app.SET('mvu:' + newPlan.moves[11].key, '2026-09-11');
-const rebuilt = app.planRegen();
+const rebuilt = app.planRegen({includeToday:true});
 assert(rebuilt.moves.every(m => app.isStudyDay(m.to)));
 assert(Object.values(rebuilt.load).every(n => n <= 90));
 cases++;
 
 setClock(at('2027-04-16'));
-const deadline = app.planRegen();
+const deadline = app.planRegen({includeToday:true});
 assert(deadline.info.unscheduled > 0, 'insufficient capacity is not hidden');
 assert.equal(deadline.info.scheduled + deadline.info.unscheduled, infoCount - 1);
 assert(deadline.fila.filter(m => m.tipo === 'INFO').every(m => /obrigatório/.test(m.reason)));
