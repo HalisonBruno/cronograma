@@ -1,0 +1,5621 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-13T08:58:23.407450+00:00",
+  "method": "full-normalized-text",
+  "policy": {
+    "requiresManualEbookReading": true,
+    "videoNeverProvesLaw": true,
+    "requiresEveryArticleAndFragmentInTargetGroup": true,
+    "noMatchMeans": "unverified-not-inferred",
+    "matchesAreDiagnosticOnly": true,
+    "normalization": "Unicode NFKC, case, punctuation/whitespace/ordinal typography; only explicitly recognized editorial parentheticals removed. Words, digits, accents and paragraph markers preserved; no fuzzy matching.",
+    "bounds": "Exact match against committed law-reading text and catalog chapter page intervals, not independent legal validity certification or a guarantee that unverified articles are absent from a book."
+  },
+  "summary": {
+    "catalogEbooks": 14,
+    "checkedEbooks": 14,
+    "checkedChapters": 203,
+    "lawGroups": 467,
+    "verifiedGroups": 7,
+    "unverifiedGroups": 460,
+    "evidenceRecords": 7,
+    "individualArticleMatches": 166
+  },
+  "sources": [
+    {
+      "ebook": "constitucional",
+      "file": "Direito Constitucional  - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "2b1f773e93f13084533bd226829ed8d5bb91707c0b9b3d95738ea021f849eb56",
+      "pages": 537,
+      "url": "https://drive.google.com/file/d/1NpTR9HTQEEj34swY5aTyEltkjwSxtbJU/view"
+    },
+    {
+      "ebook": "civil-gerais",
+      "file": "Direito Civil - Temas Gerais - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "134895dbcce336a59c457e6c55ea50a6ded59a9cc325225f7e4942944c756347",
+      "pages": 309,
+      "url": "https://drive.google.com/file/d/1hFxgiR6X23yX8z0xXqCU6fpKZKixdUBp/view"
+    },
+    {
+      "ebook": "civil-especificos",
+      "file": "Direito Civil - Temas Específicos  - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "0b4ca29dac1f1e5463e1c586c8ee16b4052602b69875b9354f079cac282fdbbf",
+      "pages": 106,
+      "url": "https://drive.google.com/file/d/1aUMvp_Qfq_KXD30ucRBJZGhErMwmKozo/view"
+    },
+    {
+      "ebook": "proc-civil",
+      "file": "Direito Processual Civil - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "7aa48259cdb35b7fea2dfa6eab672f84e95b91b01330ac76d95a7cd479700eb5",
+      "pages": 289,
+      "url": "https://drive.google.com/file/d/1922milX3O8Jz9sT4WHAptyR0OhIjW8u0/view"
+    },
+    {
+      "ebook": "penal-geral",
+      "file": "Direito Penal - Parte Geral - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "172c4082950a55f8f7b7036a819c0636a2cd2b1049de10876d491dd6dae7fb49",
+      "pages": 187,
+      "url": "https://drive.google.com/file/d/1oSydaOG8YzLl82bQgFWMgaoJmbz3gLVh/view"
+    },
+    {
+      "ebook": "penal-especial",
+      "file": "Direito Penal - Parte Especial - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "9a05b544d0bbc9189579f877e9b32db84a810033da34dde13bd4ea649234f712",
+      "pages": 244,
+      "url": "https://drive.google.com/file/d/1hQyeliDBLJIZarPYFjM-SKfUVIRIo_u4/view"
+    },
+    {
+      "ebook": "administrativo",
+      "file": "Direito Administrativo - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "50a49560fa14258266119dcef135ac0526c557475000343a6341a2bdffac18bf",
+      "pages": 415,
+      "url": "https://drive.google.com/file/d/17b8yybdiRNdoVbNUOLyQsSvpJq7g6AvV/view"
+    },
+    {
+      "ebook": "empresarial",
+      "file": "Direito Empresarial - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "01c119c1beacedf1a4dbfab99edf36da390e3015239c985f707208015becde19",
+      "pages": 271,
+      "url": "https://drive.google.com/file/d/1hehQXO9HdIovB_G8bLG4m9S2s3UimGJa/view"
+    },
+    {
+      "ebook": "tributario",
+      "file": "Direito Tributário - E-book 2026 - Revisado em 13.07.2026.pdf",
+      "sha256": "1436e4422550a46d06e611d8acf66a7ee25d03e2b55d4deac6621fdb506dbace",
+      "pages": 327,
+      "url": "https://drive.google.com/file/d/1phxDu0WhKAY_zoQbeVoadEzadWzrOB88/view"
+    },
+    {
+      "ebook": "trabalho",
+      "file": "Direito Individual do Trabalho - E-book 2026 - Revisado em 13.07.2026.pdf",
+      "sha256": "91838d2f7c9c113e36e4e800d9f83d64beac687967e0c40de318bcc11ed71435",
+      "pages": 563,
+      "url": "https://drive.google.com/file/d/1BQu892FIiectSqBR495XsDD8rD1UaIYJ/view"
+    },
+    {
+      "ebook": "proc-penal",
+      "file": "Direito Processual Penal - E-book 2026 - Revisado em 13.07.2026.pdf",
+      "sha256": "716c0fd3c965366d12d13a634367fe4fb026831e296df01bcfc4211af1e5849d",
+      "pages": 665,
+      "url": "https://drive.google.com/file/d/1ejsBzZun69h5VRyJv8EchRohEtDys-Lc/view"
+    },
+    {
+      "ebook": "dh",
+      "file": "Direitos Humanos - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "b816ac12399d1e43d4930ebafc5bf0fd479f5fbbd92900dbcfe31735b81b3232",
+      "pages": 120,
+      "url": "https://drive.google.com/file/d/12EIOGzkTKBHvvxVrnZB8ymBegUnH-d7P/view"
+    },
+    {
+      "ebook": "humanistica",
+      "file": "Humanística - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "84477d1bfd51a32dbf748ae32072af1ccca406bd065269d289390c6884170da9",
+      "pages": 223,
+      "url": "https://drive.google.com/file/d/1UDn4-3z_97aSBIuEOXznvK1sTDEVxBDZ/view"
+    },
+    {
+      "ebook": "consumidor",
+      "file": "Direito do Consumidor - Coleção ENAM - Revisado em 13.07.2026.pdf",
+      "sha256": "5aed30c7e0bceb61c4bc5df36b5e4a0aca5f273844ce07237fb011390750aa06",
+      "pages": 62,
+      "url": "https://drive.google.com/file/d/120MonImyDmzeGbOQwlWxWzPsVN3xFOyQ/view"
+    }
+  ],
+  "unavailable": [],
+  "records": [
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "797359",
+      "eb": "penal-especial",
+      "cap": 7,
+      "pages": [
+        187,
+        201
+      ],
+      "pdfPages": [
+        187
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/1hQyeliDBLJIZarPYFjM-SKfUVIRIo_u4/view",
+        "sha256": "9a05b544d0bbc9189579f877e9b32db84a810033da34dde13bd4ea649234f712",
+        "file": "Direito Penal - Parte Especial - Coleção ENAM - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869compilado.htm",
+      "lawSourceHash": "70afee0858bfecd2e6264f90cd115ebd1e29f74f1232c2a42d8a57f7adbb6028",
+      "lawHash": "f97abd87a265fd8b47807debb9bd040f3a6eb8e681afd7b7245b5adcd9ba480f",
+      "articles": [
+        "1"
+      ],
+      "scope": "full-article",
+      "verified": true,
+      "method": "full-normalized-text"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "407fc8",
+      "eb": "administrativo",
+      "cap": 15,
+      "pages": [
+        406,
+        415
+      ],
+      "pdfPages": [
+        408
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/17b8yybdiRNdoVbNUOLyQsSvpJq7g6AvV/view",
+        "sha256": "50a49560fa14258266119dcef135ac0526c557475000343a6341a2bdffac18bf",
+        "file": "Direito Administrativo - Coleção ENAM - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm",
+      "lawSourceHash": "5ed7cb41a2392cfd8ecf32a08d8622f204096ad8fac44605af5e7cf28c526122",
+      "lawHash": "3631566b5f432b35053515a045f9f1891e4ed8039de0f76d00c3e5cced707bef",
+      "articles": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "scope": "full-article",
+      "verified": true,
+      "method": "full-normalized-text"
+    },
+    {
+      "blockId": "2026-09-26-0",
+      "groupId": "18c3e9",
+      "eb": "empresarial",
+      "cap": 11,
+      "pages": [
+        233,
+        250
+      ],
+      "pdfPages": [
+        245,
+        246
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/1hehQXO9HdIovB_G8bLG4m9S2s3UimGJa/view",
+        "sha256": "01c119c1beacedf1a4dbfab99edf36da390e3015239c985f707208015becde19",
+        "file": "Direito Empresarial - Coleção ENAM - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13966.htm",
+      "lawSourceHash": "932758ad962e0c824a712b35bcfbc3b58ea83818dc3d9331014b541d445b0d2c",
+      "lawHash": "24456528782efd2bf53d8928c26cfe4cc87858a47adf2240ee6d5e5d444643e1",
+      "articles": [
+        "2"
+      ],
+      "scope": "fragment",
+      "verified": true,
+      "method": "full-normalized-text"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "75d30f",
+      "eb": "tributario",
+      "cap": 14,
+      "pages": [
+        243,
+        248
+      ],
+      "pdfPages": [
+        247
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/1phxDu0WhKAY_zoQbeVoadEzadWzrOB88/view",
+        "sha256": "1436e4422550a46d06e611d8acf66a7ee25d03e2b55d4deac6621fdb506dbace",
+        "file": "Direito Tributário - E-book 2026 - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/leis/l6830.htm",
+      "lawSourceHash": "b4b176429e40be65264e9229ad7bd7e675b09ad51fbdf2addccd9fecc2747311",
+      "lawHash": "aa845019875b76f6bb5d287d6edf1cd138b87dc3c8c41f7c9b91bacc505009a8",
+      "articles": [
+        "40"
+      ],
+      "scope": "full-article",
+      "verified": true,
+      "method": "full-normalized-text"
+    },
+    {
+      "blockId": "2026-08-21-0",
+      "groupId": "71ba5c",
+      "eb": "tributario",
+      "cap": 15,
+      "pages": [
+        249,
+        266
+      ],
+      "pdfPages": [
+        263
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/1phxDu0WhKAY_zoQbeVoadEzadWzrOB88/view",
+        "sha256": "1436e4422550a46d06e611d8acf66a7ee25d03e2b55d4deac6621fdb506dbace",
+        "file": "Direito Tributário - E-book 2026 - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicaocompilado.htm",
+      "lawSourceHash": "a4b9e17f956d3ba24d894d877d923b747cd72493775290799f95d34fe8d2bf56",
+      "lawHash": "a46c58e0ae82f7b0695e0aee664bf495fd1df56a7d40866441f0bf20f2a0c391",
+      "articles": [
+        "153"
+      ],
+      "scope": "fragment",
+      "verified": true,
+      "method": "full-normalized-text"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "c17c5d",
+      "eb": "tributario",
+      "cap": 16,
+      "pages": [
+        267,
+        289
+      ],
+      "pdfPages": [
+        281
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/1phxDu0WhKAY_zoQbeVoadEzadWzrOB88/view",
+        "sha256": "1436e4422550a46d06e611d8acf66a7ee25d03e2b55d4deac6621fdb506dbace",
+        "file": "Direito Tributário - E-book 2026 - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicaocompilado.htm",
+      "lawSourceHash": "a4b9e17f956d3ba24d894d877d923b747cd72493775290799f95d34fe8d2bf56",
+      "lawHash": "598494d51d2bed7f16cef47a4f7d4c2751fd0bed58e579611178035de0ade7f9",
+      "articles": [
+        "155"
+      ],
+      "scope": "fragment",
+      "verified": true,
+      "method": "full-normalized-text"
+    },
+    {
+      "blockId": "2026-09-03-0~2",
+      "groupId": "8b0f30",
+      "eb": "proc-penal",
+      "cap": 5,
+      "pages": [
+        77,
+        128
+      ],
+      "pdfPages": [
+        105,
+        106
+      ],
+      "source": {
+        "url": "https://drive.google.com/file/d/1ejsBzZun69h5VRyJv8EchRohEtDys-Lc/view",
+        "sha256": "716c0fd3c965366d12d13a634367fe4fb026831e296df01bcfc4211af1e5849d",
+        "file": "Direito Processual Penal - E-book 2026 - Revisado em 13.07.2026.pdf"
+      },
+      "lawSourceUrl": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm",
+      "lawSourceHash": "81bea86d60c885e0e4711ec5e511f163346ee2884bb82ceea8a15d159eae7146",
+      "lawHash": "7ab53febc766441b4df9f8ae277903d51820fd09bacce2876e814dfa3bff1650",
+      "articles": [
+        "28"
+      ],
+      "scope": "full-article",
+      "verified": true,
+      "method": "full-normalized-text"
+    }
+  ],
+  "matches": [
+    {
+      "ebook": "constitucional",
+      "chapter": 6,
+      "key": "eb:constitucional:6",
+      "blockId": "2026-08-17-0",
+      "groupId": "4d702a",
+      "rot": "CF",
+      "article": "2",
+      "scope": "full-article",
+      "lawHash": "e24912eea0f0656449665c0ae6a647658c1a3b0c985fa39ca5c74804b3436fc5",
+      "normalizedHash": "e039a1e003a1f6c4ebab1e755d8ac03fe80eedbf0f6f72e125a5bafcaf887db9",
+      "pageStart": 86,
+      "pageEnd": 99,
+      "pdfPages": [
+        90
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "constitucional",
+      "chapter": 13,
+      "key": "eb:constitucional:13",
+      "blockId": "2026-09-07-0",
+      "groupId": "7ba0a1",
+      "rot": "",
+      "article": "47",
+      "scope": "full-article",
+      "lawHash": "ccfa5866480dc5552a4e3897221d0e48257dbb42631fb73833531c85645ebeb4",
+      "normalizedHash": "40a962b989bf3026f7e51d9d3beba6f206a085421d542111540ace4f72c7cd1d",
+      "pageStart": 274,
+      "pageEnd": 307,
+      "pdfPages": [
+        286
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "constitucional",
+      "chapter": 14,
+      "key": "eb:constitucional:14",
+      "blockId": "2026-09-14-0",
+      "groupId": "f102ac",
+      "rot": "CF",
+      "article": "82",
+      "scope": "full-article",
+      "lawHash": "0cc313eb4d0995a2b6a5ff67d52755a1eed4cdc87db097cfeba41669f3506eb7",
+      "normalizedHash": "b1223207fc2c4e8fd12bde4a2ce54f5573a1e56bfc3b7f9120dcae314b819a83",
+      "pageStart": 308,
+      "pageEnd": 328,
+      "pdfPages": [
+        310
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "constitucional",
+      "chapter": 19,
+      "key": "eb:constitucional:19",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "148",
+      "scope": "full-article",
+      "lawHash": "73d4b238130a5405360ef568aae0a9fd50b3aff5b0aa774aa0e389511987e6db",
+      "normalizedHash": "379ca345dcd2a6466003933d759afb576f7ca84771ca6f4f7423fa5b27143edc",
+      "pageStart": 439,
+      "pageEnd": 474,
+      "pdfPages": [
+        447
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 2,
+      "key": "eb:civil-gerais:2",
+      "blockId": "2026-09-01-0~2",
+      "groupId": "f3ad46",
+      "rot": "CC",
+      "article": "352",
+      "scope": "full-article",
+      "lawHash": "58192725741e872d7e00c45bdad4080e062a8232fb59f497368bb6648bde9be8",
+      "normalizedHash": "40392485ab70ff7bcecd2267f23d9e1f131c53ae37880c7229ff9fb12e452c95",
+      "pageStart": 26,
+      "pageEnd": 63,
+      "pdfPages": [
+        62
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 2,
+      "key": "eb:civil-gerais:2",
+      "blockId": "2026-09-01-0~2",
+      "groupId": "f3ad46",
+      "rot": "CC",
+      "article": "355",
+      "scope": "full-article",
+      "lawHash": "ec68beb9fe0981b3787f68b68ea527745cd19f6ea421451c70991a8680589c2a",
+      "normalizedHash": "1056cb3307a34e3f9a901ca9e74ca081debe7d870bb0ddf3527ad6985824e186",
+      "pageStart": 26,
+      "pageEnd": 63,
+      "pdfPages": [
+        63
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "233",
+      "scope": "full-article",
+      "lawHash": "5e5bdb73b7d383c0ad5cb21753fa2732a6d4b74050613cc2c134e8976344351e",
+      "normalizedHash": "ae9549ce4ef26723ef7fa59846bb47b3399f56b27357d438a8e0b772557ae70c",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "234",
+      "scope": "full-article",
+      "lawHash": "7dab2b4ff719cd1925c8899ed00cab5d7b313875c4c50ba23a22e6e6c2804792",
+      "normalizedHash": "20d22c073f862c19ab42894089d0e5b7b29553d1b7c46ef4d97b87f11e74b921",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "235",
+      "scope": "full-article",
+      "lawHash": "3cc3d03eae65949d2a4b8b891a6b09178151a68d5dd0880ea0f3bedad917dbe9",
+      "normalizedHash": "f9975c4f582cc35557ecc0aff21930a3625fcf23b1be29e6cd8950cb886974fc",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "237",
+      "scope": "full-article",
+      "lawHash": "cc9c69e8bf50ca5a4b48de96e72a4433f964962de46673f98efeae052ea6c807",
+      "normalizedHash": "307080d024616449fad4aa152d9e0f26eed01d42bc4c373f771fb0dd8bed0f88",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        73
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "238",
+      "scope": "full-article",
+      "lawHash": "768d72903ab2c7a264d5f4aa6e2e2c83d615a1dae144219dea437ddf1cce1248",
+      "normalizedHash": "ec380706ec7ba8a2161ff197cc3f8bb0e3775e7255158d5abb651816c8ad8201",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "239",
+      "scope": "full-article",
+      "lawHash": "7c586ce328dab4220e8e359b9f8d0772470b1e9beb9c864d4b3d8e73425c3bc9",
+      "normalizedHash": "bd6e3dd60b947364ecd1fc8b89fb2c3d68202d559fbfbb2526f01b1e84173034",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "241",
+      "scope": "full-article",
+      "lawHash": "cf11794680f6f8f19bb4dc03f11d7b299914a6d9efbc0402032bba28edb14297",
+      "normalizedHash": "d59a5b7aeaa081d6ce780322af50e3cb7577886e849ca42721fe3d3eb6497dac",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "242",
+      "scope": "full-article",
+      "lawHash": "4a9becac89a830e1b02759f2a02672e33b776f8ab1d42968149eeb4d22a6c2a8",
+      "normalizedHash": "8d3ecc8f7f681d0a969bda3623898e69cad1af2be6634226ba8efc25583bf18d",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        74
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "rot": "CC",
+      "article": "249",
+      "scope": "full-article",
+      "lawHash": "970d0cf92e040cd10a73ecfa6bd0b39260f48011566826f7e24037fbcc1ac6d2",
+      "normalizedHash": "82c7e85ec54ee538a5ad3f33e77705c7172c321c1dbafc418ab8d6a94d8ea704",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        75
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "45f54b",
+      "rot": "CC",
+      "article": "250",
+      "scope": "full-article",
+      "lawHash": "21c5557e69aa4ddb19a9a917b332c230eabd795d72bb92c847451123b830f7b9",
+      "normalizedHash": "f4f1d9d4b16409e034740999313debf5beb6739e138a17eec846728dd97084fb",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        76
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "45f54b",
+      "rot": "CC",
+      "article": "251",
+      "scope": "full-article",
+      "lawHash": "ef58a892c4c813accfeaaee744c7d879553142280b894325245dfb1987d41099",
+      "normalizedHash": "409d7fbe566f2f61dda72d54713f8e0fea973b92df14733e867ca5ca80606a18",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        76
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "45f54b",
+      "rot": "CC",
+      "article": "254",
+      "scope": "full-article",
+      "lawHash": "7566d76b8ebf1fb678410921cb621681d347d4e21738675164953b39070dde76",
+      "normalizedHash": "9acf3726aac668459f402d7a6a0e568600cc2b5fbf9a204835333545c8cf0da6",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        78
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0",
+      "groupId": "45f54b",
+      "rot": "CC",
+      "article": "256",
+      "scope": "full-article",
+      "lawHash": "5e628ae6ead09d3f145e8ca2911f609c4bae013cd6f4032c95f42c2c6419a518",
+      "normalizedHash": "15f3eafe46504e60987182bb78515c3f891e29e655d74f9fcd09e1ad0731778a",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        78
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0~2",
+      "groupId": "f3ad46",
+      "rot": "CC",
+      "article": "346",
+      "scope": "full-article",
+      "lawHash": "67a48fd375dcb4941b35ff8ff2502affc81f800c6f9bd63985e1866cf7f2d41c",
+      "normalizedHash": "03cd3b337debe40e44e6b5081154fd132b5d8e0f786545812a5646b35f80bf19",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        90
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 3,
+      "key": "eb:civil-gerais:3",
+      "blockId": "2026-09-01-0~2",
+      "groupId": "5ab041",
+      "rot": "CC",
+      "article": "364",
+      "scope": "full-article",
+      "lawHash": "06d444b4facf30c2afbdaf32770e43df34846fcd83dcd4db1bf4cd884cffda44",
+      "normalizedHash": "dc030fe6dc25b9b9979325083a0ff349323651e8daa6fd9c435c90d6a91a472f",
+      "pageStart": 64,
+      "pageEnd": 100,
+      "pdfPages": [
+        91
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 4,
+      "key": "eb:civil-gerais:4",
+      "blockId": "2026-09-01-0",
+      "groupId": "fe496b",
+      "rot": "CC",
+      "article": "317",
+      "scope": "full-article",
+      "lawHash": "20b6c6c9c8ecc6b6d33df6ef471403d0c0e5add6c9559b7d1d50997d7d2ee78d",
+      "normalizedHash": "e1824ccf9f20161249d8db902d26695693d2875f257d3e3369924c5fd2882a33",
+      "pageStart": 101,
+      "pageEnd": 117,
+      "pdfPages": [
+        105
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 4,
+      "key": "eb:civil-gerais:4",
+      "blockId": "2026-09-08-0",
+      "groupId": "6bb362",
+      "rot": "",
+      "article": "421",
+      "scope": "full-article",
+      "lawHash": "fa5f21a98672d5e514cc33e24755987e8345b375a56ef46c86260d3a6422c008",
+      "normalizedHash": "a482d2c79c3e7914ea9d098025e3367d07705f9280740cddcd451441019ba7ad",
+      "pageStart": 101,
+      "pageEnd": 117,
+      "pdfPages": [
+        104
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 4,
+      "key": "eb:civil-gerais:4",
+      "blockId": "2026-09-08-0",
+      "groupId": "6bb362",
+      "rot": "",
+      "article": "421-A",
+      "scope": "full-article",
+      "lawHash": "db20ff0fa5974f0c3380ed0e17dd3aedbb7623d39abe6db823133e87cc20e2f8",
+      "normalizedHash": "0e5db490680bcc33d934e47b107f8edbd05e23fd2723905025e8d0373f8bd80c",
+      "pageStart": 101,
+      "pageEnd": 117,
+      "pdfPages": [
+        104
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 4,
+      "key": "eb:civil-gerais:4",
+      "blockId": "2026-09-08-0",
+      "groupId": "6bb362",
+      "rot": "",
+      "article": "422",
+      "scope": "full-article",
+      "lawHash": "0b6eab607cbc6f0d01220d16a1de9c25a7ca15a246db1fb010694c2027739b4a",
+      "normalizedHash": "c460694fec7b20faf9615a615b976ea3895921d2782f198570cfd2b745f4a24a",
+      "pageStart": 101,
+      "pageEnd": 117,
+      "pdfPages": [
+        106
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 7,
+      "key": "eb:civil-gerais:7",
+      "blockId": "2026-09-15-0",
+      "groupId": "4407bc",
+      "rot": "",
+      "article": "929",
+      "scope": "full-article",
+      "lawHash": "673867a3289491e5d6c97683146baf632e8eefa16bbfb11ab3d22d1c2fbde211",
+      "normalizedHash": "0a824b6316d7df489a8132a27f82ca1457cc868afceaa1aa0e21292d8cbb1bee",
+      "pageStart": 243,
+      "pageEnd": 253,
+      "pdfPages": [
+        253
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-gerais",
+      "chapter": 9,
+      "key": "eb:civil-gerais:9",
+      "blockId": "2026-10-13-0",
+      "groupId": "e0b910",
+      "rot": "",
+      "article": "1829",
+      "scope": "full-article",
+      "lawHash": "0d9c748b0edd152ba084544e6eb9316d59b4195f21d6fabef53b9ab43ff400ed",
+      "normalizedHash": "6eeeb721bacd3cb471bade880ab69fbd44a6aca51c928a9a60d8c074e9a2a4e6",
+      "pageStart": 285,
+      "pageEnd": 309,
+      "pdfPages": [
+        287
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "civil-especificos",
+      "chapter": 5,
+      "key": "eb:civil-especificos:5",
+      "blockId": "v10-eea549",
+      "groupId": "983f4a",
+      "rot": "",
+      "article": "1",
+      "scope": "full-article",
+      "lawHash": "d378cc0e86429d07ad4804a9a9e552d5fb73024880e5a0392245a4a93b0d8ecb",
+      "normalizedHash": "ba95af69bd39307965d02278574e25b73d6f9feab830dc3e171ce44e5dcd9c14",
+      "pageStart": 75,
+      "pageEnd": 81,
+      "pdfPages": [
+        75
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 1,
+      "key": "eb:proc-civil:1",
+      "blockId": "2026-08-19-0",
+      "groupId": "69f85c",
+      "rot": "CPC",
+      "article": "5",
+      "scope": "full-article",
+      "lawHash": "77490116c41e2694c822e23e7285c38983eadb19fa454b92bc87a31242bf7fb0",
+      "normalizedHash": "e3a173a2f7715ec0561edd0708e3d218ecb2cb0a828a5e2495549f9f2db4c566",
+      "pageStart": 14,
+      "pageEnd": 26,
+      "pdfPages": [
+        21
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 1,
+      "key": "eb:proc-civil:1",
+      "blockId": "2026-08-19-0",
+      "groupId": "69f85c",
+      "rot": "CPC",
+      "article": "6",
+      "scope": "full-article",
+      "lawHash": "73e09aae9544151d71831f5a41e3517aae6c1c31bcaae994bba6fbe7f5e6ad95",
+      "normalizedHash": "c6d8dff58991f0c19f334585820da769de846a72a284feda2f5fb379f6b7e673",
+      "pageStart": 14,
+      "pageEnd": 26,
+      "pdfPages": [
+        24
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 2,
+      "key": "eb:proc-civil:2",
+      "blockId": "2026-08-19-0~2",
+      "groupId": "445281",
+      "rot": "CPC",
+      "article": "43",
+      "scope": "full-article",
+      "lawHash": "10cb60dad65dbc0b6367e9172ed55267070f6f3570663814c4659ba6e16a6e49",
+      "normalizedHash": "11a1f68c3cdf2435ff28c35af3bcf5b4c8f1642c7cd9575d4997ba5dc10db97a",
+      "pageStart": 27,
+      "pageEnd": 57,
+      "pdfPages": [
+        39
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 2,
+      "key": "eb:proc-civil:2",
+      "blockId": "2026-08-19-0~2",
+      "groupId": "445281",
+      "rot": "CPC",
+      "article": "47",
+      "scope": "full-article",
+      "lawHash": "b683f6f3ce054dfb5392a78fbc81d0ab377810bf27a317b2ad02731572234580",
+      "normalizedHash": "6bbbf53fa4143533d2e5923eabc842d17baffe745c0fab24ee355ea9c67ab506",
+      "pageStart": 27,
+      "pageEnd": 57,
+      "pdfPages": [
+        46
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 2,
+      "key": "eb:proc-civil:2",
+      "blockId": "2026-08-19-0~2",
+      "groupId": "2c8837",
+      "rot": "CPC",
+      "article": "56",
+      "scope": "full-article",
+      "lawHash": "4a9f9b690d4b00fa9c270274a094e1c055801de255c2184515c20175630f3c3d",
+      "normalizedHash": "9d1699b48303c9d05400e99ee967da1c3dac941fba0978f366868c015c081fde",
+      "pageStart": 27,
+      "pageEnd": 57,
+      "pdfPages": [
+        49
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 2,
+      "key": "eb:proc-civil:2",
+      "blockId": "2026-08-19-0~2",
+      "groupId": "2c8837",
+      "rot": "CPC",
+      "article": "57",
+      "scope": "full-article",
+      "lawHash": "163e5037c5e01351cb02cd98a2077ba33a85bd88d118458e092522d20335307a",
+      "normalizedHash": "67c0811a08fcf0fa55af67c250b570e493adcdfe550db74432abd6414cc15df4",
+      "pageStart": 27,
+      "pageEnd": 57,
+      "pdfPages": [
+        49
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 3,
+      "key": "eb:proc-civil:3",
+      "blockId": "2026-08-19-0",
+      "groupId": "d881bd",
+      "rot": "",
+      "article": "17",
+      "scope": "full-article",
+      "lawHash": "3e55404cbf5f76cb242fb768c05f0252092eb60b62ae227a6b8359aa560e5061",
+      "normalizedHash": "b91319dbd7c3ce0c2bad08ccdbe3f8df9ffb5a3d3630fcb4972681bd865a59c4",
+      "pageStart": 58,
+      "pageEnd": 61,
+      "pdfPages": [
+        59
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 5,
+      "key": "eb:proc-civil:5",
+      "blockId": "2026-08-19-0",
+      "groupId": "69f85c",
+      "rot": "CPC",
+      "article": "2",
+      "scope": "full-article",
+      "lawHash": "3dacf2f8d37da3f867a79ce55e88d0321e349ce7004e24d69edcbb7811e89491",
+      "normalizedHash": "ebfa8f0846bacf8e112f611a7115840d921abfdb1415bb026b3b0730ebe89fdd",
+      "pageStart": 66,
+      "pageEnd": 77,
+      "pdfPages": [
+        68
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 5,
+      "key": "eb:proc-civil:5",
+      "blockId": "2026-08-26-0",
+      "groupId": "54bcf8",
+      "rot": "CPC",
+      "article": "74",
+      "scope": "full-article",
+      "lawHash": "2df8332629d99a5def64b95206d8dcb45d6b3439df03f9fb2d48a37e8999fbff",
+      "normalizedHash": "4919650265c4354c048bf93021869eb230ce0498b7702d417b34c325e571ac6e",
+      "pageStart": 66,
+      "pageEnd": 77,
+      "pdfPages": [
+        67
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 5,
+      "key": "eb:proc-civil:5",
+      "blockId": "2026-08-26-0",
+      "groupId": "f44129",
+      "rot": "CPC",
+      "article": "100",
+      "scope": "full-article",
+      "lawHash": "d392ea650b3e4860acd7b5af1d12f664bd1be616be2c2fcb05677d1b7f30341f",
+      "normalizedHash": "2d58557d1687da55d0db650551235911d0c9b1be7e16a5572ba3273e06b62728",
+      "pageStart": 66,
+      "pageEnd": 77,
+      "pdfPages": [
+        72
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 5,
+      "key": "eb:proc-civil:5",
+      "blockId": "2026-10-14-0",
+      "groupId": "ad7d5d",
+      "rot": "",
+      "article": "2",
+      "scope": "full-article",
+      "lawHash": "3dacf2f8d37da3f867a79ce55e88d0321e349ce7004e24d69edcbb7811e89491",
+      "normalizedHash": "ebfa8f0846bacf8e112f611a7115840d921abfdb1415bb026b3b0730ebe89fdd",
+      "pageStart": 66,
+      "pageEnd": 77,
+      "pdfPages": [
+        68
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 6,
+      "key": "eb:proc-civil:6",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "1a33b3",
+      "rot": "",
+      "article": "114",
+      "scope": "full-article",
+      "lawHash": "b683217cb58f9c3fe0aba8320a8d3817b03197fd1a92d4e78f64959c07cc2128",
+      "normalizedHash": "8b1e82d8b34545b48911fc604f0b5a2c0a554a7dfa96754fa84e212d945a1638",
+      "pageStart": 78,
+      "pageEnd": 82,
+      "pdfPages": [
+        79
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 6,
+      "key": "eb:proc-civil:6",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "1a33b3",
+      "rot": "",
+      "article": "115",
+      "scope": "full-article",
+      "lawHash": "98f1b74c3fa1f0226f7ebbcae5d26ee3050cbb5b0c309902a4476b4e1fe91169",
+      "normalizedHash": "d18df4fbc1e5853ae0e570bcc2f799e6426b8a768599e9c19cc42453c7a9e0ab",
+      "pageStart": 78,
+      "pageEnd": 82,
+      "pdfPages": [
+        81,
+        82
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 6,
+      "key": "eb:proc-civil:6",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "1a33b3",
+      "rot": "",
+      "article": "116",
+      "scope": "full-article",
+      "lawHash": "bb7c23a4cfa0eb5cc1110d1e54ea173c6bc117868d34dd85fcf0c42301c434e1",
+      "normalizedHash": "b2a82bc29945e273ec2358a41631770ebaa4fdff95cd82e16bb8e5704da6281c",
+      "pageStart": 78,
+      "pageEnd": 82,
+      "pdfPages": [
+        78
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 6,
+      "key": "eb:proc-civil:6",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "1a33b3",
+      "rot": "",
+      "article": "117",
+      "scope": "full-article",
+      "lawHash": "b13e4c63730661afa4f98f1079fa0bfd9ef13ad3cd69b5d6fd0a676dfef6443a",
+      "normalizedHash": "9ff4bc3b027ef4ff39dd223ca4d200d5d74b695362f0b5ba8d784a2636659f45",
+      "pageStart": 78,
+      "pageEnd": 82,
+      "pdfPages": [
+        79
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-civil",
+      "chapter": 7,
+      "key": "eb:proc-civil:7",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "1a33b3",
+      "rot": "",
+      "article": "124",
+      "scope": "full-article",
+      "lawHash": "e392efb90fe0584e9f2f56067fecc5b3933a6f13cf80d8da81b0496cb87d00e1",
+      "normalizedHash": "807d239992d5b5d07528aee884d1bcd769dd56ce743b8aa66dafa89a2c5d1ae5",
+      "pageStart": 83,
+      "pageEnd": 90,
+      "pdfPages": [
+        84
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "penal-geral",
+      "chapter": 9,
+      "key": "eb:penal-geral:9",
+      "blockId": "2026-08-20-0",
+      "groupId": "74035e",
+      "rot": "",
+      "article": "17",
+      "scope": "full-article",
+      "lawHash": "29c9b79b4e1bbafa9000be5e24a3ab627c2eae312ec7823b71c4e8b3fcdfa7e6",
+      "normalizedHash": "e25be957333a7770b8a34a1bedfad66b6f15b5f488ab648d68ac64311561d601",
+      "pageStart": 106,
+      "pageEnd": 111,
+      "pdfPages": [
+        110
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "penal-geral",
+      "chapter": 10,
+      "key": "eb:penal-geral:10",
+      "blockId": "2026-08-20-0",
+      "groupId": "6f299a",
+      "rot": "CP",
+      "article": "31",
+      "scope": "full-article",
+      "lawHash": "3463e1bdf9485573d4743f06261adc093145be9a3d13f0fd9bda134ac61774af",
+      "normalizedHash": "dc529672c5b167612994fcf43cc2de35c78b872a99d7496a47025b4027bf60d7",
+      "pageStart": 112,
+      "pageEnd": 117,
+      "pdfPages": [
+        116
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "penal-especial",
+      "chapter": 7,
+      "key": "eb:penal-especial:7",
+      "blockId": "2026-10-01-0~2",
+      "groupId": "797359",
+      "rot": "Lei 13.869",
+      "article": "1",
+      "scope": "full-article",
+      "lawHash": "50906019c3c26d319dea2f6129ef4b3ae1d002a0409767161bc2908a19353254",
+      "normalizedHash": "160ef1dd89d21147b27f02fcaafcdbd14c81747d56f17dd62e77e1055d23e734",
+      "pageStart": 187,
+      "pageEnd": 201,
+      "pdfPages": [
+        187
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "penal-especial",
+      "chapter": 10,
+      "key": "eb:penal-especial:10",
+      "blockId": "2026-10-01-0~2",
+      "groupId": "cacfb9",
+      "rot": "Lei 9.613",
+      "article": "2",
+      "scope": "full-article",
+      "lawHash": "fe8af1b57c3c4376cfab07680e6a92526b0544c6cf2883ffe93116366a82b83c",
+      "normalizedHash": "d42249397bf40e43a32ae1c0043e75d3a261ac792e6dc6a72879d6fb4abcbfff",
+      "pageStart": 215,
+      "pageEnd": 244,
+      "pdfPages": [
+        216
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 4,
+      "key": "eb:administrativo:4",
+      "blockId": "2026-08-14-0",
+      "groupId": "d27baa",
+      "rot": "LINDB",
+      "article": "30",
+      "scope": "full-article",
+      "lawHash": "62237c436fabf5bf055e7d074747b66d965350db76aeaacfc0248a30f5348350",
+      "normalizedHash": "e5a580cbf76c76da42a8a5f9e154f685daa5465b0c201061b18dfb4535b85d25",
+      "pageStart": 82,
+      "pageEnd": 105,
+      "pdfPages": [
+        105
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 4,
+      "key": "eb:administrativo:4",
+      "blockId": "2026-08-18-0",
+      "groupId": "027e67",
+      "rot": "LINDB",
+      "article": "4",
+      "scope": "full-article",
+      "lawHash": "b02f099bc2e305128b7268f3c51ffcf12bfc5cdc7e7760be1a4e3c6f56a313b3",
+      "normalizedHash": "27da16f263bdec676ab0d3c637ec734fc147d7bb9420c590c6a22d3374a4635c",
+      "pageStart": 82,
+      "pageEnd": 105,
+      "pdfPages": [
+        97
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 13,
+      "key": "eb:administrativo:13",
+      "blockId": "2026-09-21-0~2",
+      "groupId": "1aa9e5",
+      "rot": "",
+      "article": "23",
+      "scope": "full-article",
+      "lawHash": "040343f8f75edc1a91f257d126973f914373795317ccaebaa82ea4b9e0152557",
+      "normalizedHash": "802c07f01d6cdea518a14b8b579ced04962d2cc2906ca58ece145ba30db118fa",
+      "pageStart": 355,
+      "pageEnd": 371,
+      "pdfPages": [
+        365
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 13,
+      "key": "eb:administrativo:13",
+      "blockId": "2026-10-07-0~2",
+      "groupId": "3f89c5",
+      "rot": "",
+      "article": "23",
+      "scope": "full-article",
+      "lawHash": "040343f8f75edc1a91f257d126973f914373795317ccaebaa82ea4b9e0152557",
+      "normalizedHash": "802c07f01d6cdea518a14b8b579ced04962d2cc2906ca58ece145ba30db118fa",
+      "pageStart": 355,
+      "pageEnd": 371,
+      "pdfPages": [
+        365
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 15,
+      "key": "eb:administrativo:15",
+      "blockId": "2026-09-11-0~2",
+      "groupId": "407fc8",
+      "rot": "",
+      "article": "5",
+      "scope": "full-article",
+      "lawHash": "63a8f1f60c49c40f96d7be90e2b3925c3484b4e05008f5adbdc0c68c350eccee",
+      "normalizedHash": "e474056b97052181ccc30a3affddae4abc61442c36f38ec1e80fd4abc9fac7a3",
+      "pageStart": 406,
+      "pageEnd": 415,
+      "pdfPages": [
+        408
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 15,
+      "key": "eb:administrativo:15",
+      "blockId": "2026-09-11-0~2",
+      "groupId": "407fc8",
+      "rot": "",
+      "article": "6",
+      "scope": "full-article",
+      "lawHash": "9408b46256f2988f85825b94fbba602b9ff20e3139678c7ef9f09c7024a6743d",
+      "normalizedHash": "c5a913f9b83eb12fb3ee641205c8b6c050b4b9bab4b40f98498bf74404d089f6",
+      "pageStart": 406,
+      "pageEnd": 415,
+      "pdfPages": [
+        408
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 15,
+      "key": "eb:administrativo:15",
+      "blockId": "2026-09-11-0~2",
+      "groupId": "407fc8",
+      "rot": "",
+      "article": "7",
+      "scope": "full-article",
+      "lawHash": "51a601d1b5682eaac216cd717f490df0abebff6adcb0fc4d8cb7a7f7b6480a55",
+      "normalizedHash": "41c5f6743fce73fbadebc3a7c3d7acfc5080b94a1a4067c0df0188cc9266b2eb",
+      "pageStart": 406,
+      "pageEnd": 415,
+      "pdfPages": [
+        408
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "administrativo",
+      "chapter": 15,
+      "key": "eb:administrativo:15",
+      "blockId": "2026-09-11-0~2",
+      "groupId": "407fc8",
+      "rot": "",
+      "article": "8",
+      "scope": "full-article",
+      "lawHash": "d97131bb5eff35e2ae47f7f454bd021ef09eaeae3b1dbf46f01513ded798ad7f",
+      "normalizedHash": "056dbfce3b2366b5819dc7134083ca6650b5a8c29cfe7d8f8a4258aac9a03c4b",
+      "pageStart": 406,
+      "pageEnd": 415,
+      "pdfPages": [
+        408
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 2,
+      "key": "eb:empresarial:2",
+      "blockId": "2026-08-15-0",
+      "groupId": "14cda8",
+      "rot": "CC",
+      "article": "966",
+      "scope": "full-article",
+      "lawHash": "40595ed5c310a34801b5c00474e8dc3b54d72032e70438f9815d3e051464b4af",
+      "normalizedHash": "1b21a7975ff75239d20d12d7fafc9e994748bd991eebedfb80fc8ce7a81fa41f",
+      "pageStart": 16,
+      "pageEnd": 39,
+      "pdfPages": [
+        18
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 2,
+      "key": "eb:empresarial:2",
+      "blockId": "2026-08-15-0",
+      "groupId": "14cda8",
+      "rot": "CC",
+      "article": "970",
+      "scope": "full-article",
+      "lawHash": "dd8cdd8db34b2e280060e68219adac3c5464d189e74dc44ebac793f3b1697454",
+      "normalizedHash": "841660cb6ae2cd597d748b2e1ab4f1d2e549bfcfa212aa38a37e2c2c706a24cf",
+      "pageStart": 16,
+      "pageEnd": 39,
+      "pdfPages": [
+        23
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 2,
+      "key": "eb:empresarial:2",
+      "blockId": "2026-08-15-0",
+      "groupId": "59849e",
+      "rot": "CC",
+      "article": "1150",
+      "scope": "full-article",
+      "lawHash": "14ae599ab81a38371f634554a990128f73f98281c44562ef0b10f2d8dda71b36",
+      "normalizedHash": "ce058060e8fb1986bb555739a5b88a36847e6f5f62b2a1a8dc2c2ccbca3cc5db",
+      "pageStart": 16,
+      "pageEnd": 39,
+      "pdfPages": [
+        34
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 2,
+      "key": "eb:empresarial:2",
+      "blockId": "2026-08-22-0",
+      "groupId": "ab6959",
+      "rot": "CC",
+      "article": "981",
+      "scope": "full-article",
+      "lawHash": "0a427e219aa564479ea92762b791e8b3364eb6046541ed566a6149aa1a484cfb",
+      "normalizedHash": "8a51d6406062d098bba5d3fb09ae5fc3b0aedec3a88eef04ade0bb3163b2ea59",
+      "pageStart": 16,
+      "pageEnd": 39,
+      "pdfPages": [
+        22
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 2,
+      "key": "eb:empresarial:2",
+      "blockId": "2026-08-22-0",
+      "groupId": "ab6959",
+      "rot": "CC",
+      "article": "982",
+      "scope": "full-article",
+      "lawHash": "ad081ad89cc091795648ceb790b99124aed1b516af11eb38eaf7b1808f4ea650",
+      "normalizedHash": "7ac61e48096b650d675aee7a088dfa12be3e729298010117708ff82b8ed56597",
+      "pageStart": 16,
+      "pageEnd": 39,
+      "pdfPages": [
+        27
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 2,
+      "key": "eb:empresarial:2",
+      "blockId": "2026-08-26-0~3",
+      "groupId": "86257d",
+      "rot": "CPC",
+      "article": "178",
+      "scope": "full-article",
+      "lawHash": "ff9cff47c4808fb518a0548258cdd6a4635222e08d5770dd756a15111c6e5b3b",
+      "normalizedHash": "fa3ceb9e1f72e32b96a052379b2b2947b743465192563941bbf08c711b555fbd",
+      "pageStart": 16,
+      "pageEnd": 39,
+      "pdfPages": [
+        25
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 3,
+      "key": "eb:empresarial:3",
+      "blockId": "2026-08-15-0",
+      "groupId": "5f2cae",
+      "rot": "CC",
+      "article": "1144",
+      "scope": "full-article",
+      "lawHash": "16a091b04efc77f745dce5297c00202c919766b936eb1b5f63f98b9bb6e64691",
+      "normalizedHash": "48256b3c8ed3af55c7f1267601b64cb348add438a65bb3df2cc7f182b386f9b8",
+      "pageStart": 40,
+      "pageEnd": 47,
+      "pdfPages": [
+        41
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 3,
+      "key": "eb:empresarial:3",
+      "blockId": "2026-08-15-0",
+      "groupId": "5f2cae",
+      "rot": "CC",
+      "article": "1146",
+      "scope": "full-article",
+      "lawHash": "bcc478367f3a136e83990afd04f338b70f68ba631c4bb3233b516bf9a931a2b2",
+      "normalizedHash": "0b752e100c20fd61c29329bf9b9a9c24f3d42d3b6e7e61998746d632ef69bf97",
+      "pageStart": 40,
+      "pageEnd": 47,
+      "pdfPages": [
+        42
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 3,
+      "key": "eb:empresarial:3",
+      "blockId": "2026-08-15-0",
+      "groupId": "5f2cae",
+      "rot": "CC",
+      "article": "1149",
+      "scope": "full-article",
+      "lawHash": "7b31895de3fe039bf2d7ea9430da71ec0973c1fb8812af906da56d263ed9afbe",
+      "normalizedHash": "5c6cefb7a132a4bd90898c3bb117b4b57fb719970ac6ba74a5e95ff3abdc5002",
+      "pageStart": 40,
+      "pageEnd": 47,
+      "pdfPages": [
+        43
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 4,
+      "key": "eb:empresarial:4",
+      "blockId": "2026-08-15-0~2",
+      "groupId": "f3152f",
+      "rot": "CC",
+      "article": "1163",
+      "scope": "full-article",
+      "lawHash": "a3d7e7ba50ba674236bb2b1647d09d82fbd5cf6358b617381e5f26d9f34a65c6",
+      "normalizedHash": "e012f5cc8ec50639e941dcf2592e33f450c683507e61cf938d2bb36c7c8e1917",
+      "pageStart": 48,
+      "pageEnd": 53,
+      "pdfPages": [
+        52
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 7,
+      "key": "eb:empresarial:7",
+      "blockId": "2026-08-15-0",
+      "groupId": "416144",
+      "rot": "CC",
+      "article": "977",
+      "scope": "full-article",
+      "lawHash": "c2573cd7f2cd6665831155ff338400acf9de9965e38ec5aaa9bef0d1389d11a8",
+      "normalizedHash": "714a72676bc09c791b6169c87bea422b8fc0fe1ddfcc79ea9161d271626e746f",
+      "pageStart": 77,
+      "pageEnd": 99,
+      "pdfPages": [
+        89
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 7,
+      "key": "eb:empresarial:7",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "962953",
+      "rot": "",
+      "article": "133",
+      "scope": "full-article",
+      "lawHash": "232f4034cb834975ff10d971e32568cc4d90a9ad617c05d17ec4f53d9f1710c6",
+      "normalizedHash": "0dc62ed3b3027666d2266d3dfcd2f4365a675f951ca1efba40d5e199bf57ab98",
+      "pageStart": 77,
+      "pageEnd": 99,
+      "pdfPages": [
+        83
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 7,
+      "key": "eb:empresarial:7",
+      "blockId": "2026-08-26-0~2",
+      "groupId": "962953",
+      "rot": "",
+      "article": "135",
+      "scope": "full-article",
+      "lawHash": "f154ae322cac3a31200fb955ddebd3e75722f0032fc655c926e309a5da0319d4",
+      "normalizedHash": "e925f78931a26c290fb8949a20237f5cedcccda146b3631553e73adf7f920c8c",
+      "pageStart": 77,
+      "pageEnd": 99,
+      "pdfPages": [
+        83
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 8,
+      "key": "eb:empresarial:8",
+      "blockId": "2026-08-22-0",
+      "groupId": "ab6959",
+      "rot": "CC",
+      "article": "986",
+      "scope": "full-article",
+      "lawHash": "1c98bc52471e0cff88f151e753d16e056a9203a68a71cee02bcc0ed6a94ab6ef",
+      "normalizedHash": "7755357c89757475144e71842f3c8fc7642b1c4dc850295f076c39eaa2a05c43",
+      "pageStart": 100,
+      "pageEnd": 138,
+      "pdfPages": [
+        109
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 8,
+      "key": "eb:empresarial:8",
+      "blockId": "2026-08-22-0",
+      "groupId": "ab6959",
+      "rot": "CC",
+      "article": "988",
+      "scope": "full-article",
+      "lawHash": "547a389b68a8f8bab565d4f8f6d85a2734f28d9fa2c376189dfc5f71789a6d22",
+      "normalizedHash": "bde828fedf3fe1c549305ffba4602b24296521e19bfedc784f7989e7baaceaee",
+      "pageStart": 100,
+      "pageEnd": 138,
+      "pdfPages": [
+        110
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 8,
+      "key": "eb:empresarial:8",
+      "blockId": "2026-08-22-0",
+      "groupId": "5f165c",
+      "rot": "CC",
+      "article": "991",
+      "scope": "full-article",
+      "lawHash": "580996eec4262ebc12d7d74355d704237f968fc3e630525c9202c7e1e7dd3692",
+      "normalizedHash": "38a1f50810d9cc7f6ecd8e4fc930b880c959d1ed9f1297c74dde94f2defd186b",
+      "pageStart": 100,
+      "pageEnd": 138,
+      "pdfPages": [
+        108
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 8,
+      "key": "eb:empresarial:8",
+      "blockId": "2026-08-22-0",
+      "groupId": "5f165c",
+      "rot": "CC",
+      "article": "992",
+      "scope": "full-article",
+      "lawHash": "65f18ed2caffeb6cdd9102d0ee5730b96bb575fe0d71502484a707888c95ce21",
+      "normalizedHash": "8c8e82c73bc59f976643d11b12ca4ac0ad213cc8f27141ae5eb59254c4c9adf4",
+      "pageStart": 100,
+      "pageEnd": 138,
+      "pdfPages": [
+        108
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 8,
+      "key": "eb:empresarial:8",
+      "blockId": "2026-08-18-0~2",
+      "groupId": "1cd2e4",
+      "rot": "CC",
+      "article": "48",
+      "scope": "full-article",
+      "lawHash": "c4e4125a5ce7877aa769063b7870002b48937b997bacc6b88bd80959d183c7fe",
+      "normalizedHash": "5eec208bdf7b513268833cff998d83d36ddca1f97ee82749fefdf8d892b1d796",
+      "pageStart": 100,
+      "pageEnd": 138,
+      "pdfPages": [
+        103
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 9,
+      "key": "eb:empresarial:9",
+      "blockId": "2026-09-19-0",
+      "groupId": "c221f1",
+      "rot": "CC",
+      "article": "913",
+      "scope": "full-article",
+      "lawHash": "90823155fbe4870f4c29c1a21701ba4af03d4f82bc179b887c03d8c1469db699",
+      "normalizedHash": "3c834cb77182de0e4dc5fcb7a17ec985c543b71665267415434fd1b4ced2b4a6",
+      "pageStart": 139,
+      "pageEnd": 164,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 9,
+      "key": "eb:empresarial:9",
+      "blockId": "2026-09-19-0",
+      "groupId": "36f8aa",
+      "rot": "CC",
+      "article": "921",
+      "scope": "full-article",
+      "lawHash": "0748e4f738af73093dfe85574d7959e442b3d71e4656793c60c20330020f69a5",
+      "normalizedHash": "08de94889756f5ded4a3768d9097da15d06d3b525b1f91ae4c9d7594f8f53b7f",
+      "pageStart": 139,
+      "pageEnd": 164,
+      "pdfPages": [
+        142
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 11,
+      "key": "eb:empresarial:11",
+      "blockId": "2026-09-26-0",
+      "groupId": "18c3e9",
+      "rot": "Lei 13.966",
+      "article": "2",
+      "scope": "fragment",
+      "lawHash": "7ddb2dc46062f0f052627bb22a6c29b574960ac9513a399d97955cfa719c3b64",
+      "normalizedHash": "83bce8568bcc27c91f027e466e684526411f8ba89fb17d4a1f60d9f11631e834",
+      "pageStart": 233,
+      "pageEnd": 250,
+      "pdfPages": [
+        245,
+        246
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 14,
+      "key": "eb:empresarial:14",
+      "blockId": "2026-08-15-0~2",
+      "groupId": "f3152f",
+      "rot": "CC",
+      "article": "1161",
+      "scope": "full-article",
+      "lawHash": "dc155c50ef1bda8f989cce6135479205c92392394dae2898f017d2e94b35f318",
+      "normalizedHash": "79f68793ad82400e713e6057f9c8881a76a482f6f051619d8fc6016048fd9279",
+      "pageStart": 264,
+      "pageEnd": 271,
+      "pdfPages": [
+        264
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "empresarial",
+      "chapter": 14,
+      "key": "eb:empresarial:14",
+      "blockId": "2026-08-18-0~2",
+      "groupId": "1cd2e4",
+      "rot": "CC",
+      "article": "48-A",
+      "scope": "full-article",
+      "lawHash": "88f040e840849f3669c17f438a2f813d178c274a83da223dc0947a660a1c5d87",
+      "normalizedHash": "54ffabbdc7b777e371da87afac4adfa346e08e8892b33db75f61d2e0a891cdb2",
+      "pageStart": 264,
+      "pageEnd": 271,
+      "pdfPages": [
+        265
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 1,
+      "key": "eb:tributario:1",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "148",
+      "scope": "full-article",
+      "lawHash": "73d4b238130a5405360ef568aae0a9fd50b3aff5b0aa774aa0e389511987e6db",
+      "normalizedHash": "379ca345dcd2a6466003933d759afb576f7ca84771ca6f4f7423fa5b27143edc",
+      "pageStart": 12,
+      "pageEnd": 30,
+      "pdfPages": [
+        20
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 2,
+      "key": "eb:tributario:2",
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "rot": "",
+      "article": "3",
+      "scope": "full-article",
+      "lawHash": "fd228df194aa7066f63912c2baf1109a4fc69f7591eb4f364b41545c6429263c",
+      "normalizedHash": "b01713e2a042668a6bf6a01601156259527f16e469b1cc6d3db5a7e9cffe4628",
+      "pageStart": 31,
+      "pageEnd": 57,
+      "pdfPages": [
+        31
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 2,
+      "key": "eb:tributario:2",
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "rot": "",
+      "article": "4",
+      "scope": "full-article",
+      "lawHash": "62bfe431db695c0e7edc94d6d2f7c9f287880f5afe49392e1a00c8c3885a9091",
+      "normalizedHash": "afe41d1bc5c3692754d7012e487c954192f20e0c2feb0a82e9929a3f37581b4c",
+      "pageStart": 31,
+      "pageEnd": 57,
+      "pdfPages": [
+        33
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 2,
+      "key": "eb:tributario:2",
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "rot": "",
+      "article": "5",
+      "scope": "full-article",
+      "lawHash": "0f8eb8f8ac5a3cd4cc06591b9d8061bbed36a7aed642ef9ba19329691bb7425f",
+      "normalizedHash": "07cbc261c128ab580dda8123f479b132de5c5f809aad5bfd62a651da5114d620",
+      "pageStart": 31,
+      "pageEnd": 57,
+      "pdfPages": [
+        34
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 2,
+      "key": "eb:tributario:2",
+      "blockId": "2026-08-21-0~2",
+      "groupId": "afdb08",
+      "rot": "",
+      "article": "15",
+      "scope": "full-article",
+      "lawHash": "c905663c682eccda60b27123a3cb085c4980ec63bfa7aa39f57c7e2202334790",
+      "normalizedHash": "a7e074dc989036e874d08fd61de1b82e18ce0fff7b25ee024e0d31fe329beef5",
+      "pageStart": 31,
+      "pageEnd": 57,
+      "pdfPages": [
+        46
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 2,
+      "key": "eb:tributario:2",
+      "blockId": "v10-8a40fa",
+      "groupId": "0a1b76",
+      "rot": "",
+      "article": "154",
+      "scope": "full-article",
+      "lawHash": "19b5d91de92529ecf2839cca73d2d26fb70fbada49fcf8c67ea61e4dadca0e5d",
+      "normalizedHash": "10f9b599cf9d86740346423630fdb4d82a5e1d4343738d2943dcda715185f515",
+      "pageStart": 31,
+      "pageEnd": 57,
+      "pdfPages": [
+        37
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 2,
+      "key": "eb:tributario:2",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "148",
+      "scope": "full-article",
+      "lawHash": "73d4b238130a5405360ef568aae0a9fd50b3aff5b0aa774aa0e389511987e6db",
+      "normalizedHash": "379ca345dcd2a6466003933d759afb576f7ca84771ca6f4f7423fa5b27143edc",
+      "pageStart": 31,
+      "pageEnd": 57,
+      "pdfPages": [
+        45
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 3,
+      "key": "eb:tributario:3",
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "rot": "",
+      "article": "7",
+      "scope": "full-article",
+      "lawHash": "f43a60173497bdaa608c7d0e902e080165ff7aeb30192549cef5dc318dca5fac",
+      "normalizedHash": "31a83de8e580eb343acda8ada0a261f38754bdd45ef7f23435aaabb34e37d59c",
+      "pageStart": 58,
+      "pageEnd": 69,
+      "pdfPages": [
+        59,
+        60
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 3,
+      "key": "eb:tributario:3",
+      "blockId": "v10-8a40fa",
+      "groupId": "0a1b76",
+      "rot": "",
+      "article": "154",
+      "scope": "full-article",
+      "lawHash": "19b5d91de92529ecf2839cca73d2d26fb70fbada49fcf8c67ea61e4dadca0e5d",
+      "normalizedHash": "10f9b599cf9d86740346423630fdb4d82a5e1d4343738d2943dcda715185f515",
+      "pageStart": 58,
+      "pageEnd": 69,
+      "pdfPages": [
+        61
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 3,
+      "key": "eb:tributario:3",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "147",
+      "scope": "full-article",
+      "lawHash": "cf48a85f62ce1b02343639f44cc25283e5e77ede7c67e6cd0029c90df5c49f68",
+      "normalizedHash": "9310685a0943e2ad7ee668c85427315039ca426203ca7ef07379294ec8afd8b5",
+      "pageStart": 58,
+      "pageEnd": 69,
+      "pdfPages": [
+        62
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 3,
+      "key": "eb:tributario:3",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "148",
+      "scope": "full-article",
+      "lawHash": "73d4b238130a5405360ef568aae0a9fd50b3aff5b0aa774aa0e389511987e6db",
+      "normalizedHash": "379ca345dcd2a6466003933d759afb576f7ca84771ca6f4f7423fa5b27143edc",
+      "pageStart": 58,
+      "pageEnd": 69,
+      "pdfPages": [
+        60
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 4,
+      "key": "eb:tributario:4",
+      "blockId": "2026-08-21-0",
+      "groupId": "5dca7a",
+      "rot": "CF",
+      "article": "152",
+      "scope": "full-article",
+      "lawHash": "84208e95ffef5e89136ed936eb356fc2df81dfa5feaab647aef75a0b35f36b66",
+      "normalizedHash": "9fb87c9af076fd4378b3982e90219b21e9597c5c89498bd2ee64f77cea064b32",
+      "pageStart": 70,
+      "pageEnd": 97,
+      "pdfPages": [
+        88
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 4,
+      "key": "eb:tributario:4",
+      "blockId": "2026-08-21-0~2",
+      "groupId": "3eb280",
+      "rot": "",
+      "article": "106",
+      "scope": "full-article",
+      "lawHash": "467cc5a966a2ee377136dd7252f633fd84f34a9e82babd331ed64bd07c55cce6",
+      "normalizedHash": "07ae948da6977ad277ab40fb3a21f14b47b5f7db342cd94ca4f1335aef4a7512",
+      "pageStart": 70,
+      "pageEnd": 97,
+      "pdfPages": [
+        77
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 4,
+      "key": "eb:tributario:4",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "118",
+      "scope": "full-article",
+      "lawHash": "45be5a15bca2a34ae72cf6f528348eb198957a6d0425bd0816e505716d8f356b",
+      "normalizedHash": "88a3662df29962d4b1ca076760148178865873ab366ff64080473bc700489a74",
+      "pageStart": 70,
+      "pageEnd": 97,
+      "pdfPages": [
+        72
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 6,
+      "key": "eb:tributario:6",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "114",
+      "scope": "full-article",
+      "lawHash": "7e975eddf728fce9b29d19ea715e687a447ee1f0be76b224bdfae9d94eb0a377",
+      "normalizedHash": "29100895e833a097c04433e2bdacb8b6f2c516b7000d9acd494cb790a2d8aec9",
+      "pageStart": 127,
+      "pageEnd": 145,
+      "pdfPages": [
+        137
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 6,
+      "key": "eb:tributario:6",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "115",
+      "scope": "full-article",
+      "lawHash": "f6099b08dc18e9f6755b5efaab0cae6d94b3a020b87e783adf614c866634d339",
+      "normalizedHash": "937613e5b94f86d7cf5af5eda716701edbc6792478ed2ef6c1df9eae375fc72f",
+      "pageStart": 127,
+      "pageEnd": 145,
+      "pdfPages": [
+        138
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 6,
+      "key": "eb:tributario:6",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "148",
+      "scope": "full-article",
+      "lawHash": "73d4b238130a5405360ef568aae0a9fd50b3aff5b0aa774aa0e389511987e6db",
+      "normalizedHash": "379ca345dcd2a6466003933d759afb576f7ca84771ca6f4f7423fa5b27143edc",
+      "pageStart": 127,
+      "pageEnd": 145,
+      "pdfPages": [
+        128
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 7,
+      "key": "eb:tributario:7",
+      "blockId": "2026-08-21-0~2",
+      "groupId": "ee6097",
+      "rot": "",
+      "article": "109",
+      "scope": "full-article",
+      "lawHash": "8e38b8a0b4730a7e8d960aacf7e9c91c595edda7be6e70d901411d403dbb05ad",
+      "normalizedHash": "fbb19820cf058a9c09aff647b03f44a4ad390df21aeb14dca101157414e85044",
+      "pageStart": 146,
+      "pageEnd": 162,
+      "pdfPages": [
+        148
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 8,
+      "key": "eb:tributario:8",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "114",
+      "scope": "full-article",
+      "lawHash": "7e975eddf728fce9b29d19ea715e687a447ee1f0be76b224bdfae9d94eb0a377",
+      "normalizedHash": "29100895e833a097c04433e2bdacb8b6f2c516b7000d9acd494cb790a2d8aec9",
+      "pageStart": 163,
+      "pageEnd": 173,
+      "pdfPages": [
+        171
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 8,
+      "key": "eb:tributario:8",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "115",
+      "scope": "full-article",
+      "lawHash": "f6099b08dc18e9f6755b5efaab0cae6d94b3a020b87e783adf614c866634d339",
+      "normalizedHash": "937613e5b94f86d7cf5af5eda716701edbc6792478ed2ef6c1df9eae375fc72f",
+      "pageStart": 163,
+      "pageEnd": 173,
+      "pdfPages": [
+        171
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 8,
+      "key": "eb:tributario:8",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "117",
+      "scope": "full-article",
+      "lawHash": "7e65fbf5804e7b4a6b2c313e57657ded403dcb9facb4fb1a9e3ca6ea6d52516c",
+      "normalizedHash": "3069bd3ad0b0e413b28e9ba96e61419f88578362e6bb0a19550c8bef612212d9",
+      "pageStart": 163,
+      "pageEnd": 173,
+      "pdfPages": [
+        172
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 8,
+      "key": "eb:tributario:8",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "118",
+      "scope": "full-article",
+      "lawHash": "45be5a15bca2a34ae72cf6f528348eb198957a6d0425bd0816e505716d8f356b",
+      "normalizedHash": "88a3662df29962d4b1ca076760148178865873ab366ff64080473bc700489a74",
+      "pageStart": 163,
+      "pageEnd": 173,
+      "pdfPages": [
+        171
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 8,
+      "key": "eb:tributario:8",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "119",
+      "scope": "full-article",
+      "lawHash": "becfc5b716204e6179c5793bd1cea0f3953e4692d453a36a6d5e948fabdfafd6",
+      "normalizedHash": "d09c81ac4f16b5b9dceb4328c473491670d39a56cce1a0545753c978e697d69e",
+      "pageStart": 163,
+      "pageEnd": 173,
+      "pdfPages": [
+        166
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 8,
+      "key": "eb:tributario:8",
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "rot": "",
+      "article": "123",
+      "scope": "full-article",
+      "lawHash": "68910b05d4f6d4ca30bd78c112e33278c105bd068ad3656ec4b0ab9fc84a632c",
+      "normalizedHash": "14a25b9d90a9a758e0876ebc7291dad9ae34ad6f9b390cdf0e0ac1fa6b4b9dda",
+      "pageStart": 163,
+      "pageEnd": 173,
+      "pdfPages": [
+        168
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 9,
+      "key": "eb:tributario:9",
+      "blockId": "v10-8a40fa",
+      "groupId": "7385e0",
+      "rot": "",
+      "article": "129",
+      "scope": "full-article",
+      "lawHash": "8ee1fa87ad088de740272e7e456bb5f580c99e570f8633ed7323989f39dc0320",
+      "normalizedHash": "0ff76ad27a6c134335013e222c9aff82a8b2963fbbef7bddc5611f5535c9af61",
+      "pageStart": 174,
+      "pageEnd": 188,
+      "pdfPages": [
+        187,
+        188
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 9,
+      "key": "eb:tributario:9",
+      "blockId": "v10-8a40fa",
+      "groupId": "7385e0",
+      "rot": "",
+      "article": "132",
+      "scope": "full-article",
+      "lawHash": "41431952f13851a3355884f874dc4bf455bdd3618919300d9490ec032c6342d9",
+      "normalizedHash": "77b586f2594e7de5eaeba0b6b271127d8d1e72af0147260f84be4f75826b7536",
+      "pageStart": 174,
+      "pageEnd": 188,
+      "pdfPages": [
+        177
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 9,
+      "key": "eb:tributario:9",
+      "blockId": "v10-b26de6",
+      "groupId": "a9cc68",
+      "rot": "",
+      "article": "136",
+      "scope": "full-article",
+      "lawHash": "2b7c0f831d7447178e1bb6a9a17fafeec63d7ef71cf4cd23b8955c26bb94ae87",
+      "normalizedHash": "43c84f9d6b9ee9460235586abd568ed7af1cf40ad031ef9002f565925dc9130e",
+      "pageStart": 174,
+      "pageEnd": 188,
+      "pdfPages": [
+        180
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 10,
+      "key": "eb:tributario:10",
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "rot": "",
+      "article": "7",
+      "scope": "full-article",
+      "lawHash": "f43a60173497bdaa608c7d0e902e080165ff7aeb30192549cef5dc318dca5fac",
+      "normalizedHash": "31a83de8e580eb343acda8ada0a261f38754bdd45ef7f23435aaabb34e37d59c",
+      "pageStart": 189,
+      "pageEnd": 200,
+      "pdfPages": [
+        199
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 10,
+      "key": "eb:tributario:10",
+      "blockId": "v10-b26de6",
+      "groupId": "5e7f23",
+      "rot": "",
+      "article": "145",
+      "scope": "full-article",
+      "lawHash": "0efa6445007b35d6ebf65c59f158229760cc543c9a5f38b0abc59410f5a7f741",
+      "normalizedHash": "cefa4f735a27719b02e530ddb20951056240a2f695d8ec24fbc51d5b313c4a25",
+      "pageStart": 189,
+      "pageEnd": 200,
+      "pdfPages": [
+        191
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 11,
+      "key": "eb:tributario:11",
+      "blockId": "2026-10-02-0",
+      "groupId": "684623",
+      "rot": "",
+      "article": "158",
+      "scope": "full-article",
+      "lawHash": "3bf6852729c5c3264ac45a4ffad81a2e32c830ac879bb1f806f01202ab877f94",
+      "normalizedHash": "5f9df99b5365d9e0b2e3b31e371d603563e71c641ca37a5b16c1c44f6f207260",
+      "pageStart": 201,
+      "pageEnd": 229,
+      "pdfPages": [
+        209
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 11,
+      "key": "eb:tributario:11",
+      "blockId": "2026-10-02-0",
+      "groupId": "baaa32",
+      "rot": "",
+      "article": "163",
+      "scope": "full-article",
+      "lawHash": "1e1d296ee5a6ba80ed16e996cac4893ae088765c48b1b557332ff5390acef6a7",
+      "normalizedHash": "77affce2c968a9cba09c1caff8719817db8a4e75626093e7942c5fc47edbad01",
+      "pageStart": 201,
+      "pageEnd": 229,
+      "pdfPages": [
+        209
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 11,
+      "key": "eb:tributario:11",
+      "blockId": "v10-494ead",
+      "groupId": "137c55",
+      "rot": "",
+      "article": "206",
+      "scope": "full-article",
+      "lawHash": "88a917c8281604f89760f67c7265cc1d33f9a55df0b27284108911d20691ee1f",
+      "normalizedHash": "b6828abf5094243bab9be85562610f4d58e90cfd9b26cfe296fffe2b0df27d6c",
+      "pageStart": 201,
+      "pageEnd": 229,
+      "pdfPages": [
+        206
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 12,
+      "key": "eb:tributario:12",
+      "blockId": "v10-494ead",
+      "groupId": "137c55",
+      "rot": "",
+      "article": "206",
+      "scope": "full-article",
+      "lawHash": "88a917c8281604f89760f67c7265cc1d33f9a55df0b27284108911d20691ee1f",
+      "normalizedHash": "b6828abf5094243bab9be85562610f4d58e90cfd9b26cfe296fffe2b0df27d6c",
+      "pageStart": 230,
+      "pageEnd": 240,
+      "pdfPages": [
+        236
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 12,
+      "key": "eb:tributario:12",
+      "blockId": "v10-494ead",
+      "groupId": "137c55",
+      "rot": "",
+      "article": "208",
+      "scope": "full-article",
+      "lawHash": "16146a2d2009f76be58e190dc0e3f3758821cf441a11f9d06da41a76b7486f9d",
+      "normalizedHash": "21634849c7a91fe7ff218c26c9def3197dc3410dfc8808a7634870973092e232",
+      "pageStart": 230,
+      "pageEnd": 240,
+      "pdfPages": [
+        237
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 13,
+      "key": "eb:tributario:13",
+      "blockId": "2026-08-21-0~2",
+      "groupId": "ee6097",
+      "rot": "",
+      "article": "112",
+      "scope": "full-article",
+      "lawHash": "c816437945908e30c493ee4c6bc5961536eb60d7197d597a34f4eca739c09b54",
+      "normalizedHash": "46f398a9a65479c3e6cfb924c89675abc0f135c18c278e87d35d5fcb1c79c1fd",
+      "pageStart": 241,
+      "pageEnd": 242,
+      "pdfPages": [
+        241
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 14,
+      "key": "eb:tributario:14",
+      "blockId": "2026-09-16-0",
+      "groupId": "535c03",
+      "rot": "Lei 6.830",
+      "article": "3",
+      "scope": "full-article",
+      "lawHash": "c8a8e2a47e2d1b7758d11c4374da5cf18871adc963f0b21e22e03b3dc7de5ada",
+      "normalizedHash": "23ddeb5a33e90e015666da527b5e146f00388f23a00cece7dc003516440c2e0a",
+      "pageStart": 243,
+      "pageEnd": 248,
+      "pdfPages": [
+        245
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 14,
+      "key": "eb:tributario:14",
+      "blockId": "2026-09-16-0",
+      "groupId": "75d30f",
+      "rot": "",
+      "article": "40",
+      "scope": "full-article",
+      "lawHash": "a353593b64920dc5d854ac77a8ba71b0f970ddbecf4058b2e35e0b6f6bc0385d",
+      "normalizedHash": "684dcd480d93936ab16ef4625fbad992fbc0dc0e01a365246a4a59f18d866a59",
+      "pageStart": 243,
+      "pageEnd": 248,
+      "pdfPages": [
+        247
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 15,
+      "key": "eb:tributario:15",
+      "blockId": "2026-08-21-0",
+      "groupId": "71ba5c",
+      "rot": "CF",
+      "article": "153",
+      "scope": "fragment",
+      "lawHash": "e84c9e0c290ed3c080be83d982d4c2345769112d25aa5b2b69848e69afd8bcaa",
+      "normalizedHash": "8812b9f2e9ad457032014e204f150a0d9c336053dd839ae6e241521e0eb0d3ca",
+      "pageStart": 249,
+      "pageEnd": 266,
+      "pdfPages": [
+        263
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 16,
+      "key": "eb:tributario:16",
+      "blockId": "2026-08-21-0~2",
+      "groupId": "c17c5d",
+      "rot": "CF",
+      "article": "155",
+      "scope": "fragment",
+      "lawHash": "3883fb315a591c2018f7fae4af5c78dfa25097f99ace6c42a50e14adcf0358b3",
+      "normalizedHash": "bfc263b378c6e2be3adc8a29b8205811fd20a5c8224c3d0eb4c44ff59ac68506",
+      "pageStart": 267,
+      "pageEnd": 289,
+      "pdfPages": [
+        281
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 18,
+      "key": "eb:tributario:18",
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "rot": "",
+      "article": "4",
+      "scope": "full-article",
+      "lawHash": "62bfe431db695c0e7edc94d6d2f7c9f287880f5afe49392e1a00c8c3885a9091",
+      "normalizedHash": "afe41d1bc5c3692754d7012e487c954192f20e0c2feb0a82e9929a3f37581b4c",
+      "pageStart": 300,
+      "pageEnd": 314,
+      "pdfPages": [
+        314
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "tributario",
+      "chapter": 18,
+      "key": "eb:tributario:18",
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "rot": "",
+      "article": "148",
+      "scope": "full-article",
+      "lawHash": "73d4b238130a5405360ef568aae0a9fd50b3aff5b0aa774aa0e389511987e6db",
+      "normalizedHash": "379ca345dcd2a6466003933d759afb576f7ca84771ca6f4f7423fa5b27143edc",
+      "pageStart": 300,
+      "pageEnd": 314,
+      "pdfPages": [
+        314
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "trabalho",
+      "chapter": 16,
+      "key": "eb:trabalho:16",
+      "blockId": "2026-09-04-0~2",
+      "groupId": "9c4b4a",
+      "rot": "CLT",
+      "article": "469-A",
+      "scope": "full-article",
+      "lawHash": "a7fedbfefe4018f4e7d08441be5c9982dc8a9b81040a143691653e71edae5216",
+      "normalizedHash": "0f26a48f81879d55ddc88dcba8683a45e5e27ded4b4d693666c860e1b059be8d",
+      "pageStart": 311,
+      "pageEnd": 334,
+      "pdfPages": [
+        318
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 3,
+      "key": "eb:proc-penal:3",
+      "blockId": "2026-08-18-0",
+      "groupId": "027e67",
+      "rot": "LINDB",
+      "article": "4",
+      "scope": "full-article",
+      "lawHash": "b02f099bc2e305128b7268f3c51ffcf12bfc5cdc7e7760be1a4e3c6f56a313b3",
+      "normalizedHash": "27da16f263bdec676ab0d3c637ec734fc147d7bb9420c590c6a22d3374a4635c",
+      "pageStart": 49,
+      "pageEnd": 66,
+      "pdfPages": [
+        50
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 5,
+      "key": "eb:proc-penal:5",
+      "blockId": "2026-09-03-0~2",
+      "groupId": "8b0f30",
+      "rot": "CPP",
+      "article": "28",
+      "scope": "full-article",
+      "lawHash": "9031f11c2b296dc56897540882a5582f7e1e5603f43b3ade7d802699ccf6f031",
+      "normalizedHash": "7f4d7bdf97413f537e40cef3357e253ccea126127020eaef28c40ef53eed1460",
+      "pageStart": 77,
+      "pageEnd": 128,
+      "pdfPages": [
+        105,
+        106
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 7,
+      "key": "eb:proc-penal:7",
+      "blockId": "2026-09-15-0",
+      "groupId": "4407bc",
+      "rot": "",
+      "article": "927",
+      "scope": "full-article",
+      "lawHash": "fefb70b3b3ca3803eb2465063e77a4a50d7201a24f7ef5a49be54335d28f4635",
+      "normalizedHash": "f0470219edde54d0c5edfd3550ceeba8c865531d5ec7303f48885aa08e05394f",
+      "pageStart": 165,
+      "pageEnd": 173,
+      "pdfPages": [
+        165
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 7,
+      "key": "eb:proc-penal:7",
+      "blockId": "2026-09-15-0",
+      "groupId": "4407bc",
+      "rot": "",
+      "article": "930",
+      "scope": "full-article",
+      "lawHash": "2ff652b17996de32e0a4c06fcd516ace029097606ecb5017eb3a916f28531bf8",
+      "normalizedHash": "89d6c620d92b6bf19c07d05ee877c8567804f54e16c923ddc51fc1ff89e73950",
+      "pageStart": 165,
+      "pageEnd": 173,
+      "pdfPages": [
+        168
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "4df147",
+      "rot": "CPP",
+      "article": "283",
+      "scope": "full-article",
+      "lawHash": "e2b89cd8019709217d3895c0e938c2cce8ff02acd645b80b1debbe72a6449eb0",
+      "normalizedHash": "65d1149f8acf11f4c1eb4ebf1c989d1969743d4904c74741e27cc9a9db87e8be",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        385
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "4df147",
+      "rot": "CPP",
+      "article": "285",
+      "scope": "full-article",
+      "lawHash": "57abb0c07fa137690c87392e695e8dd3a71a50c5721c89529e5fd0b732b2cbae",
+      "normalizedHash": "5b6e9b207c1f3383a3f8c97fe2be53846dc63be7c2bdf6d07bf8502152f369fb",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        393
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "4df147",
+      "rot": "CPP",
+      "article": "287",
+      "scope": "full-article",
+      "lawHash": "96bda5784d1ca050fe88fe6a282646eae83437757d39fd273a6338421319bff5",
+      "normalizedHash": "1f23f3853bef1caefa19c5f94d1eb10c8ea06797a4aab58bd5e15c4574237313",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        397
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "4df147",
+      "rot": "CPP",
+      "article": "289",
+      "scope": "full-article",
+      "lawHash": "75372339600a8741917df1aabfc66edbca850040bc80c9b4c9cf5fff15e51fc6",
+      "normalizedHash": "a387e9a1bcccc8b9b89bd18feec01015d54063b0ba00cac7330f49f6c6a74a87",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        393
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "d1b0e2",
+      "rot": "CPP",
+      "article": "289-A",
+      "scope": "full-article",
+      "lawHash": "8de67beed1c893eb85bbd359ce6bd7d2ff5c1aff98766a6bc5263c50e4484c6c",
+      "normalizedHash": "c1439b47fd60802ec27c712f3712a2b48523be0b92fcff6de1548121894cd113",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        394
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "d1b0e2",
+      "rot": "CPP",
+      "article": "290",
+      "scope": "full-article",
+      "lawHash": "31a16139d93d161c82258b1573a1a8273e0bff109828b10f4e2d75a2d504e3c9",
+      "normalizedHash": "20f543a6f857346c3e3280531997e9599de40bfc2ddc6ed56bee4bd48b392282",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        394
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "d1b0e2",
+      "rot": "CPP",
+      "article": "293",
+      "scope": "full-article",
+      "lawHash": "148e0c85721bc19ec1f4ada7fad977b3af65c54c3f569b07a354d47e72691bbe",
+      "normalizedHash": "1b684cd96212fbfca836e9b633ca020f5027d12030a7e30a89fc310d84a157bb",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        395
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "25c27b",
+      "rot": "CPP",
+      "article": "301",
+      "scope": "full-article",
+      "lawHash": "53d60ff696bc4204c745c5dea13d91c0c48b274337eb663b01965357524f55c4",
+      "normalizedHash": "40ff35e1461698f1786030568ad73d1c36347ad23bec61044f986e26ffd6164c",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        401
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "25c27b",
+      "rot": "CPP",
+      "article": "302",
+      "scope": "full-article",
+      "lawHash": "ba532cf9b6948c3aed282839c307585464780188141512086346c55edca48a73",
+      "normalizedHash": "72e0388d045ac05e8731fd1edead95326bf2778e0fd145ecf5f41b9d280e5a6c",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        402
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "25c27b",
+      "rot": "CPP",
+      "article": "304",
+      "scope": "full-article",
+      "lawHash": "77f95deaaea55f5e729218a6918b0ba1c265d0ffcced832637055e315b4e60ff",
+      "normalizedHash": "697f27cee2388aa903147ac5c68412eb9ed4d38e61c516a662d33b61a697df96",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        405,
+        406
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "25c27b",
+      "rot": "CPP",
+      "article": "306",
+      "scope": "full-article",
+      "lawHash": "7709e010f4fd0c778f55d92a38df49dc02ed6d0140180d08994884ab2cec4187",
+      "normalizedHash": "412bb2e2417e01c76f28adbb08081d787565ef1b61da3d94f028e0582c1462ef",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        406,
+        407
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "25c27b",
+      "rot": "CPP",
+      "article": "307",
+      "scope": "full-article",
+      "lawHash": "6ed987586f02355c7c5e4500ec14f7f9496963c13286798992ac12d1df06d484",
+      "normalizedHash": "9f6902f8d061dba311f4d57dd9a5dc5e02d67c6cebd87e6029107ad5b7527c3e",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        407
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "617e73",
+      "rot": "",
+      "article": "311",
+      "scope": "full-article",
+      "lawHash": "068aac4b764b831cbf7bd01759610c723bc06b527f6e3a08da3bdcf12f79d8c2",
+      "normalizedHash": "e634f4f8c1feb138f5656444a2f6aa4c266d3297c25a3b96fbcdfd2e481e8e38",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        380,
+        381
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0",
+      "groupId": "617e73",
+      "rot": "",
+      "article": "314",
+      "scope": "full-article",
+      "lawHash": "2a910d188bb1a6304ea134209a380925b27cb6f4bd419d45987127c3ca5a5eef",
+      "normalizedHash": "ec6c86306eb557146623fd7e1114b15026d0cc2978bdd8430e7479c487757bfc",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        436
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 16,
+      "key": "eb:proc-penal:16",
+      "blockId": "2026-09-18-0~2",
+      "groupId": "47790b",
+      "rot": "",
+      "article": "318-A",
+      "scope": "full-article",
+      "lawHash": "65e4e68dcefa6f504e3397820d8d91b7cf28363a27c98969b0fa98f0069cf6ab",
+      "normalizedHash": "9c0a5d21591e353093625e114ffef52a3bcc23eb64dffdbb063587c7380ecab0",
+      "pageStart": 375,
+      "pageEnd": 444,
+      "pdfPages": [
+        423
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 17,
+      "key": "eb:proc-penal:17",
+      "blockId": "2026-09-02-0~2",
+      "groupId": "2384ea",
+      "rot": "CPC",
+      "article": "253",
+      "scope": "full-article",
+      "lawHash": "0c9aacc7365400edf23369eb434b855d52ef3c910aa2198a2143b2f8cc238107",
+      "normalizedHash": "90fe3da99463573b93b37b7e091ec2240bca047ad7d41e4779c3ecaac4bef6de",
+      "pageStart": 445,
+      "pageEnd": 460,
+      "pdfPages": [
+        455
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "proc-penal",
+      "chapter": 17,
+      "key": "eb:proc-penal:17",
+      "blockId": "2026-09-02-0~2",
+      "groupId": "2384ea",
+      "rot": "CPC",
+      "article": "254",
+      "scope": "full-article",
+      "lawHash": "0375af53ff116fc8eac13ffd1f5228c8142b9f167ecd368a0729ab4a6a9aebd6",
+      "normalizedHash": "ecf50eb9d6d813f25e15c6b35da9403fa5fd525b549a72058e39c41dcec64b42",
+      "pageStart": 445,
+      "pageEnd": 460,
+      "pdfPages": [
+        455
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 3,
+      "key": "eb:humanistica:3",
+      "blockId": "2026-08-18-0",
+      "groupId": "027e67",
+      "rot": "LINDB",
+      "article": "4",
+      "scope": "full-article",
+      "lawHash": "b02f099bc2e305128b7268f3c51ffcf12bfc5cdc7e7760be1a4e3c6f56a313b3",
+      "normalizedHash": "27da16f263bdec676ab0d3c637ec734fc147d7bb9420c590c6a22d3374a4635c",
+      "pageStart": 41,
+      "pageEnd": 68,
+      "pdfPages": [
+        60
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 3,
+      "key": "eb:humanistica:3",
+      "blockId": "2026-08-18-0",
+      "groupId": "027e67",
+      "rot": "LINDB",
+      "article": "5",
+      "scope": "full-article",
+      "lawHash": "b4a114a4441501a5af953cdcc960fe713988ee9ba6c4cd67ac0e219627a09cdb",
+      "normalizedHash": "acfc81fbc7a76be397f4e89ca01e8b46678fe07d7514e7ed2e213ecd2efd0b28",
+      "pageStart": 41,
+      "pageEnd": 68,
+      "pdfPages": [
+        60
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 5,
+      "key": "eb:humanistica:5",
+      "blockId": "v10-eea549",
+      "groupId": "983f4a",
+      "rot": "",
+      "article": "1",
+      "scope": "full-article",
+      "lawHash": "d378cc0e86429d07ad4804a9a9e552d5fb73024880e5a0392245a4a93b0d8ecb",
+      "normalizedHash": "ba95af69bd39307965d02278574e25b73d6f9feab830dc3e171ce44e5dcd9c14",
+      "pageStart": 94,
+      "pageEnd": 139,
+      "pdfPages": [
+        101
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "11",
+      "scope": "full-article",
+      "lawHash": "57f1c2249317bcd6aebaca775abcb13107b3741d3ba06561bf0653131b6d4749",
+      "normalizedHash": "e92c7c62d2bcb785d3c3de6ef4302537de987c38bbd6c9e4beb7063bc6f27cd8",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "12",
+      "scope": "full-article",
+      "lawHash": "fe10247060d371f77aa0e4dcd44a66b354c036ea76e399981362ab991f376c06",
+      "normalizedHash": "90cf73e3010716c44482d4e126ad449956e3263ce28b6d48fd29ccc332d83cd8",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "13",
+      "scope": "full-article",
+      "lawHash": "65373537d86859f0f6d6ef29fcce83de7516afcb19710fbb3a8c24f8b8ae31af",
+      "normalizedHash": "0288a6f9f594322b46b0a1a577ab92d51c9e0d6ecea41c27d285b6ff9f07cb96",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "14",
+      "scope": "full-article",
+      "lawHash": "6a33f5f12ed4e8ada1315bc50a3362eb068017d8b12b9ca7e155ad6adf07948b",
+      "normalizedHash": "598f0a9a545a320ee4635e68e8f90d3a49206485030257d11ad8406906982f7f",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "15",
+      "scope": "full-article",
+      "lawHash": "7f7f173e90611919d9597895ab3d3f8399d008c278993057c9444427a83c21a8",
+      "normalizedHash": "326b6f403327b76431bb4dda227525debce3e16ddee964531aef2678b898035a",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        144
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "16",
+      "scope": "full-article",
+      "lawHash": "dc5895d5970c0517c84c414f31c7d7cec4b8596e04fcfa6765febb602844a50c",
+      "normalizedHash": "0735a16e08a0c0d860bf45d19780b00790836f6b1ac2195134120ec0c3490f16",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        144
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "17",
+      "scope": "full-article",
+      "lawHash": "9b0d48a78726e007428e6d9972f136f44d987f7e400f8d17cb69591b2514a3a6",
+      "normalizedHash": "69ced4aac925bb3d3041d8cffbb56d9dc7d699f1dbd0c1e91f44d5206eead761",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        144
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "18",
+      "scope": "full-article",
+      "lawHash": "bffb0f1cc33ad8c12187d1f5b22fa3db4cfb039b21a5f2129222dbe8c540a2fa",
+      "normalizedHash": "877d90f41d2ec942ee6ad55e30efe73faf765c6680d629d861437ba1c0669e4a",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        144
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "19",
+      "scope": "full-article",
+      "lawHash": "ac4940d718652d25f67b5344bd8bbf87e8291a2c6aa541b16aac8a70a137bf09",
+      "normalizedHash": "1e95f404cadee4b8e75d313f0a88457cb415f39e18323ed23a85ccc496f7b909",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        144
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "24",
+      "scope": "full-article",
+      "lawHash": "11d5c4773a290d1297c6d9b450c34dc7095c01756957603e8d0ff069adca9be5",
+      "normalizedHash": "30e5339d931bd9d2bba91f63bc3ce90dfd7dbc35e0715a94dfc334ee634c728c",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "25",
+      "scope": "full-article",
+      "lawHash": "8deecccbeab2722e1fb188b09a4c388ce1a2513ca529ef899ddb8ad3b38bf227",
+      "normalizedHash": "2d57e313ee5d7de8402e9e5fc6479c3455d53f4bc24bad2f1ed75fb3ddc524dc",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "30",
+      "scope": "full-article",
+      "lawHash": "19d4c20cf140c3cd2e5b842029aef1ea1c7ad67420844e0c1af758a6dbd3a5c7",
+      "normalizedHash": "a2314e82d7dd0455eeaf03e45dc24f240693660d2a46b0a4b4b4b961c02deb18",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        144
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "31",
+      "scope": "full-article",
+      "lawHash": "5296da4be5b7db75bbecedf26ced07f60bcdcb930aa62ab152f0b792aa6a0c9d",
+      "normalizedHash": "79174befbcb747d2235124902a2da9f30c0ca7813a2be9aeb2ff8e6d2b945385",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "32",
+      "scope": "full-article",
+      "lawHash": "6b81f96daf2348f269bfb51f5b718a32a6d9f57f8cd762ab83860e41f588f411",
+      "normalizedHash": "dcd29d6e1ced656e8c4a47c716ef95520c1af88739389e8629d382e12d247814",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "33",
+      "scope": "full-article",
+      "lawHash": "eaeadc75199f665f17afeb1a902382757f83ac760f33f82078a7f53aeae557ed",
+      "normalizedHash": "3ad584f4464377c4bfe6c67d86b86efb675b88708cf129507c979602a3b846ef",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "34",
+      "scope": "full-article",
+      "lawHash": "13b2391640769ac4881541f4a1fa9d5a012e196fc1bb445204840d60ceb387f7",
+      "normalizedHash": "037b1a07046c272f8dff4d8777861e317e65ea1b3cbcd30a45c424f56ab13d5f",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "rot": "Código de Ética da Magistratura",
+      "article": "35",
+      "scope": "full-article",
+      "lawHash": "b48454f94844001399e3f34e8e47891e914d58c7dc4782d935ae724dc1fa6989",
+      "normalizedHash": "9a7ce4699898831c2b9161a2d591c39a664512505bf24cb8ecfb1a4594afa84e",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "8ae2ad",
+      "rot": "Código de Ética da Magistratura",
+      "article": "36",
+      "scope": "full-article",
+      "lawHash": "156dfb52e9d574b412e2947b0523485e93156870e7f14222c5b1c5c1833b2223",
+      "normalizedHash": "40937e19f225ed666d6c873940dac8d826fc37c823b8b3b300a3cf6641d056ff",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        145
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 6,
+      "key": "eb:humanistica:6",
+      "blockId": "2026-08-15-9",
+      "groupId": "8ae2ad",
+      "rot": "Código de Ética da Magistratura",
+      "article": "37",
+      "scope": "full-article",
+      "lawHash": "aa5d21369b3552662ef6b6791f95413312ae8ead30b8dcb0a3f4430541be00ca",
+      "normalizedHash": "ba560ddc3f11706ec6eaec7dec986b58b2139fb8c1bb0a15fb26272bfabdbab5",
+      "pageStart": 140,
+      "pageEnd": 154,
+      "pdfPages": [
+        146
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "humanistica",
+      "chapter": 9,
+      "key": "eb:humanistica:9",
+      "blockId": "2026-08-18-0",
+      "groupId": "f2be69",
+      "rot": "LINDB",
+      "article": "17",
+      "scope": "full-article",
+      "lawHash": "9ebc40fa99be5fd968da9e7f78c3e713f25a4359ee1115a9490c52f2dd042479",
+      "normalizedHash": "751c9f5f08f2ef7924320826151decd99f26c798b386586424dca4ce8abec9c3",
+      "pageStart": 181,
+      "pageEnd": 223,
+      "pdfPages": [
+        183
+      ],
+      "match": "full-normalized-text"
+    },
+    {
+      "ebook": "consumidor",
+      "chapter": 7,
+      "key": "eb:consumidor:7",
+      "blockId": "2026-09-29-0~2",
+      "groupId": "28bfae",
+      "rot": "",
+      "article": "104",
+      "scope": "full-article",
+      "lawHash": "749e9efc5d0ae0d7f2091849b014e0aef0aa4b0c274e6d857d5afbc6bbef7ea6",
+      "normalizedHash": "8cf241fabc52c4d17c0674f53192113d558c42994c07e05feca93cb0e6b2ba8d",
+      "pageStart": 55,
+      "pageEnd": 62,
+      "pdfPages": [
+        62
+      ],
+      "match": "full-normalized-text"
+    }
+  ],
+  "unverified": [
+    {
+      "blockId": "2026-08-13-1",
+      "groupId": "7d33a4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-13-1",
+      "groupId": "eef25a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-13-1",
+      "groupId": "d48066",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-14-0",
+      "groupId": "fd4a43",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-14-0",
+      "groupId": "d27baa",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-14-0",
+      "groupId": "1ae5b3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-14-0",
+      "groupId": "822713",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0",
+      "groupId": "14cda8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0",
+      "groupId": "416144",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0",
+      "groupId": "5f2cae",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0",
+      "groupId": "59849e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0",
+      "groupId": "418c2d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0",
+      "groupId": "e1a87b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-9",
+      "groupId": "ef777c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-9",
+      "groupId": "8b9c32",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-9",
+      "groupId": "5a3c31",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-9",
+      "groupId": "8ae2ad",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-17-0",
+      "groupId": "4d702a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-18-0",
+      "groupId": "027e67",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-18-0",
+      "groupId": "f2be69",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-18-0",
+      "groupId": "762f58",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0",
+      "groupId": "69f85c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0",
+      "groupId": "e66eab",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0",
+      "groupId": "d881bd",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0",
+      "groupId": "0e98aa",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-20-0",
+      "groupId": "74035e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-20-0",
+      "groupId": "6f299a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-20-0",
+      "groupId": "017461",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-21-0",
+      "groupId": "5dca7a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-21-0",
+      "groupId": "4bad4d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-21-0",
+      "groupId": "6a145e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0",
+      "groupId": "ab6959",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0",
+      "groupId": "5f165c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0",
+      "groupId": "550bd0",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0",
+      "groupId": "90f3fa",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0",
+      "groupId": "63adee",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0",
+      "groupId": "dc2c28",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0",
+      "groupId": "557dec",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0",
+      "groupId": "e91a1d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0",
+      "groupId": "9acfb3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0",
+      "groupId": "ca1dc3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0",
+      "groupId": "0e547e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0",
+      "groupId": "459485",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0",
+      "groupId": "54bcf8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0",
+      "groupId": "61be48",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0",
+      "groupId": "f44129",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0",
+      "groupId": "9a5f4a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-27-0",
+      "groupId": "cf904c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-27-0",
+      "groupId": "c6eec4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-27-0",
+      "groupId": "49833a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-28-0",
+      "groupId": "323683",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-28-0",
+      "groupId": "d75476",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-28-0",
+      "groupId": "24d17a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-28-0",
+      "groupId": "8810fa",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-28-0",
+      "groupId": "982575",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-29-0",
+      "groupId": "ace8c7",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-29-0",
+      "groupId": "c2ab21",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-29-0",
+      "groupId": "681b18",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-29-0",
+      "groupId": "4d94c4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-31-0",
+      "groupId": "de651d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-31-0",
+      "groupId": "eb3948",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-31-0",
+      "groupId": "1ee491",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0",
+      "groupId": "f2692d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0",
+      "groupId": "45f54b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0",
+      "groupId": "d6da30",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0",
+      "groupId": "fe496b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0",
+      "groupId": "270737",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0",
+      "groupId": "acd0ae",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0",
+      "groupId": "bf4944",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0",
+      "groupId": "f0b86f",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0",
+      "groupId": "042d38",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0",
+      "groupId": "b2288c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0",
+      "groupId": "fcb61c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0",
+      "groupId": "d46503",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0",
+      "groupId": "4b27e3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0",
+      "groupId": "919931",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0",
+      "groupId": "b61e3d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0",
+      "groupId": "8416ad",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0",
+      "groupId": "adfc1e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0",
+      "groupId": "1dd01e",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-05-0",
+      "groupId": "59e482",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-07-0",
+      "groupId": "7ba0a1",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0",
+      "groupId": "dec787",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0",
+      "groupId": "7e3e54",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-08-0",
+      "groupId": "6bb362",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0",
+      "groupId": "b58165",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0",
+      "groupId": "290899",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0",
+      "groupId": "4306ee",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-10-0",
+      "groupId": "c392df",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-10-0",
+      "groupId": "c7eed6",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-10-0",
+      "groupId": "2dae26",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0",
+      "groupId": "ae6f10",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0",
+      "groupId": "25c7ce",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0",
+      "groupId": "87b3dc",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0",
+      "groupId": "480c73",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0",
+      "groupId": "27566a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0",
+      "groupId": "41b654",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0",
+      "groupId": "c71842",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0",
+      "groupId": "c37e5f",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0",
+      "groupId": "f102ac",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0",
+      "groupId": "70ee02",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0",
+      "groupId": "e8133d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0",
+      "groupId": "e08ab2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-15-0",
+      "groupId": "4407bc",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-15-0",
+      "groupId": "114ab1",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-15-0",
+      "groupId": "a0b8f3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-15-0",
+      "groupId": "d68722",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "ac69e3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "601ee1",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "535c03",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "849d39",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "afefa5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "668037",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-16-0",
+      "groupId": "445c95",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-17-0",
+      "groupId": "cbdcf5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-17-0",
+      "groupId": "208e93",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-17-0",
+      "groupId": "4149b8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0",
+      "groupId": "4df147",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0",
+      "groupId": "d1b0e2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0",
+      "groupId": "25c27b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0",
+      "groupId": "617e73",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-19-0",
+      "groupId": "a89114",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-19-0",
+      "groupId": "e2e831",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-19-0",
+      "groupId": "c221f1",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-19-0",
+      "groupId": "36f8aa",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0",
+      "groupId": "2c2038",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0",
+      "groupId": "afa357",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0",
+      "groupId": "c06607",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0",
+      "groupId": "666536",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-22-0",
+      "groupId": "2b185c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-22-0",
+      "groupId": "348558",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-22-0",
+      "groupId": "0f6443",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0",
+      "groupId": "cbaaff",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0",
+      "groupId": "1de453",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0",
+      "groupId": "dc03ac",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0",
+      "groupId": "5ae4a9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0",
+      "groupId": "5266cf",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0",
+      "groupId": "f486ce",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0",
+      "groupId": "e99a72",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0",
+      "groupId": "253b5d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0",
+      "groupId": "25c205",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0",
+      "groupId": "2dab4b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0",
+      "groupId": "362371",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0",
+      "groupId": "464a89",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0",
+      "groupId": "4dccc6",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-26-0",
+      "groupId": "62236d",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-26-0",
+      "groupId": "d7ea77",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-26-0",
+      "groupId": "2236b4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-26-0",
+      "groupId": "4a6e3c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0",
+      "groupId": "56cd9e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0",
+      "groupId": "2a34bf",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0",
+      "groupId": "a8537d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0",
+      "groupId": "fadf74",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0",
+      "groupId": "234bae",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0",
+      "groupId": "226c41",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0",
+      "groupId": "6be18d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0",
+      "groupId": "ca5cd2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0",
+      "groupId": "7ed444",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0",
+      "groupId": "5e20f5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0",
+      "groupId": "2887db",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0",
+      "groupId": "827d45",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0",
+      "groupId": "99bd48",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0",
+      "groupId": "a193eb",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0",
+      "groupId": "19c1ca",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0",
+      "groupId": "94f53d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-02-0",
+      "groupId": "8a419f",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-02-0",
+      "groupId": "86c3e2",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-02-0",
+      "groupId": "24d50e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-02-0",
+      "groupId": "684623",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-02-0",
+      "groupId": "baaa32",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0",
+      "groupId": "4bf1c3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0",
+      "groupId": "e30c80",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0",
+      "groupId": "a35d0d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0",
+      "groupId": "165dfe",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0",
+      "groupId": "283531",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0",
+      "groupId": "2f0b8c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0",
+      "groupId": "e2301e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0",
+      "groupId": "df8853",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0",
+      "groupId": "9b0330",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0",
+      "groupId": "c23b16",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0",
+      "groupId": "4bd702",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-08-0",
+      "groupId": "eeb662",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-09-0",
+      "groupId": "246277",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-09-0",
+      "groupId": "d56e47",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-09-0",
+      "groupId": "615471",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-09-0",
+      "groupId": "9be422",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-09-0",
+      "groupId": "66b068",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-09-0",
+      "groupId": "d1cc37",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-10-0",
+      "groupId": "f0b715",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-10-0",
+      "groupId": "e4dee9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-10-0",
+      "groupId": "05add4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-12-0",
+      "groupId": "90a9b2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-12-0",
+      "groupId": "e5b7c5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-12-0",
+      "groupId": "7a3ed3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-12-0",
+      "groupId": "455750",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-12-0",
+      "groupId": "6e10e4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-13-0",
+      "groupId": "e0b910",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-14-0",
+      "groupId": "ad7d5d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-13-1~2",
+      "groupId": "1dd748",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-13-1~2",
+      "groupId": "f1524c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-13-1~2",
+      "groupId": "b31290",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-13-1~3",
+      "groupId": "b2dfad",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-14-0~2",
+      "groupId": "0286c8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-14-0~2",
+      "groupId": "a1335c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-14-0~2",
+      "groupId": "6fcf91",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-14-0~2",
+      "groupId": "f9f7db",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-15-0~2",
+      "groupId": "f3152f",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0~2",
+      "groupId": "bfd126",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0~2",
+      "groupId": "50aeb2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0~2",
+      "groupId": "6bf84f",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-15-0~2",
+      "groupId": "395e76",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-15-0~2",
+      "groupId": "5632c4",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-18-0~2",
+      "groupId": "07f190",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-18-0~2",
+      "groupId": "f3804b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-18-0~2",
+      "groupId": "1cd2e4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-18-0~2",
+      "groupId": "e5dcd7",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-18-0~2",
+      "groupId": "834850",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-18-0~3",
+      "groupId": "33ddeb",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-19-0~2",
+      "groupId": "445281",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0~2",
+      "groupId": "bbd7b2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0~2",
+      "groupId": "2c8837",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0~2",
+      "groupId": "467c6b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0~3",
+      "groupId": "e9930d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-19-0~3",
+      "groupId": "57df3f",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "f0e889",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "f02bb1",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "f6b245",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "afdb08",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "ee6097",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-21-0~2",
+      "groupId": "3eb280",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "cb447a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "94dab6",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "7e3c43",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "e5a217",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "a170b5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "ec5124",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "dbbd5c",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-22-0~2",
+      "groupId": "c180d2",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-22-0~3",
+      "groupId": "4ca1ee",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-22-0~3",
+      "groupId": "40b22d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-22-0~3",
+      "groupId": "53575b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0~2",
+      "groupId": "b7837c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0~2",
+      "groupId": "3ee7d5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-24-0~2",
+      "groupId": "9b91ac",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-25-0~2",
+      "groupId": "70897c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0~2",
+      "groupId": "8e60cd",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0~2",
+      "groupId": "985a5e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0~2",
+      "groupId": "ce4b5e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-25-0~2",
+      "groupId": "4f5865",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-26-0~2",
+      "groupId": "1a33b3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0~2",
+      "groupId": "928f06",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0~2",
+      "groupId": "962953",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0~3",
+      "groupId": "86257d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-26-0~3",
+      "groupId": "aedabb",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-27-0~2",
+      "groupId": "f73200",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-27-0~2",
+      "groupId": "827ab2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-27-0~2",
+      "groupId": "34d873",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-27-0~3",
+      "groupId": "7143f0",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-08-31-0~2",
+      "groupId": "01dbf8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-08-31-0~2",
+      "groupId": "1b9fd8",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-01-0~2",
+      "groupId": "cc1165",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0~2",
+      "groupId": "f3ad46",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0~2",
+      "groupId": "5ab041",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0~2",
+      "groupId": "2ae11d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0~2",
+      "groupId": "04ca2b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-01-0~3",
+      "groupId": "8c12e6",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-02-0~2",
+      "groupId": "7b8b9b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0~2",
+      "groupId": "d43ab1",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0~2",
+      "groupId": "2384ea",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0~2",
+      "groupId": "e47db4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0~3",
+      "groupId": "963502",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-02-0~3",
+      "groupId": "dcbac7",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-02-0~3",
+      "groupId": "48ac53",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-03-0~2",
+      "groupId": "c6479c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0~2",
+      "groupId": "0a33b5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0~2",
+      "groupId": "aed253",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-03-0~2",
+      "groupId": "a525f1",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-04-0~2",
+      "groupId": "9c4b4a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0~2",
+      "groupId": "c33ee7",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-04-0~2",
+      "groupId": "244fd3",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "172cf0",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "d7bd22",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "33dead",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "972e03",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "16abc0",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "2397ff",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-07-0~2",
+      "groupId": "f2b7a2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0~2",
+      "groupId": "cd9430",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0~2",
+      "groupId": "52ad22",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0~2",
+      "groupId": "c83fcb",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0~2",
+      "groupId": "cfd8d7",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-09-0~3",
+      "groupId": "ba07da",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-10-0~2",
+      "groupId": "e20944",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-10-0~2",
+      "groupId": "4cd1e9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-10-0~2",
+      "groupId": "aabf28",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-10-0~2",
+      "groupId": "1ab8d9",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "058fc6",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "4c46cf",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "7b11a8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "6dfcfb",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "535bf9",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "1d3169",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-11-0~2",
+      "groupId": "247aee",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0~2",
+      "groupId": "36f05b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0~2",
+      "groupId": "23741a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-12-0~2",
+      "groupId": "02236e",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "9d5a3a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "b2ffcf",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "515cf4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "b32ac2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "677a18",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "93cfd5",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "491ed7",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-14-0~2",
+      "groupId": "dbaa89",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-17-0~2",
+      "groupId": "c06e31",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-17-0~2",
+      "groupId": "117b0a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-17-0~2",
+      "groupId": "e56bde",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "2f76aa",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "47790b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "c8b59b",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "c1b810",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "6aab1c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "fd5019",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "c3e69b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "f7b809",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-18-0~2",
+      "groupId": "8c1036",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-18-0~3",
+      "groupId": "702d80",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-18-0~3",
+      "groupId": "87c6f7",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-19-0~2",
+      "groupId": "7d970f",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-19-0~2",
+      "groupId": "fd1758",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-19-0~2",
+      "groupId": "1ae4e1",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-19-0~2",
+      "groupId": "5ab7f4",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-19-0~2",
+      "groupId": "27b8a5",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-19-0~2",
+      "groupId": "1065d9",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-21-0~2",
+      "groupId": "5fb372",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-21-0~2",
+      "groupId": "c910fb",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0~2",
+      "groupId": "4b9f46",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0~2",
+      "groupId": "ecd809",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0~2",
+      "groupId": "1aa9e5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0~3",
+      "groupId": "5d8efc",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-21-0~3",
+      "groupId": "7f0106",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-21-0~3",
+      "groupId": "e602bc",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-21-0~3",
+      "groupId": "f42efd",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-21-0~3",
+      "groupId": "54528b",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-23-0~2",
+      "groupId": "404e0e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0~2",
+      "groupId": "f8c0de",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0~2",
+      "groupId": "94d7d2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0~3",
+      "groupId": "92c22d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0~3",
+      "groupId": "62cbf7",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-23-0~3",
+      "groupId": "a57d83",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "d06dbe",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "2d6fce",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "d97c78",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "ad71ab",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "dc1f06",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "9a1620",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "4810aa",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-24-0~2",
+      "groupId": "b7a451",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-24-0~3",
+      "groupId": "541a6d",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-24-0~3",
+      "groupId": "e97510",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "c9724a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "8cbfb2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "56136c",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "b1203a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "dc942a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "b9c3c5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "580d74",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-25-0~2",
+      "groupId": "c7bff4",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-28-0~2",
+      "groupId": "349063",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0~2",
+      "groupId": "5de4d6",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0~2",
+      "groupId": "734d05",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-28-0~2",
+      "groupId": "b4b856",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-29-0~2",
+      "groupId": "72dd6d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0~2",
+      "groupId": "7da741",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0~2",
+      "groupId": "a69adf",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0~2",
+      "groupId": "cc69f2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0~2",
+      "groupId": "74d770",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0~2",
+      "groupId": "28bfae",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-29-0~3",
+      "groupId": "182c7e",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-29-0~3",
+      "groupId": "21c2d7",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-29-0~3",
+      "groupId": "4a026f",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-29-0~3",
+      "groupId": "5d0ebc",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-30-0~2",
+      "groupId": "d9ca77",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0~2",
+      "groupId": "364357",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-30-0~2",
+      "groupId": "9a51c2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0~3",
+      "groupId": "0500f4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0~3",
+      "groupId": "927122",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-09-30-0~3",
+      "groupId": "e594e7",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-30-0~3",
+      "groupId": "855ad8",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-30-0~3",
+      "groupId": "6b2559",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-09-30-0~3",
+      "groupId": "181f0c",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "a5daa9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "b988ac",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "54cb14",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "cacfb9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "8eb96e",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "10550a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~2",
+      "groupId": "7d2e1b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-01-0~3",
+      "groupId": "35db7f",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-01-0~3",
+      "groupId": "3a024c",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-01-0~3",
+      "groupId": "03ae83",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-01-0~3",
+      "groupId": "df4643",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-05-0~2",
+      "groupId": "5eb3ee",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0~2",
+      "groupId": "479188",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0~2",
+      "groupId": "bb2a7e",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-05-0~2",
+      "groupId": "be9a7b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0~2",
+      "groupId": "83e8ac",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-05-0~2",
+      "groupId": "abc18a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "45ecf0",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "a33380",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "6029e8",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "71ea25",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "466adf",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "4cb7e4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~2",
+      "groupId": "9251af",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~3",
+      "groupId": "00bee6",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-06-0~3",
+      "groupId": "588a8b",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-06-0~3",
+      "groupId": "6b09d6",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-06-0~3",
+      "groupId": "4a8c4d",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-06-0~3",
+      "groupId": "1fa467",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "e61358",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "3f89c5",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "8fd83a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "a49af4",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "37b8ef",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "081ffe",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "d4fbfd",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "68eaee",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "ec5013",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "3adb32",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "2026-10-07-0~2",
+      "groupId": "18a199",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-07-0~3",
+      "groupId": "e4ee47",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "2026-10-07-0~3",
+      "groupId": "3e0062",
+      "reason": "source-group-incomplete-or-too-short"
+    },
+    {
+      "blockId": "v10-8a40fa",
+      "groupId": "7385e0",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-8a40fa",
+      "groupId": "0a1b76",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-6ba91a",
+      "groupId": "bf07fe",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-6ba91a",
+      "groupId": "8fb461",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-eea549",
+      "groupId": "b65d0b",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-eea549",
+      "groupId": "983f4a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-5f0ecd",
+      "groupId": "0384db",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-5f0ecd",
+      "groupId": "09f884",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-f9c6a5",
+      "groupId": "6607a2",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-3bdf95",
+      "groupId": "65d420",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-2f9e5c",
+      "groupId": "328aff",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-b26de6",
+      "groupId": "9442ee",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-b26de6",
+      "groupId": "a9cc68",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-b26de6",
+      "groupId": "5e7f23",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-b26de6",
+      "groupId": "a6e6b3",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-494ead",
+      "groupId": "27755f",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-494ead",
+      "groupId": "5e2aba",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-494ead",
+      "groupId": "7c5db9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-494ead",
+      "groupId": "137c55",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-11bd4d",
+      "groupId": "e1265a",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-10289a",
+      "groupId": "26f623",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-f7720d",
+      "groupId": "95694d",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-ffddac",
+      "groupId": "63f3e7",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-e4da8a",
+      "groupId": "292c64",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-e4da8a",
+      "groupId": "6fa5f9",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-e4da8a",
+      "groupId": "5542cc",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    },
+    {
+      "blockId": "v10-aaa45d",
+      "groupId": "85b7b0",
+      "reason": "complete-target-text-not-proven-in-one-chapter"
+    }
+  ]
+}

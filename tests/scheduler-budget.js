@@ -12,10 +12,33 @@ const DAY = '2026-09-08';
 const at = d => new Date(d + 'T12:00:00').getTime();
 const {app} = loadApp({'cfg:cap': [300, at(DAY)]});
 let cases = 0;
-assert.equal(app.capMin(), 90);
-assert.equal(app.G('cfg:cap'), 90, 'legacy profile migrated automatically');
+assert.equal(app.capMin(), 120);
+assert.equal(app.G('cfg:cap'), 120, 'legacy profile migrated automatically');
 assert.equal(app.G('profile:previous-cap'), 300);
+assert.equal(app.G('profile:120-weekdays:v1'), 1);
 cases++;
+
+function assertBudget(p) {
+  assert(Object.values(p.load).every(n => n <= 135), 'even a pedagogical finish has a hard 15-minute margin');
+  for (const [day, minutes] of Object.entries(p.load)) {
+    if (minutes <= 120) continue;
+    const explanations = p.extensions.filter(x => x.day === day);
+    assert.equal(explanations.length, 1, `${day}: one explicit pedagogical extension, not an arbitrary raised cap`);
+    const finishing = p.moves.find(m => m.key === explanations[0].key && m.to === day);
+    assert(finishing && finishing.finishReason === explanations[0].reason);
+    assert(['LEI', 'EBOOK'].includes(finishing.tipo));
+    assert(explanations[0].reason.length > 15);
+  }
+}
+function infoTwins(id) {
+  const graph = app.DATA.infgem || {}, found = new Set(), todo = [id];
+  while (todo.length) {
+    const next = todo.pop(); if (found.has(next)) continue; found.add(next);
+    (graph[next] || []).forEach(x => todo.push(x));
+    Object.entries(graph).filter(([, xs]) => xs.includes(next)).forEach(([x]) => todo.push(x));
+  }
+  return found;
+}
 
 const dataBefore = JSON.stringify(app.DATA);
 const infoCount = app.INFOS.length;
@@ -25,13 +48,20 @@ let plan = app.planRegen({includeToday:true});
 assert(plan.days.length > 100);
 assert(plan.days.includes('2027-03-04'), 'missing calendar weeks restored without changing DATA');
 assert(plan.days.every(app.isStudyDay));
-assert(Object.values(plan.load).every(n => n <= 90));
+assertBudget(plan);
 assert.equal(plan.info.total, infoCount);
-assert.equal(plan.info.scheduled, infoCount, 'all informativos have real dates within current capacity');
+assert.equal(plan.info.scheduled + plan.info.equivalent, infoCount, 'every informativo has a date or a proven twin scheduled');
 assert.equal(plan.info.unscheduled, 0);
 assert.equal(new Set(plan.moves.map(m => m.key)).size, plan.moves.length);
-assert.equal(plan.moves.filter(m => m.tipo === 'INFO').length, infoCount);
-assert(plan.days.every(d => plan.moves.some(m => m.to === d && m.tipo === 'INFO')), 'continuous informativo reserve');
+assert.equal(plan.moves.filter(m => m.tipo === 'INFO').length, plan.info.scheduled);
+const equivalentInfos = plan.library.filter(m => m.tipo === 'INFO');
+assert.equal(equivalentInfos.length, plan.info.equivalent);
+for (const item of equivalentInfos) {
+  const family = infoTwins(item.key.slice(4));
+  assert(plan.moves.some(m => m.tipo === 'INFO' && family.has(m.key.slice(4))),
+    'an informativo in the library has an exact twin with a real study date, never an unverified topic substitute');
+}
+assert(plan.days.every(d => plan.moves.some(m => m.to === d)), 'moving an informativo to fit a whole chapter must not create empty weekdays');
 cases++;
 
 const pending = app.planningUnits().filter(u => !app.unitDone(u));
@@ -41,14 +71,15 @@ assert.equal(represented.length, pending.length);
 assert(plan.fila.every(m => m.reason));
 assert(plan.library.every(m => m.reason));
 assert(!plan.moves.some(m => m.tipo === 'QUEST'));
-assert(!plan.moves.some(m => m.tipo === 'SIM' && m.min > 90));
+assert(!plan.moves.some(m => m.tipo === 'SIM' && m.min > 120));
 cases++;
 
 app.applyRegen(plan);
 for (const d of app.CALENDAR.map(x => x.d).filter(d => d >= DAY)) {
   const units = app.unitsOn(d).filter(u => !app.unitDone(u));
   if (!app.isStudyDay(d)) assert.equal(units.length, 0, `weekend ${d} has no tasks`);
-  assert(units.reduce((n, u) => n + app.minRestante(u), 0) + app.coreStudyMinutesOn(d) <= 90,
+  const maximum = plan.extensions.some(x => x.day === d) ? 135 : 120;
+  assert(units.reduce((n, u) => n + app.minRestante(u), 0) + app.coreStudyMinutesOn(d) <= maximum,
     `${d}: the actual Home list, not just the preview, respects the budget`);
 }
 cases++;
@@ -74,7 +105,7 @@ cases++;
 const beforeQuestions = app.planRegen({includeToday:true});
 app.SET('qd:' + DAY + ':1', JSON.stringify({mat:'Civil', banca:'FGV', n:30, ac:20}));
 const afterQuestions = app.planRegen({includeToday:true});
-assert.equal(app.coreStudyMinutesOn(DAY), future.min, '60 minutes of questions remain outside 90 minutes');
+assert.equal(app.coreStudyMinutesOn(DAY), future.min, '60 minutes of questions remain outside 120 minutes');
 assert.equal(afterQuestions.initialLoad[DAY], beforeQuestions.initialLoad[DAY]);
 cases++;
 
@@ -86,15 +117,16 @@ app.SET('mvu:' + newPlan.moves[10].key, '2026-09-12');
 app.SET('mvu:' + newPlan.moves[11].key, '2026-09-11');
 const rebuilt = app.planRegen({includeToday:true});
 assert(rebuilt.moves.every(m => app.isStudyDay(m.to)));
-assert(Object.values(rebuilt.load).every(n => n <= 90));
+assertBudget(rebuilt);
 cases++;
 
 setClock(at('2027-04-16'));
 const deadline = app.planRegen({includeToday:true});
 assert(deadline.info.unscheduled > 0, 'insufficient capacity is not hidden');
-assert.equal(deadline.info.scheduled + deadline.info.unscheduled, infoCount - 1);
+assert.equal(deadline.info.scheduled + deadline.info.equivalent + deadline.info.unscheduled,
+  app.planningUnits().filter(u => u.b.tipo === 'INFO' && !app.unitDone(u)).length);
 assert(deadline.fila.filter(m => m.tipo === 'INFO').every(m => /obrigatório/.test(m.reason)));
-assert(Object.values(deadline.load).every(n => n <= 90));
+assertBudget(deadline);
 cases++;
 
 console.log(JSON.stringify({status:'ok', cases, studyDays:plan.days.length, scheduledInformativos:plan.info.scheduled, maxMinutes:Math.max(...Object.values(plan.load))}));

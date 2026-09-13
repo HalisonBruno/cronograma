@@ -40,7 +40,9 @@ function extra(a, id, day, min = 10, done = false) {
 function assertFuture(a, days, expectDaily) {
   for (const d of days) {
     const pending = pendingOn(a, d);
-    assert(pending.reduce((sum, u) => sum + a.minRestante(u), 0) <= 90, d + ': real Home respects 90 minutes');
+    const minutes=pending.reduce((sum,u)=>sum+a.minRestante(u),0);
+    const extensions=JSON.parse(a.G('planner:details')||'{}').extensions||[];
+    assert(minutes <= a.capMin() + (extensions.some(x=>x.day===d)?15:0), d + ': real Home respects base120 and documented pedagogical margin');
     if (expectDaily) assert(pending.length > 0, d + ': pending work, not just already-completed cards');
   }
   for (const d of a.CALENDAR.map(x => x.d).filter(d => d > DAY && !a.isStudyDay(d))) {
