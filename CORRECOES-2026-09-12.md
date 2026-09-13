@@ -71,3 +71,25 @@ O acervo inclui alternativas, aulas, capítulos, jurisprudências, informativos 
 ## Recuperação
 
 Antes da migração para 120 minutos, o navegador cria uma cópia local integral do estado, sem o código de sincronização. Ela pode ser baixada em **Ajustes -> Exportar backup anterior à mudança de 120 min**. O replanejamento também mantém a ação **Desfazer último replanejamento**.
+
+## Previsão viva — atualização de 13/09/2026
+
+A aba **Progresso** passou a calcular dois horizontes independentes, sem alterar as datas da Home:
+
+- **Núcleo:** usa as prioridades já existentes, todos os informativos e as revisões geradas a partir de atividades nucleares.
+- **Todo o acervo:** inclui também capítulos, aulas e julgados disponíveis apenas no catálogo — inclusive os 98 itens antes classificados como opcionais —, sempre depois da rota prioritária, e encontra o menor horizonte que comporta a carga diária.
+
+O cálculo respeita 120 minutos, somente de segunda a sexta, e mantém questões fora do teto. O painel separa **blocos pendentes** de **tarefas líquidas**: equivalentes continuam contando como dois ou mais blocos cobertos, mas apenas a tarefa realmente estudada entra nos minutos. Simulados integrais e outras sessões que não cabem no perfil aparecem separadamente; não recebem uma data fictícia.
+
+Na primeira abertura da aba é criado um marco fixo e sincronizado. A previsão seguinte é comparada a esse marco em **dias úteis**: antecipar carga adianta o saldo; deixar passar um dia útil sem estudar atrasa; sábado e domingo não acrescentam atraso. O botão **Redefinir marco** só substitui essa referência após confirmação expressa.
+
+Cada projeção oferece um calendário mensal navegável. Ao tocar em um dia, o aplicativo mostra os blocos e minutos previstos. Esse calendário é uma simulação: não grava `mvu:*`, não altera `cfg:plan-end`, não substitui o replanejamento aplicado e não modifica prioridades.
+
+Simulação somente leitura com o estado sincronizado de 12/09/2026, usando 13/09/2026 como data corrente:
+
+- núcleo: 1.871 blocos pendentes, representados por 1.835 tarefas líquidas e 9.822 minutos, término mínimo em **06/01/2027**;
+- todo o acervo: os 2.616 blocos pendentes do contador foram representados por 2.469 tarefas líquidas e 31.331 minutos, término mínimo da carga diária em **20/09/2027**;
+- nenhuma pendência sem encaixe em qualquer das duas projeções;
+- 330 marcadores manuais e todo o conteúdo/prioridades permaneceram inalterados.
+
+As datas são fotografias iniciais. O próprio objetivo do contador vivo é que elas avancem ou recuem conforme o estudo registrado e a passagem dos dias úteis.
