@@ -374,8 +374,10 @@ async function pull(rerender){if(!token){setSync("off");return false}
     const ch=mergeKv(S.kv,j.kv||{});
     profileReady=true;
     if(ch){migrateV3();migrateV4();migrateV6();migrateV7();saveLocal()}
+    const needsProfile=!G("profile:120-weekdays:v1");
     syncEquiv();ensureStudyProfile();
-    if(rerender!==false)render();
+    // Uma consulta sem novidades não pode desmontar o texto que está sendo lido.
+    if(rerender!==false&&(firstPull||ch||needsProfile))render();
     if(firstPull)schedulePush();
     lastSync=new Date();setSync("ok");updateStats();
     return true;
@@ -1095,10 +1097,12 @@ async function infoTexto(arq){
 function infLeitorHtml(){return '<button class="lerinf" style="background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:5px 10px;font-size:.75rem;cursor:pointer;margin-top:5px">\u{1F4D6} ler aqui</button>'}
 function infLeitorBind(el,o){
   const bt=el.querySelector(".lerinf");if(!bt)return;
+  el.dataset.readerKey="inf:"+o.id;bt.setAttribute("aria-expanded","false");
   bt.addEventListener("click",async(ev)=>{
     ev.preventDefault();ev.stopPropagation();
     let bx=el.querySelector(".inftxt");
-    if(bx){bx.remove();return}
+    if(bx){bx.remove();bt.setAttribute("aria-expanded","false");return}
+    bt.setAttribute("aria-expanded","true");
     bx=document.createElement("div");bx.className="inftxt";
     bx.style.cssText="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;font-size:.88rem;line-height:1.6;white-space:pre-wrap";
     bx.textContent="carregando…";bt.parentNode.appendChild(bx);
@@ -1483,6 +1487,7 @@ function unitProv(u){const v=u.val;if(v==="auto")return "pela equivalência";if(
 function unitCard(u,showOrigin){
   const b=u.b,dn=unitDone(u);
   const div=document.createElement("div");div.className="card"+(dn?" done":"");
+  div.dataset.readerKey=u.key;
   div.style.setProperty("--stripe","var("+(TIPO_VAR[b.tipo]||"--rev")+")");
   const mvd=unitDate(u),moved=mvd&&mvd!==b.day&&!String(b.id).startsWith("jsb:");
   const prov=dn?unitProv(u):"";
@@ -1509,18 +1514,19 @@ function unitCard(u,showOrigin){
     if(isBlock){SET("st:"+b.id,e.target.checked?"done":null,{minutes:minRestante(u)})}
     else{SET(u.key,e.target.checked?1:null,{minutes:minRestante(u)});if(!e.target.checked&&isDone(b))SET("st:"+b.id,null)}
     render()});
-  const ex=div.querySelector(".exp");if(ex)ex.addEventListener("click",()=>div.classList.toggle("open"));
+  const ex=div.querySelector(".exp");if(ex){ex.setAttribute("aria-expanded","false");ex.addEventListener("click",()=>{div.classList.toggle("open");ex.setAttribute("aria-expanded",String(div.classList.contains("open")))});}
   const adi=div.querySelector(".adi");if(adi)adi.addEventListener("click",()=>{if(b.tipo==="SIM")adiar(b);else adiarUnit(u)});
   const pct=div.querySelector(".pct:not(.pgin):not(.errin)");if(pct)pct.addEventListener("change",e=>{SET("pct:"+b.id,+e.target.value);updateStats()});
   const errin=div.querySelector(".errin");if(errin)errin.addEventListener("change",e=>{SET("err:"+b.id,e.target.value.trim()||null);toast("Assuntos anotados — entram no filtro de revisão.")});
   const pgin=div.querySelector(".pgin");if(pgin)pgin.addEventListener("change",e=>{SET("pg:"+u.key,+e.target.value||null);render()});
-  const lerbt=div.querySelector(".lerbt");if(lerbt)lerbt.addEventListener("click",async()=>{
+  const lerbt=div.querySelector(".lerbt");if(lerbt){lerbt.setAttribute("aria-expanded","false");lerbt.addEventListener("click",async()=>{
     let box=div.querySelector(".inlinetxt");
-    if(box){box.remove();return}
+    if(box){box.remove();lerbt.setAttribute("aria-expanded","false");return}
+    lerbt.setAttribute("aria-expanded","true");
     box=document.createElement("div");box.className="inlinetxt det";box.style.display="block";box.innerHTML='<span class="mmin">carregando…</span>';
     div.querySelector(".actions").insertAdjacentElement("beforebegin",box);
     const h=await textoDe(u);box.innerHTML=h||'<span class="mmin">Texto não disponível offline — use o link acima.</span>';
-  });
+  });}
   const focbt=div.querySelector(".focbt");if(focbt)focbt.addEventListener("click",()=>abrirFoco(u));
   const notabt=div.querySelector(".notabt");if(notabt)notabt.addEventListener("click",()=>{
     let t=div.querySelector(".nota");
@@ -1771,13 +1777,14 @@ function pendingPanel(root){
   box.innerHTML='<summary><b>'+units.length+' pendências sem data · '+Math.round(minutes/60*10)/10+' h</b></summary><p class="mmin">Não são tarefas extras para hoje. Falta capacidade no horizonte atual ou há um bloco maior que a sessão. Os informativos continuam obrigatórios; alternativas não entram nesta lista.</p><div class="toolbar"><button class="rebuild">Replanejar no horizonte atual</button><button class="extend">Ver data para concluir tudo</button></div><div class="queue-list"></div><div class="toolbar"><button class="prev">Anterior</button><span class="page"></span><button class="next">Próxima</button></div>';
   box.querySelector(".rebuild").addEventListener("click",()=>showRegenPreview(planRegen()));
   box.querySelector(".extend").addEventListener("click",()=>showRegenPreview(planRegen({extend:true})));
-  let page=0;const size=30,pages=Math.ceil(units.length/size),list=box.querySelector(".queue-list");
-  const fill=()=>{list.innerHTML="";box.querySelector(".page").textContent="Página "+(page+1)+" de "+pages+" · todas as "+units.length+" pendências acessíveis";
+  let page=0,filled=false;const size=30,pages=Math.ceil(units.length/size),list=box.querySelector(".queue-list");
+  const fill=()=>{filled=true;box.dataset.readerPage=String(page);list.innerHTML="";box.querySelector(".page").textContent="Página "+(page+1)+" de "+pages+" · todas as "+units.length+" pendências acessíveis";
     box.querySelector(".prev").disabled=page===0;box.querySelector(".next").disabled=page===pages-1;
     units.slice(page*size,(page+1)*size).forEach(u=>{const reason=document.createElement("div");reason.className="mmin";reason.textContent=minRestante(u)>capMin()+15?"Este bloco excede a sessão e sua margem: registre onde parou para recalcular o restante.":"Sem capacidade neste horizonte; a prévia de continuidade permite atribuir uma data.";list.appendChild(reason);list.appendChild(unitCard(u,true))})};
   box.querySelector(".prev").addEventListener("click",()=>{if(page>0){page--;fill()}});box.querySelector(".next").addEventListener("click",()=>{if(page<pages-1){page++;fill()}});
-  // Só monta os cards quando o painel é aberto.
-  box.addEventListener("toggle",()=>{if(box.open)fill()});root.appendChild(box);
+  box.restoreReadingPage=value=>{page=Math.max(0,Math.min(pages-1,+value||0));box.open=true;fill();};
+  // Reabrir ou restaurar o painel não descarta um leitor que já está montado.
+  box.addEventListener("toggle",()=>{if(box.open&&!filled)fill()});root.appendChild(box);
 }
 function vHoje(root){
   root.appendChild(semaforoEl());
@@ -2252,6 +2259,7 @@ let matSel="";
 function pitem(key,titulo,extra,score,linkHtml,onTick){
   const dn=!!G(key);
   const el=document.createElement("div");el.className="pitem"+(dn?" done":"");
+  el.dataset.readerKey=key;
   el.style.setProperty("--pc",prioColor(score));
   el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+'><div style="flex:1">'+titulo+(linkHtml||"")+'</div><span class="pcx">'+extra+'</span>';
   el.querySelector("input").addEventListener("change",e=>{SET(key,e.target.checked?(onTick||1):null);el.classList.toggle("done",e.target.checked)});
@@ -2317,7 +2325,6 @@ function vMats(root){
     root.appendChild(g);return;
   }
   if(matSel==="Informativos 10x"){vInfos(root);return}
-  setTimeout(matNavEnhance,0);   // indice + colapso de secoes + voltar ao topo (pos-render)
   const m=matSel;
   const top=document.createElement("div");top.className="daynav";
   top.innerHTML='<button id="volt">‹</button><div class="dlabel"><b>'+esc(m)+'</b><small id="ordlbl"></small></div><span style="width:38px"></span>';
@@ -2406,7 +2413,8 @@ function vMats(root){
         (j.infref?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 Informativos 10x "+esc(j.infref)+"</span>":(j.inf?" <span class='badge-moved' style='background:var(--done-soft);color:var(--done)'>📘 nos Informativos 10x</span>":""))+"</div>",
         j.cit+"×",Math.max(.1,j.cit/mx));
       const bt=el.querySelector(".vtese"),bx=el.querySelector(".tesebox");
-      bt.addEventListener("click",e=>{e.stopPropagation();const ab=bx.style.display==="none";bx.style.display=ab?"":"none";bt.textContent=ab?"fechar tese":"ver tese"});
+      bt.setAttribute("aria-expanded","false");
+      bt.addEventListener("click",e=>{e.stopPropagation();const ab=bx.style.display==="none";bx.style.display=ab?"":"none";bt.textContent=ab?"fechar tese":"ver tese";bt.setAttribute("aria-expanded",String(ab))});
       return el;}});
   });
   appendItems(root,items);
@@ -2754,12 +2762,52 @@ function updateStats(){
   todayMinutes.title="Minutos das atividades que você concluiu hoje: tempo estimado ou medido no modo foco, mais 2 min por questão registrada. Equivalências avançam os blocos sem duplicar minutos.";
   scheduleCompletionForecast();
 }
+// Estado transitório da leitura: não vai para a nuvem nem altera o progresso.
+// Reanexar o próprio texto conserva inclusive um fetch ainda em andamento.
+let renderedReadingContext="";
+function readingContext(){return JSON.stringify([curTab,curTab==="hoje"||curTab==="semana"?curDate:"",curTab==="mats"?matSel:""]);}
+function captureReadingState(root){
+  const rows=new Map();let any=false,anchor=null;
+  root.querySelectorAll("[data-reader-key]").forEach(el=>{
+    const inline=el.querySelector(".inlinetxt"),info=el.querySelector(".inftxt"),tese=el.querySelector(".tesebox");
+    const expanded=el.classList.contains("open"),teseOpen=!!tese&&tese.style.display!=="none";
+    const state={inline,info,expanded,teseOpen};
+    const list=rows.get(el.dataset.readerKey)||[];list.push(state);rows.set(el.dataset.readerKey,list);
+    if(!inline&&!info&&!expanded&&!teseOpen)return;
+    any=true;
+    const body=inline||info||(teseOpen?tese:el.querySelector(".det"));
+    if(body&&!anchor){const rect=body.getBoundingClientRect();if(rect.bottom>0&&rect.top<window.innerHeight)anchor={state,top:rect.top};}
+  });
+  const backlog=root.querySelector(".backlog");
+  return any?{rows,anchor,y:window.scrollY,x:window.scrollX,backlogPage:backlog?.open?(+backlog.dataset.readerPage||0):null}:null;
+}
+function restoreReadingState(root,snapshot){
+  if(!snapshot)return;
+  if(snapshot.backlogPage!=null)root.querySelector(".backlog")?.restoreReadingPage?.(snapshot.backlogPage);
+  let restored=false,anchorBody=null;
+  root.querySelectorAll("[data-reader-key]").forEach(el=>{
+    const state=snapshot.rows.get(el.dataset.readerKey)?.shift();if(!state)return;
+    if(state.inline){const actions=el.querySelector(".actions");if(actions){actions.insertAdjacentElement("beforebegin",state.inline);el.querySelector(".lerbt")?.setAttribute("aria-expanded","true");restored=true;}}
+    if(state.info){const button=el.querySelector(".lerinf");if(button){button.parentNode.appendChild(state.info);button.setAttribute("aria-expanded","true");restored=true;}}
+    if(state.expanded){el.classList.add("open");el.querySelector(".exp")?.setAttribute("aria-expanded","true");restored=true;}
+    const tese=el.querySelector(".tesebox");
+    if(state.teseOpen&&tese){tese.style.display="";const button=el.querySelector(".vtese");if(button){button.textContent="fechar tese";button.setAttribute("aria-expanded","true");}restored=true;}
+    if(snapshot.anchor?.state===state)anchorBody=state.inline||state.info||(state.teseOpen?tese:el.querySelector(".det"));
+  });
+  if(restored){
+    const top=anchorBody?.isConnected?window.scrollY+anchorBody.getBoundingClientRect().top-snapshot.anchor.top:snapshot.y;
+    window.scrollTo({top,left:snapshot.x,behavior:"instant"});
+  }
+}
 function render(){
+  const root=document.getElementById("view"),context=readingContext();
+  const reading=renderedReadingContext===context?captureReadingState(root):null;
+  renderedReadingContext=context;
   syncEquiv();
   ensureStudyProfile();
   ensureCalendarUntil(planEnd());
   updateStats();
-  const root=document.getElementById("view");root.innerHTML="";
+  root.innerHTML="";
   if(!profileReady&&!G("profile:120-weekdays:v1")){
     root.innerHTML='<div class="note"><b>Seu progresso está preservado.</b> O plano será preparado depois de carregar a sincronização ou de você escolher usar este aparelho sem sincronizar. Se estiver offline, reconecte e toque no indicador de sincronização; nenhuma data será substituída antes disso.</div>';
     return;
@@ -2773,6 +2821,9 @@ function render(){
   else if(curTab==="aulas")vAulas(root);
   else if(curTab==="mats")vMats(root);
   else vAjustes(root);
+  // Finaliza a estrutura antes de restaurar a altura e a posição dos leitores.
+  if(curTab==="mats"&&matSel)matNavEnhance();
+  restoreReadingState(root,reading);
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{curTab=b.dataset.tab;render()}));
 // indicador de que há mais abas à direita
