@@ -34,7 +34,7 @@ let summary = a.progressSummary();
 assert.equal(summary.manual, 1);
 assert.equal(summary.done, 1);
 a.updateStats();
-assert.equal(nodes.get('stDone').textContent, '1', 'main counter is a covered count, not an alarming acervo ratio');
+assert.equal(nodes.get('stDone').textContent, '1 / '+summary.total, 'main counter shows completed blocks and the full catalog total');
 assert(nodes.get('stCatalog').innerHTML.includes('Não significa'));
 assert(nodes.get('stOrigins').textContent.includes('1 marcados por você'));
 cases++;

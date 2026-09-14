@@ -199,8 +199,8 @@ button.forecast-day{cursor:pointer;color:var(--ink);background:color-mix(in srgb
   <div class="sub">Halison · foco ENAM 2027.1 · 120 min de segunda a sexta · questões à parte · data da prova a confirmar</div>
   <div class="statrow">
     <div class="stat"><b id="stDays">—</b><span>dias p/ prova</span></div>
-    <div class="stat"><b id="stDone">—</b><span>blocos concluídos</span></div>
-    <div class="stat"><b id="stPend">—</b><span>pendentes com data</span></div>
+    <div class="stat"><b id="stDone">—</b><span>blocos feitos / total</span></div>
+    <div class="stat"><b id="stEnd" aria-live="polite">—</b><span>conclusão prevista</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
     <button id="regen" title="Reconstrói os dias úteis a partir de amanhã, preservando hoje e tudo que já está feito">⟳ replanejar</button>
     <button id="syncpill" title="Estado da sincronização">—</button>
@@ -285,7 +285,7 @@ let statsQueued=false;
 function queueStatsRefresh(){
   if(statsQueued)return;
   statsQueued=true;
-  Promise.resolve().then(()=>{try{syncEquiv();updateStats();scheduleCompletionForecast()}finally{statsQueued=false}});
+  Promise.resolve().then(()=>{try{syncEquiv();updateStats()}finally{statsQueued=false}});
 }
 function SET(k,v,study){
   const now=Date.now();
@@ -389,12 +389,12 @@ async function push(){if(!token){setSync("off");return}
     if(!r.ok)throw 0;
     const j=await r.json();
     const changed=mergeKv(S.kv,j.kv||{});if(changed){syncEquiv();saveLocal()}
-    lastSync=new Date();setSync("ok");updateStats();if(changed)scheduleCompletionForecast();
+    lastSync=new Date();setSync("ok");updateStats();
   }catch(e){setSync("err")}}
 let liveStudyDate=todayStr();
 function refreshStudyDate(){
   const now=todayStr();if(now===liveStudyDate)return;
-  liveStudyDate=now;updateStats();scheduleCompletionForecast(true);
+  liveStudyDate=now;updateStats();
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){refreshStudyDate();pull()}});
 setInterval(()=>{if(document.visibilityState==="visible"){refreshStudyDate();pull()}},120000);
@@ -1918,7 +1918,7 @@ function vDesempenho(root){
   root.appendChild(lst);
 }
 const FORECAST_VERSION=1,FORECAST_BASELINE_KEY="forecast:baseline:v1",FORECAST_LAST_KEY="forecast:last:v1";
-let forecastCache={key:"",value:null},forecastTimer=0,forecastRun=0;
+let forecastCache={key:"",value:null},forecastTimer=0,forecastRun=0,forecastPendingKey="";
 const forecastUi={nucleo:{month:"",day:""},acervo:{month:"",day:""}};
 function forecastFingerprint(){
   const rows=[];
@@ -2046,15 +2046,44 @@ function renderCompletionForecast(host,snapshot){
   host.querySelector(".forecast-reset").addEventListener("click",()=>{if(!confirm("Usar as previsões atuais como novo marco? O saldo de avanço ou atraso passará a ser contado a partir de hoje."))return;const next=makeForecastBaseline(snapshot);SET(FORECAST_BASELINE_KEY,JSON.stringify(next));renderCompletionForecast(host,snapshot);toast("As previsões de hoje são o novo marco.")});
   ["nucleo","acervo"].forEach(scope=>mountForecastCalendar(host.querySelector('[data-forecast="'+scope+'"]'),scope==="nucleo"?snapshot.core:snapshot.all,scope));
 }
+function renderHeaderForecast(result,pending=false){
+  const node=document.getElementById("stEnd");if(!node)return;
+  node.setAttribute("aria-busy",String(pending));
+  node.textContent=result?(result.complete?(result.tasks?fullDate(result.end):"Concluído"):"Sem previsão"):(pending?"Calculando…":"—");
+  node.title=(pending?"Atualizando a previsão. ":"")+(result&&!result.complete?
+    result.unresolved+" blocos ainda precisam de encaixe; consulte Progresso.":
+    "Data prevista para concluir o conteúdo de todo o acervo, considerando seus estudos registrados, dias úteis e equivalências. Simulados integrais permanecem como sessões especiais.");
+}
 function scheduleCompletionForecast(force){
-  const host=document.getElementById("completionForecast");if(!host)return;
-  const key=forecastFingerprint();if(!force&&forecastCache.key===key&&forecastCache.value){renderCompletionForecast(host,forecastCache.value);return}
-  clearTimeout(forecastTimer);const run=++forecastRun;host.innerHTML='<div class="forecast-loading">Calculando o calendário mínimo do núcleo…</div>';
-  const last=parseForecastValue(FORECAST_LAST_KEY),base=parseForecastValue(FORECAST_BASELINE_KEY),coreHint=last?.core?.end||base?.core?.end||planEnd(),allHint=last?.all?.end||base?.all?.end||planEnd(),pool=planningUnits(true);
-  forecastTimer=setTimeout(()=>{const core=findCompletionPlan("nucleo",coreHint,pool);if(run!==forecastRun||document.getElementById("completionForecast")!==host)return;
-    host.innerHTML='<div class="forecast-loading">Núcleo calculado. Calculando todo o acervo…</div>';
-    forecastTimer=setTimeout(()=>{const all=findCompletionPlan("acervo",allHint,pool);if(run!==forecastRun||document.getElementById("completionForecast")!==host)return;
-      const snapshot={version:FORECAST_VERSION,today:todayStr(),cap:capMin(),counts:forecastCatalogCounts(),core,all};forecastCache={key:forecastFingerprint(),value:snapshot};renderCompletionForecast(host,snapshot)},0)},20);
+  if(!profileReady&&!G("profile:120-weekdays:v1"))return;
+  const host=document.getElementById("completionForecast"),key=forecastFingerprint();
+  if(!force&&forecastCache.key===key&&forecastCache.value){
+    if(forecastPendingKey){clearTimeout(forecastTimer);forecastRun++;forecastPendingKey="";}
+    renderHeaderForecast(forecastCache.value.all);if(host)renderCompletionForecast(host,forecastCache.value);return;
+  }
+  // O cabeçalho existe em todas as abas. Trocar de página não cancela o cálculo
+  // nem inicia outra busca para o mesmo progresso.
+  if(!force&&forecastPendingKey===key)return;
+  clearTimeout(forecastTimer);const run=++forecastRun;forecastPendingKey=key;
+  const last=parseForecastValue(FORECAST_LAST_KEY),base=parseForecastValue(FORECAST_BASELINE_KEY),coreHint=last?.core?.end||base?.core?.end||planEnd(),allHint=last?.all?.end||base?.all?.end||planEnd();
+  renderHeaderForecast(forecastCache.value?.all||last?.all,true);
+  if(host)host.innerHTML='<div class="forecast-loading">Calculando a previsão de conclusão…</div>';
+  forecastTimer=setTimeout(()=>{
+    if(run!==forecastRun)return;
+    if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
+    const pool=planningUnits(true),all=findCompletionPlan("acervo",allHint,pool);
+    if(run!==forecastRun)return;
+    renderHeaderForecast(all);
+    forecastTimer=setTimeout(()=>{
+      if(run!==forecastRun)return;
+      if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
+      const core=findCompletionPlan("nucleo",coreHint,pool);if(run!==forecastRun)return;
+      const snapshot={version:FORECAST_VERSION,today:todayStr(),cap:capMin(),counts:forecastCatalogCounts(),core,all};
+      forecastCache={key,value:snapshot};forecastPendingKey="";
+      if(profileReady)rememberForecast(snapshot);
+      const currentHost=document.getElementById("completionForecast");if(currentHost)renderCompletionForecast(currentHost,snapshot);
+    },0);
+  },20);
 }
 function vProg(root){
   const forecast=document.createElement("section");forecast.id="completionForecast";forecast.className="forecast-shell";forecast.setAttribute("aria-live","polite");forecast.innerHTML='<div class="forecast-loading">Preparando as duas previsões…</div>';root.appendChild(forecast);scheduleCompletionForecast();
@@ -2707,10 +2736,8 @@ function updateStats(){
   const prova=new Date((DATA.prova||"2027-04-17")+"T12:00:00"),now=new Date(t+"T12:00:00");
   document.getElementById("stDays").textContent=Math.max(0,Math.round((prova-now)/86400000));
   const summary=progressSummary();
-  document.getElementById("stDone").textContent=String(summary.done);
+  document.getElementById("stDone").textContent=summary.done+" / "+summary.total;
   document.getElementById("stDone").title="Uma conclusão por bloco: estudo marcado por você ou cobertura por equivalência válida. Inclui o que você antecipou e o que estudou fora do plano.";
-  document.getElementById("stPend").textContent=String(summary.scheduledPending);
-  document.getElementById("stPend").title="Atividades ainda não concluídas com data de hoje em diante, em dia útil. Não é o tamanho do acervo nem a quantidade de realocações.";
   document.getElementById("stOrigins").textContent=summary.manual+" marcados por você"+(summary.group?" + "+summary.group+" pelo bloco completo":"")+" · "+summary.equivalent+" por equivalência · minutos contados só pelo estudo realizado";
   document.getElementById("stCatalog").innerHTML=
     '<b>Acervo disponível: '+summary.total+' blocos distintos.</b> Inclui todos os capítulos, vídeos, informativos e jurisprudências cadastrados, materiais opcionais e revisões já geradas. Não significa '+summary.total+' tarefas obrigatórias no cronograma.<br>'+
@@ -2720,6 +2747,7 @@ function updateStats(){
   const todayMinutes=document.getElementById("stHoje");
   todayMinutes.textContent=studyMinutesOn(t);
   todayMinutes.title="Minutos das atividades que você concluiu hoje: tempo estimado ou medido no modo foco, mais 2 min por questão registrada. Equivalências avançam os blocos sem duplicar minutos.";
+  scheduleCompletionForecast();
 }
 function render(){
   syncEquiv();

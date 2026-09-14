@@ -13,7 +13,7 @@ const flush = async () => { for(let i=0;i<12;i++) await Promise.resolve(); };
 const progress = t => {
   t.app.syncEquiv(); t.app.updateStats();
   const summary = t.app.progressSummary();
-  assert.equal(t.nodes.get('stDone').textContent, String(summary.done), 'headline is completed blocks, not a misleading fraction of the whole library');
+  assert.equal(t.nodes.get('stDone').textContent, summary.done+' / '+summary.total, 'headline shows completed blocks and the full catalog total');
   assert.equal(summary.done, summary.manual + summary.group + summary.equivalent);
   assert.equal(summary.total, summary.done + summary.pending);
   return [summary.done, summary.total];
