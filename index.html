@@ -200,7 +200,7 @@ button.forecast-day{cursor:pointer;color:var(--ink);background:color-mix(in srgb
   <div class="statrow">
     <div class="stat"><b id="stDays">—</b><span>dias p/ prova</span></div>
     <div class="stat"><b id="stDone">—</b><span>blocos feitos / total</span></div>
-    <div class="stat"><b id="stEnd" aria-live="polite">—</b><span>conclusão prevista</span></div>
+    <div class="stat"><b id="stEnd" aria-live="polite">—</b><span id="stEndLabel">conclusão do acervo</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
     <button id="regen" title="Reconstrói os dias úteis a partir de amanhã, preservando hoje e tudo que já está feito">⟳ replanejar</button>
     <button id="syncpill" title="Estado da sincronização">—</button>
@@ -1918,7 +1918,7 @@ function vDesempenho(root){
   root.appendChild(lst);
 }
 const FORECAST_VERSION=1,FORECAST_BASELINE_KEY="forecast:baseline:v1",FORECAST_LAST_KEY="forecast:last:v1";
-let forecastCache={key:"",value:null},forecastTimer=0,forecastRun=0,forecastPendingKey="";
+let forecastCache={key:"",value:null},forecastTimer=0,forecastRun=0,forecastPendingKey="",forecastPendingValue=null;
 const forecastUi={nucleo:{month:"",day:""},acervo:{month:"",day:""}};
 function forecastFingerprint(){
   const rows=[];
@@ -2046,40 +2046,45 @@ function renderCompletionForecast(host,snapshot){
   host.querySelector(".forecast-reset").addEventListener("click",()=>{if(!confirm("Usar as previsões atuais como novo marco? O saldo de avanço ou atraso passará a ser contado a partir de hoje."))return;const next=makeForecastBaseline(snapshot);SET(FORECAST_BASELINE_KEY,JSON.stringify(next));renderCompletionForecast(host,snapshot);toast("As previsões de hoje são o novo marco.")});
   ["nucleo","acervo"].forEach(scope=>mountForecastCalendar(host.querySelector('[data-forecast="'+scope+'"]'),scope==="nucleo"?snapshot.core:snapshot.all,scope));
 }
-function renderHeaderForecast(result,pending=false){
+function renderHeaderForecast(snapshot,pending=false){
   const node=document.getElementById("stEnd");if(!node)return;
+  const result=nucleoOnly?snapshot?.core:snapshot?.all;
+  document.getElementById("stEndLabel").textContent=nucleoOnly?"conclusão do núcleo":"conclusão do acervo";
   node.setAttribute("aria-busy",String(pending));
   node.textContent=result?(result.complete?(result.tasks?fullDate(result.end):"Concluído"):"Sem previsão"):(pending?"Calculando…":"—");
   node.title=(pending?"Atualizando a previsão. ":"")+(result&&!result.complete?
     result.unresolved+" blocos ainda precisam de encaixe; consulte Progresso.":
-    "Data prevista para concluir o conteúdo de todo o acervo, considerando seus estudos registrados, dias úteis e equivalências. Simulados integrais permanecem como sessões especiais.");
+    "Data prevista para concluir "+(nucleoOnly?"somente o núcleo":"o conteúdo de todo o acervo")+", considerando seus estudos registrados, dias úteis e equivalências. Simulados integrais permanecem como sessões especiais.");
 }
 function scheduleCompletionForecast(force){
   if(!profileReady&&!G("profile:120-weekdays:v1"))return;
   const host=document.getElementById("completionForecast"),key=forecastFingerprint();
   if(!force&&forecastCache.key===key&&forecastCache.value){
-    if(forecastPendingKey){clearTimeout(forecastTimer);forecastRun++;forecastPendingKey="";}
-    renderHeaderForecast(forecastCache.value.all);if(host)renderCompletionForecast(host,forecastCache.value);return;
+    if(forecastPendingKey){clearTimeout(forecastTimer);forecastRun++;forecastPendingKey="";forecastPendingValue=null;}
+    renderHeaderForecast(forecastCache.value);if(host)renderCompletionForecast(host,forecastCache.value);return;
   }
   // O cabeçalho existe em todas as abas. Trocar de página não cancela o cálculo
   // nem inicia outra busca para o mesmo progresso.
-  if(!force&&forecastPendingKey===key)return;
+  if(!force&&forecastPendingKey===key){renderHeaderForecast(forecastPendingValue,true);return;}
   clearTimeout(forecastTimer);const run=++forecastRun;forecastPendingKey=key;
   const last=parseForecastValue(FORECAST_LAST_KEY),base=parseForecastValue(FORECAST_BASELINE_KEY),coreHint=last?.core?.end||base?.core?.end||planEnd(),allHint=last?.all?.end||base?.all?.end||planEnd();
-  renderHeaderForecast(forecastCache.value?.all||last?.all,true);
+  forecastPendingValue=forecastCache.value||last;
+  renderHeaderForecast(forecastPendingValue,true);
   if(host)host.innerHTML='<div class="forecast-loading">Calculando a previsão de conclusão…</div>';
   forecastTimer=setTimeout(()=>{
     if(run!==forecastRun)return;
     if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
     const pool=planningUnits(true),all=findCompletionPlan("acervo",allHint,pool);
     if(run!==forecastRun)return;
-    renderHeaderForecast(all);
+    forecastPendingValue={...forecastPendingValue,all};
+    renderHeaderForecast(forecastPendingValue,nucleoOnly);
     forecastTimer=setTimeout(()=>{
       if(run!==forecastRun)return;
       if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
       const core=findCompletionPlan("nucleo",coreHint,pool);if(run!==forecastRun)return;
       const snapshot={version:FORECAST_VERSION,today:todayStr(),cap:capMin(),counts:forecastCatalogCounts(),core,all};
-      forecastCache={key,value:snapshot};forecastPendingKey="";
+      forecastCache={key,value:snapshot};forecastPendingKey="";forecastPendingValue=null;
+      renderHeaderForecast(snapshot);
       if(profileReady)rememberForecast(snapshot);
       const currentHost=document.getElementById("completionForecast");if(currentHost)renderCompletionForecast(currentHost,snapshot);
     },0);
