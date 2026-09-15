@@ -7,7 +7,10 @@ Dry run (default) fetches, parses and reports; --apply writes leis/*.json, DATA
 Rules: every article text comes from a captured official page (sha256 in the
 audit manifest); labels that do not resolve are dropped and listed, never
 invented; articles already read in another plain group of the same law are
-omitted; a group whose devices exceed 28 is split at article boundaries.
+omitted; no group exceeds CAP_DEVICES (30 devices = 120 min at 4 min/device,
+the envelope of the pre-existing groups): long runs are split at article
+boundaries and a single article above the cap is split into fractions
+("(k/n: first–last)", the same convention as CF art. 5 and art. 84).
 """
 from __future__ import annotations
 import argparse, copy, datetime as dt, hashlib, importlib.util, json, re, sys
@@ -67,19 +70,149 @@ def devices(text: str) -> int:
     return max(1, n)
 
 
-def fmt_sub(sg: str, labels: list[str], adct=False) -> str:
-    nums = [article_key(l) for l in labels]
-    # compress consecutive plain numbers into ranges; suffixed labels stay explicit
+CAP_DEVICES = 30   # teto diario de 120 min a 4 min/dispositivo; os grupos antigos vao ate 29
+DEVICE = re.compile(r'^(Art(?:igo)?\.?\s*\d|§|Par[áa]grafo [úu]nico|[IVXLCDM]+\s*[-–—])')
+
+
+def device_label(line: str):
+    """Marker of a device line in the label style of scripts/apply-law-refresh.fragment (caput, § 4º-A, Parágrafo único, IV)."""
+    ln = line.strip()
+    if re.match(r'^Art(?:igo)?\.?\s*\d', ln):
+        return 'caput'
+    m = re.match(r'^§\s*(\d+[º°o]?(?:-[A-Z])?)', ln)
+    if m:
+        return '§ ' + m[1]
+    if re.match(r'^Par[áa]grafo [úu]nico', ln):
+        return 'Parágrafo único'
+    m = re.match(r'^([IVXLCDM]+)\s*[-–—]', ln)
+    return m[1] if m else None
+
+
+def fraction_parts(text: str, n: int) -> list[dict]:
+    """Split one article into n consecutive parts at device boundaries, balanced by device count.
+
+    Cuts prefer paragraph-level devices (§ / parágrafo único) so the labels stay unambiguous;
+    alíneas and continuation lines always stay with their device."""
+    lines = text.split('\n')
+    dev = [(i, device_label(ln)) for i, ln in enumerate(lines) if DEVICE.match(ln.strip())]
+    total = len(dev)
+    cuts, prev = [], 0
+    for k in range(1, n):
+        target = round(total * k / n)
+        room = total - (n - k)   # leave at least one device for each remaining part
+        every = list(range(prev + 1, room + 1))
+        cands = [p for p in every if dev[p][1] and (dev[p][1].startswith('§') or dev[p][1] == 'Parágrafo único')]
+        pos = min(cands, key=lambda p: (abs(p - target), p)) if cands else None
+        # a paragraph cut only when it keeps the parts balanced (an article that is one caput
+        # plus thirty incisos has no useful paragraph boundary)
+        if pos is None or abs(pos - target) > max(2, total // (2 * n)):
+            pos = min(every, key=lambda p: (abs(p - target), p))
+        cuts.append(pos)
+        prev = pos
+    bounds = [0] + cuts + [total]
     parts = []
-    i = 0
+    for k in range(n):
+        a, b = bounds[k], bounds[k + 1]
+        start = 0 if k == 0 else dev[a][0]
+        end = dev[b][0] if b < total else len(lines)
+        parts.append({'text': '\n'.join(lines[start:end]).strip('\n'), 'first': dev[a][1], 'last': dev[b - 1][1], 'devices': b - a,
+                      'lastParent': enclosing_paragraph([d[1] for d in dev[:b]])})
+    return parts
+
+
+def enclosing_paragraph(labels: list) -> str:
+    """Paragraph-level device (caput, § n, Parágrafo único) that contains the last device of the sequence."""
+    parent = 'caput'
+    for lb in labels:
+        if lb and (lb == 'caput' or lb.startswith('§') or lb == 'Parágrafo único'):
+            parent = lb
+    return parent
+
+
+def fraction_read_title(sg: str, frac: dict, adct=False):
+    """Explicit reading title when the part ends on an inciso nested under a paragraph: the bare numeral
+    repeats across paragraphs ("caput–II" does not say which II), so the title names the paragraph too.
+    The sub keeps the "(k/n: first–last)" form that scripts/apply-law-refresh.py parses."""
+    last, parent = frac.get('last') or '', frac.get('lastParent') or 'caput'
+    if not re.match(r'^[IVXLCDM]+$', last) or parent == 'caput':
+        return None
+    return f"{sg} · {'ADCT ' if adct else ''}art. {frac['label']} ({frac['k']}/{frac['n']}: {frac['first']}–{parent}, {last})"
+
+
+def compress_labels(labels: list[str]) -> list[str]:
+    """Consecutive plain numbers become ranges; suffixed labels stay explicit: 106, 125–126."""
+    nums = [article_key(l) for l in labels]
+    parts, i = [], 0
     while i < len(labels):
         j = i
         while j + 1 < len(labels) and nums[j][1] == '' and nums[j + 1][1] == '' and nums[j + 1][0] == nums[j][0] + 1:
             j += 1
         parts.append(labels[i] if i == j else f'{labels[i]}–{labels[j]}')
         i = j + 1
+    return parts
+
+
+def split_chunk(arts: list[dict], cap: int = CAP_DEVICES) -> list[dict]:
+    """Chunks of at most cap devices: bisect runs at article boundaries; fraction a single long article."""
+    d = sum(devices(a['t']) for a in arts)
+    if d <= cap:
+        return [{'arts': arts}]
+    if len(arts) > 1:
+        best, best_diff, acc = 1, None, 0
+        for i in range(1, len(arts)):
+            acc += devices(arts[i - 1]['t'])
+            diff = abs(acc - (d - acc))
+            if best_diff is None or diff < best_diff:
+                best, best_diff = i, diff
+        return split_chunk(arts[:best], cap) + split_chunk(arts[best:], cap)
+    a = arts[0]
+    n = -(-d // cap)
+    out = []
+    for k, part in enumerate(fraction_parts(a['t'], n), 1):
+        out.append({'arts': [{**a, 't': part['text']}], 'frac': {'label': a['n'], 'k': k, 'n': n, 'first': part['first'], 'last': part['last']}})
+    return out
+
+
+def chunk_articles(arts: list[dict], cap: int = CAP_DEVICES) -> list[dict]:
+    """Greedy runs of at most cap devices; a short leftover joins the previous run only when the sum still fits."""
+    chunks, cur, cur_d = [], [], 0
+    for a in arts:
+        d = devices(a['t'])
+        if cur and cur_d + d > cap:
+            chunks.append(cur)
+            cur, cur_d = [], 0
+        cur.append(a)
+        cur_d += d
+    if cur:
+        chunks.append(cur)
+    if len(chunks) > 1 and sum(devices(a['t']) for a in chunks[-1]) <= 10 and sum(devices(a['t']) for a in chunks[-2] + chunks[-1]) <= cap:
+        chunks[-2].extend(chunks.pop())
+    out = []
+    for c in chunks:
+        out.extend(split_chunk(c, cap))
+    return out
+
+
+def chunk_labels(base_r: str, sg: str, chunk: dict, single: bool, adct=False) -> tuple[str, str]:
+    """(r, sub) of a chunk: ranges of articles, or the fraction convention for a split article."""
+    frac = chunk.get('frac')
+    labels = [a['n'] for a in chunk['arts']]
+    if frac:
+        r = f"{base_r} — art. {frac['label']} ({frac['k']}/{frac['n']})"
+        sub = f"{sg} · {'ADCT ' if adct else ''}art. {frac['label']} ({frac['k']}/{frac['n']}: {frac['first']}–{frac['last']})"
+        return r, sub
+    if single:
+        r = base_r
+    elif len(labels) > 1:
+        r = f"{base_r} — arts. {', '.join(compress_labels(labels))}"   # gaps stay visible: 106, 125–126
+    else:
+        r = f'{base_r} — art. {labels[0]}'
+    return r, fmt_sub(sg, labels, adct)
+
+
+def fmt_sub(sg: str, labels: list[str], adct=False) -> str:
     prefix = 'art.' if len(labels) == 1 else 'arts.'
-    return f'{sg} · {"ADCT " if adct else ""}{prefix} {", ".join(parts)}'
+    return f'{sg} · {"ADCT " if adct else ""}{prefix} {", ".join(compress_labels(labels))}'
 
 
 def main():
@@ -160,34 +293,30 @@ def main():
                 arts.append({'n': label, 't': cand['text'], 'v': [], 'sourceUrl': sources[u]['finalUrl'], 'sourceLinks': cand.get('links', [])})
             if not arts:
                 report['skipped'].append({'block': B['id'], 'r': G['r'], 'reason': 'no-resolvable-article'}); continue
-            # split by devices (cap 30) at article boundaries; a short leftover joins the previous chunk
-            chunks, cur, cur_d = [], [], 0
-            for a in arts:
-                d = devices(a['t'])
-                if cur and cur_d + d > 30:
-                    chunks.append(cur); cur, cur_d = [], 0
-                cur.append(a); cur_d += d
-            if cur:
-                chunks.append(cur)
-            if len(chunks) > 1 and sum(devices(a['t']) for a in chunks[-1]) <= 10:
-                chunks[-2].extend(chunks.pop())
+            # runs of at most CAP_DEVICES at article boundaries; a single long article becomes fractions
+            chunks = chunk_articles(arts)
             for ci, chunk in enumerate(chunks):
-                labels_c = [a['n'] for a in chunk]
-                d = sum(devices(a['t']) for a in chunk)
+                arts_c, frac = chunk['arts'], chunk.get('frac')
+                labels_c = [a['n'] for a in arts_c]
+                d = sum(devices(a['t']) for a in arts_c)
                 m = max(5, round(3 * d))
-                seed = B['id'] + '|' + u + '|' + ','.join(labels_c)
+                seed = B['id'] + '|' + u + '|' + ','.join(labels_c) + (f"|{frac['k']}/{frac['n']}" if frac else '')
                 gid = hashlib.sha1(seed.encode('utf8')).hexdigest()[:6]
                 while gid in all_gids:
                     seed += '#'; gid = hashlib.sha1(seed.encode('utf8')).hexdigest()[:6]
                 all_gids.add(gid)
-                r = G['r'] if len(chunks) == 1 else f"{G['r']} — arts. {labels_c[0]}–{labels_c[-1]}" if len(labels_c) > 1 else f"{G['r']} — art. {labels_c[0]}"
-                sub = fmt_sub(G['lei'], labels_c, adct)
+                r, sub = chunk_labels(G['r'], G['lei'], chunk, len(chunks) == 1, adct)
                 meta = {'r': r, 'sub': sub, 'u': u, 'a': labels_c, 'm': m, 'd': d, 'sg': G['lei'], 'nl': G['lei'], 'oi': oi, 'id': gid}
+                if frac:
+                    meta['fa'] = frac['label']
+                    title = fraction_read_title(G['lei'], frac, adct)
+                    if title:
+                        meta['readTitle'] = title
                 if sources[u]['finalUrl'] != u:
                     meta['readSourceUrl'] = sources[u]['finalUrl']
                 metas.append(meta); oi += 1
                 audit = {'checkedAt': checked, 'status': 'source-reviewed', 'sourceUrl': sources[u]['finalUrl'], 'notes': ['Bloco criado em ' + checked + ' pela auditoria de incidência de banca (FGV/CP Iuris/Cebraspe).'] + notes, 'sourceHash': sources[u]['sha256'], 'retrievedAt': sources[u]['retrievedAt']}
-                groups.append({'id': gid, 'r': r, 'u': u, 'a': chunk, 'sub': sub, 'audit': audit})
+                groups.append({'id': gid, 'r': r, 'u': u, 'a': arts_c, 'sub': sub, 'audit': audit})
                 key = f'lg2:{B["id"]}:{gid}'
                 report['inc'][key] = G['inc']
         if not metas:
