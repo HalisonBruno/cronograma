@@ -143,7 +143,10 @@ async function main() {
     window.__remoteKv = {'nt:reader-return': ['returned', Date.now() + 20000]};
     document.dispatchEvent(new Event('visibilitychange'));
   });
-  await page.waitForFunction(() => G('nt:reader-return') === 'returned');
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)));
+  assert.equal(await page.evaluate(() => G('nt:reader-return')), null, 'returning to the browser tab must not start synchronization');
+  await page.evaluate(() => syncNow());
+  assert.equal(await page.evaluate(() => G('nt:reader-return')), 'returned', 'explicit synchronization still receives remote changes');
   assert(await page.evaluate(key => window.__pendingBox === document.querySelector('[data-reader-key=' + JSON.stringify(key) + '] .inlinetxt'), fixture.info), 'returning to the browser tab must not close its reader');
   cases++;
 

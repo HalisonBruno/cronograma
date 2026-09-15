@@ -50,7 +50,7 @@ h1{font-family:Georgia,"Times New Roman",serif;font-size:1.25rem;margin:0;letter
 #syncpill{align-self:center;margin-left:auto;font-size:.7rem;border-radius:99px;padding:4px 11px;border:1px solid var(--line);color:var(--muted);background:var(--surface);cursor:pointer}
 #syncpill.ok{color:var(--done);border-color:var(--done)}
 #syncpill.err,#syncpill.badtoken{color:var(--danger);border-color:var(--danger)}
-#syncpill.sync{color:var(--warn);border-color:var(--warn)}
+#syncpill.sync,#syncpill.pending{color:var(--warn);border-color:var(--warn)}
 nav.tabs{display:flex;gap:2px;margin:0 -14px;padding:0 14px;overflow-x:auto;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);scrollbar-width:none}
 nav.tabs::-webkit-scrollbar{display:none}
 nav.tabs.fade{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
@@ -203,7 +203,7 @@ button.forecast-day{cursor:pointer;color:var(--ink);background:color-mix(in srgb
     <div class="stat"><b id="stEnd" aria-live="polite">—</b><span id="stEndLabel">conclusão do acervo</span></div>
     <div class="stat"><b id="stHoje">—</b><span>min hoje</span></div>
     <button id="regen" title="Reconstrói os dias úteis a partir de amanhã, preservando hoje e tudo que já está feito">⟳ replanejar</button>
-    <button id="syncpill" title="Estado da sincronização">—</button>
+    <button id="syncpill" title="Sincronizar agora: enviar as marcações deste aparelho e receber as dos outros">—</button>
   </div>
   <div id="stOrigins" class="mmin" style="margin:4px 0"></div>
   <details class="mmin" style="margin:4px 0 10px"><summary style="cursor:pointer">Entender os contadores e o acervo</summary><div id="stCatalog" style="margin-top:6px;line-height:1.6"></div></details>
@@ -302,7 +302,7 @@ function SET(k,v,study){
       if(S.kv["tm:"+k])S.kv["tm:"+k]=[null,now];
     }
   }
-  S.kv[k]=[v,now];saveLocal();schedulePush();
+  S.kv[k]=[v,now];saveLocal();schedulePush(k);
   // Os catálogos mantêm o item no lugar; atualizar o cabeçalho não exige redesenhar a página.
   if(STUDY_KEY.test(k)||/^(qd|qx|tm|study):/.test(k))queueStatsRefresh();
 }
@@ -359,17 +359,28 @@ let token=localStorage.getItem(TKEY)||"";
 // Um aparelho novo não pode fabricar datas mais recentes que o plano ainda
 // não carregado da nuvem. O modo local precisa ser escolhido explicitamente.
 let profileReady=!token&&localStorage.getItem("enam-local-mode")==="1";
-let pushTimer=0,lastSync=null,syncState=token?"sync":"off";
+let lastSync=null,syncState=token?"sync":"off",syncInFlight=null,syncDirty=false,localRevision=0;
 function setSync(s){syncState=s;const p=document.getElementById("syncpill");if(!p)return;p.className=s;
   p.textContent=s==="ok"?("✓ sync "+(lastSync?lastSync.toTimeString().slice(0,5):"")):
-  s==="sync"?"sincronizando…":s==="err"?"offline · salvo local":s==="badtoken"?"código inválido!":"sem sincronização"}
+  s==="sync"?"sincronizando…":s==="pending"?"sincronizar · salvo no aparelho":s==="err"?"falha · salvo no aparelho":s==="badtoken"?"código inválido!":"sem sincronização";
+  p.title=s==="pending"||s==="err"?"Suas alterações estão salvas neste aparelho. Clique para sincronizar ou recarregue a página. Não há envio automático em segundo plano.":"Sincronizar agora: enviar as marcações deste aparelho e receber as dos outros. Também sincroniza ao abrir ou recarregar a página.";
+}
+function markSyncPending(key){
+  // A última previsão é só um cache recalculável, não uma marcação de estudo.
+  if(key==="forecast:last:v1")return;
+  syncDirty=true;localRevision++;
+  if(token&&syncState!=="sync")setSync("pending");
+}
 function apiCall(method,body){return fetch(API,{method,headers:{"content-type":"application/json","x-sync-token":token},body:body?JSON.stringify(body):undefined})}
 async function pull(rerender){if(!token){setSync("off");return false}
+  const requestToken=token;
   setSync("sync");
   try{const r=await apiCall("GET");
+    if(token!==requestToken)return false;
     if(r.status===401){setSync("badtoken");return false}
     if(!r.ok)throw 0;
     const j=await r.json();
+    if(token!==requestToken)return false;
     const firstPull=!profileReady;
     const ch=mergeKv(S.kv,j.kv||{});
     profileReady=true;
@@ -378,38 +389,51 @@ async function pull(rerender){if(!token){setSync("off");return false}
     syncEquiv();ensureStudyProfile();
     // Uma consulta sem novidades não pode desmontar o texto que está sendo lido.
     if(rerender!==false&&(firstPull||ch||needsProfile))render();
-    if(firstPull)schedulePush();
-    lastSync=new Date();setSync("ok");updateStats();
+    setSync(syncInFlight?"sync":syncDirty?"pending":"ok");updateStats();
     return true;
-  }catch(e){setSync("err");return false}}
-function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(push,1500)}
-async function push(){if(!token){setSync("off");return}
-  if(!profileReady)return; // preserva alterações offline até primeiro merge seguro
+  }catch(e){if(token===requestToken)setSync("err");return false}}
+// Compatibilidade das gravações existentes: só marca pendência, nunca agenda rede.
+function schedulePush(key){markSyncPending(key)}
+async function push(){if(!token){setSync("off");return false}
+  if(!profileReady)return false; // preserva alterações offline até primeiro merge seguro
+  const requestToken=token,sentRevision=localRevision;
   setSync("sync");
   try{const r=await apiCall("POST",{kv:S.kv});
-    if(r.status===401){setSync("badtoken");return}
+    if(token!==requestToken)return false;
+    if(r.status===401){setSync("badtoken");return false}
     if(!r.ok)throw 0;
     const j=await r.json();
+    if(token!==requestToken)return false;
     const changed=mergeKv(S.kv,j.kv||{});if(changed){syncEquiv();saveLocal()}
-    lastSync=new Date();setSync("ok");updateStats();
-  }catch(e){setSync("err")}}
+    syncDirty=localRevision!==sentRevision;
+    lastSync=new Date();setSync(syncDirty?"pending":"ok");updateStats();return true;
+  }catch(e){if(token===requestToken)setSync("err");return false}}
+function syncNow(){
+  if(syncInFlight)return syncInFlight;
+  if(!token){showSetup();return Promise.resolve(false);}
+  // Um único ciclo por clique/abertura. GET falho nunca autoriza POST.
+  syncInFlight=(async()=>{if(!await pull())return false;return push();})().finally(()=>{syncInFlight=null;});
+  return syncInFlight;
+}
 let liveStudyDate=todayStr();
 function refreshStudyDate(){
   const now=todayStr();if(now===liveStudyDate)return;
   liveStudyDate=now;updateStats();
 }
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){refreshStudyDate();pull()}});
-setInterval(()=>{if(document.visibilityState==="visible"){refreshStudyDate();pull()}},120000);
+// Só o relógio local é atualizado ao voltar à aba ou passar um dia: sem rede.
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refreshStudyDate()});
+setInterval(()=>{if(document.visibilityState==="visible")refreshStudyDate()},120000);
 // setup overlay
 function showSetup(){document.getElementById("setupOverlay").style.display="flex";document.getElementById("tokenInput").focus()}
 function hideSetup(){document.getElementById("setupOverlay").style.display="none"}
 document.getElementById("tokenSave").addEventListener("click",()=>{
+  if(syncInFlight){toast("Aguarde a sincronização atual antes de trocar o código.");return;}
   const v=document.getElementById("tokenInput").value.trim();
   if(!v)return;
-  token=v;profileReady=false;localStorage.setItem(TKEY,v);localStorage.setItem("enam-local-mode","0");hideSetup();pull().then(ok=>{if(ok)push()});
+  token=v;profileReady=false;localStorage.setItem(TKEY,v);localStorage.setItem("enam-local-mode","0");hideSetup();syncNow();
 });
 document.getElementById("tokenSkip").addEventListener("click",()=>{localStorage.setItem("enam-local-mode","1");profileReady=true;hideSetup();render();setSync("off")});
-document.getElementById("syncpill").addEventListener("click",()=>{if(!token)showSetup();else pull()});
+document.getElementById("syncpill").addEventListener("click",()=>syncNow());
 function isStudyDay(d){const n=new Date(d+"T12:00:00").getDay();return n>=1&&n<=5}
 function datePlus(d,n){const t=new Date(d+"T12:00:00");t.setDate(t.getDate()+n);return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0")}
 function planEnd(){return G("cfg:plan-end")||datePlus(DATA.prova||"2027-04-17",-1)}
@@ -2551,7 +2575,7 @@ function vAjustes(root){
   tb.appendChild(mkb("Ver prévia para concluir todo o plano",()=>showRegenPreview(planRegen({extend:true}))));
   tb.appendChild(mkb("Voltar ao horizonte ENAM 2027.1 (prévia)",()=>showRegenPreview(planRegen({end:datePlus(DATA.prova,-1)}))));
   tb.appendChild(mkb("Exportar backup anterior à mudança de 120 min",()=>{const raw=localStorage.getItem("enam-backup-before-120-v1");if(!raw){toast("Backup desta migração não está neste aparelho.");return}const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([raw],{type:"application/json"}));a.download="enam-backup-antes-120.json";a.click()}));
-  tb.appendChild(mkb("Sincronizar agora",()=>{pull().then(()=>push())}));
+  tb.appendChild(mkb("Sincronizar agora",()=>syncNow()));
   tb.appendChild(mkb(token?"Trocar código de sincronização":"Ativar sincronização",()=>showSetup()));
   tb.appendChild(mkb("Exportar backup",()=>{
     const payload=JSON.stringify({v:2,exported:new Date().toISOString(),state:S});
@@ -2562,22 +2586,22 @@ function vAjustes(root){
   const imp=document.createElement("input");imp.type="file";imp.accept=".json";imp.style.display="none";
   imp.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
     r.onload=()=>{try{const obj=JSON.parse(r.result);
-      if(obj.state&&obj.state.kv){mergeKv(S.kv,obj.state.kv);saveLocal();push();render();toast("Backup mesclado.")}
+      if(obj.state&&obj.state.kv){mergeKv(S.kv,obj.state.kv);saveLocal();markSyncPending();render();toast("Backup mesclado neste aparelho. Sincronize para enviar à nuvem.")}
       else if(obj.state){const now=Date.now();const o=obj.state;const kv={};
         for(const id in (o.st||{}))kv["st:"+id]=[o.st[id],now];
         for(const id in (o.pct||{}))kv["pct:"+id]=[o.pct[id],now];
         for(const id in (o.mv||{}))kv["mv:"+id]=[o.mv[id],now];
         for(const i2 in (o.js||{}))kv["js:"+i2]=[1,now];
         for(const d in (o.sim||{}))kv["sim:"+d]=[o.sim[d],now];
-        mergeKv(S.kv,kv);saveLocal();push();render();toast("Backup antigo convertido e mesclado.")}
+        mergeKv(S.kv,kv);saveLocal();markSyncPending();render();toast("Backup convertido e salvo neste aparelho. Sincronize para enviar à nuvem.")}
       else toast("Arquivo inválido.")}catch(err){toast("Arquivo inválido.")}};
     r.readAsText(f)});
   tb.appendChild(mkb("Importar backup",()=>imp.click()));tb.appendChild(imp);
   tb.appendChild(mkb("Zerar tudo",()=>{
-    if(!confirm("Apagar TODO o progresso (neste aparelho e na nuvem)?"))return;
+    if(!confirm("Apagar TODO o progresso neste aparelho? A exclusão será enviada à nuvem somente ao sincronizar ou recarregar a página."))return;
     const now=Date.now();
     for(const k in S.kv)S.kv[k]=[null,now];
-    saveLocal();push();render();
+    saveLocal();markSyncPending();render();
   }));
   root.appendChild(tb);
   const exs=extras();
@@ -2588,7 +2612,7 @@ function vAjustes(root){
       el.querySelector("button").addEventListener("click",()=>{if(confirm("Remover este material?")){SET("ext:"+o.id,null);SET("xdone:"+o.id,null);SET("mvu:xdone:"+o.id,null);render()}});
       root.appendChild(el)})}
   const info=document.createElement("div");info.className="note";
-  info.innerHTML="Progresso sincronizado automaticamente entre aparelhos via seu Supabase (projeto elucidados-dev, tabela enam_sync). O selo no topo mostra o estado: <b>✓ sync</b> = tudo salvo na nuvem; <b>offline</b> = salvo neste aparelho e reenviado quando a conexão voltar.<br><br>"+
+  info.innerHTML="As marcações são salvas imediatamente neste aparelho. A sincronização entre aparelhos ocorre <b>somente ao abrir/recarregar a página ou clicar em Sincronizar</b>. Não há sincronização por intervalo, ao voltar à aba ou após ticar atividades.<br><br>O selo <b>✓ sync</b> confirma o último envio; <b>sincronizar · salvo no aparelho</b> indica alterações locais ainda não enviadas. Antes de estudar em outro aparelho, sincronize o atual. Se houver falha de rede, os dados ficam salvos localmente; clique novamente ou recarregue quando houver conexão.<br><br>"+
   "<b>Primeiro uso em cada aparelho:</b> abrir o link → colar o código de sincronização → pronto. No celular, use “Adicionar à tela inicial”.<br><br>"+
   "<b>Filtro-base do TEC</b> (montar uma vez): bancas <b>FGV + Cebraspe</b> · área jurídica · <b>2021-2026</b>. Cada bloco de questões indica o(s) assunto(s) a adicionar.<br><br>"+
   "<b>Quando o edital 2026.2 sair:</b> confira a data da prova; se mudar, avise o Claude no chat que ele regenera o app.";
@@ -2833,7 +2857,7 @@ tnav.addEventListener("scroll",tabsFade,{passive:true});addEventListener("resize
 render();
 tabsFade();
 setSync(syncState);
-if(!token)showSetup();else pull();
+if(!token)showSetup();else syncNow();
 if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
