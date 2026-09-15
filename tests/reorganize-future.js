@@ -67,7 +67,8 @@ function assertFuture(a, days, expectDaily) {
   assert(plan.moves.some(m => m.key === overdueKey), 'overdue work is rescued into the future');
   assert(plan.days.every(d => plan.moves.some(m => m.to === d)), 'enough eligible tasks fill every future weekday');
   a.applyRegen(plan);
-  assert.equal(assignment(a, [todayKey, completedKey]), dates);
+  assert.equal(a.G('mvu:' + todayKey), DAY, 'today is preserved');
+  assert(a.G('mvu:' + completedKey) <= DAY, 'completed future item moves back to its completion day (never a future day)');
   assert.equal(JSON.stringify(a.S.kv[completedKey]), completion);
   assertFuture(a, plan.days, true);
   assert.equal(JSON.stringify(a.DATA), curriculum, 'curriculum and researched priorities are unchanged');
@@ -112,7 +113,7 @@ function assertFuture(a, days, expectDaily) {
   assert(!rebuilt.moves.some(m => doneKeys.includes(m.key)));
   for (const id of [twin[0], ...twin[1]]) assert(!rebuilt.moves.some(m => m.key === 'inf:' + id), 'equivalent informativo is not assigned again');
   a.applyRegen(rebuilt);
-  assert.equal(assignment(a, doneKeys), dates);
+  for (const key of doneKeys) assert.equal(a.G('mvu:' + key), DAY, 'completed future work is recorded on its completion day, not left in the future');
   assert.equal(JSON.stringify(doneKeys.map(key => a.S.kv[key])), manual);
   assert(pendingOn(a, date).length > 0, 'the fully anticipated date gets new pending tasks');
   assertFuture(a, rebuilt.days, true);
@@ -133,7 +134,8 @@ function assertFuture(a, days, expectDaily) {
   a.applyRegen(preview);
   assert(pendingOn(a, targetDate).length > 0, 'apply refreshes stale preview rather than leaving a one-task date empty');
   assert.equal(JSON.stringify(a.S.kv[completed.key]), stamp);
-  assert.equal(a.G('mvu:' + completed.key), oldDate);
+  assert.equal(a.G('mvu:' + completed.key), DAY, 'activity completed while the preview was open is recorded on its completion day, never left in a future day');
+  assert.notEqual(a.G('mvu:' + completed.key), oldDate);
   assertFuture(a, preview.days, true);
   a.undoRegen();
   assert.equal(JSON.stringify(a.S.kv[completed.key]), stamp, 'undo does not undo actual study');

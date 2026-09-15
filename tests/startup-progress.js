@@ -7,6 +7,7 @@ const harness = fs.readFileSync(path.join(__dirname, 'study-minutes.js'), 'utf8'
   .replace('updateStats, unitCard,', 'updateStats, catalogUnits, progressSummary, jurisSemBloco, jkey, unitDone, unitsOn, minRestante, coreStudyMinutesOn, qdCard, unitCard,');
 const {loadApp} = new Function('require', '__dirname', harness + '\nreturn {loadApp};')(require, __dirname);
 const DAY = '2026-09-08';
+const PRIO_V = +(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8').match(/"versao":([0-9]+)/) || [0, 1])[1];   // versão atual da régua de bancas: semear com ela evita reaplicar a migração no teste
 const now = new Date(DAY + 'T12:00:00').getTime();
 const old = now - 86400000;
 const flush = async () => { for(let i=0;i<12;i++) await Promise.resolve(); };
@@ -22,7 +23,7 @@ let cases = 0;
 
 async function main() {
   {
-    const t=loadApp({'profile:120-weekdays:v1':[1,now],'profile:prio-bancas:v1':[1,now]});
+    const t=loadApp({'profile:120-weekdays:v1':[1,now],'profile:prio-bancas:v1':[PRIO_V,now]});
     const a=t.app;
     const civil=a.allBlocks.filter(b=>b.mat==='Civil').flatMap(b=>a.unitsOf(b)).find(u=>u.key.startsWith('eb:'));
     assert(civil);
@@ -34,7 +35,7 @@ async function main() {
     cases++;
   }
   {
-    const t = loadApp({'profile:120-weekdays:v1':[1,now],'profile:prio-bancas:v1':[1,now]});
+    const t = loadApp({'profile:120-weekdays:v1':[1,now],'profile:prio-bancas:v1':[PRIO_V,now]});
     const a = t.app;
     const original = a.allBlocks.filter(b => !b.opt).flatMap(b => a.unitsOf(b));
     const originalKeys = new Set(original.map(u => u.key));
@@ -82,7 +83,7 @@ async function main() {
     assert.deepEqual(calls, ['GET'], 'POST não atropela a primeira leitura');
     const remotePlan = JSON.stringify({generatedAt:old, cap:120, days:['2026-10-01'], fila:[], library:[]});
     const remote = {
-      'profile:90-weekdays:v1':[1,old], 'profile:120-weekdays:v1':[1,old],'profile:prio-bancas:v1':[1,old], 'cfg:cap':[120,old],
+      'profile:90-weekdays:v1':[1,old], 'profile:120-weekdays:v1':[1,old],'profile:prio-bancas:v1':[PRIO_V,old], 'cfg:cap':[120,old],
       'planner:details':[remotePlan,old],
       [remoteKey]:[1,old], ['mvu:' + remoteKey]:['2026-10-01',old]
     };
@@ -112,7 +113,7 @@ async function main() {
     const backup = JSON.parse(t.storage.get('enam-backup-before-120-v1'));
     assert.equal(backup.kv['cfg:cap'][0], 300, 'recoverable local backup precedes the profile change');
     assert.deepEqual(backup.kv[key], [1, now]);
-    assert.equal(a.G('mvu:' + key), '2026-10-01', 'atividade concluída não recebe outra data');
+    assert(a.G('mvu:' + key) <= DAY, 'atividade concluída sai do dia futuro e fica registrada no dia da conclusão');
     assert.equal(a.S.kv[key][1], now, 'carimbo real de conclusão é preservado');
     const load = a.unitsOn(DAY).filter(u => !a.unitDone(u)).reduce((n,u) => n+a.minRestante(u),0);
     const plan = JSON.parse(a.G('planner:details'));

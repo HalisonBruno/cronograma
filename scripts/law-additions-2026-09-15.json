@@ -1,0 +1,1215 @@
+{
+ "checkedAt": "2026-09-15",
+ "motivo": "Lacunas apontadas pela auditoria de banca de 14/09/2026 (Diagnostico ENAM CP Iuris, FGV v2.1 + ranking por capitulo, Cebraspe v2). Cada grupo e uma unidade estrutural da lei; artigos ja lidos em outro grupo pleno sao omitidos; nada e transcrito sem fonte oficial capturada. Recorte enxuto: so os trechos de maior incidencia.",
+ "urls": {
+  "CPC": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm",
+  "CP": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm",
+  "CC": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm",
+  "CF": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm",
+  "CPP": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm",
+  "CTN": "https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm",
+  "LEF": "https://www.planalto.gov.br/ccivil_03/leis/l6830.htm",
+  "LRF": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11101.htm",
+  "LSA": "https://www.planalto.gov.br/ccivil_03/leis/l6404compilada.htm",
+  "CDC": "https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm",
+  "Lei 8.009": "https://www.planalto.gov.br/ccivil_03/leis/l8009.htm",
+  "LRP": "https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm",
+  "LIA": "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm",
+  "Lei 14.133": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm",
+  "Lei 9.784": "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm",
+  "Lei 8.112": "https://www.planalto.gov.br/ccivil_03/leis/l8112cons.htm",
+  "DL 3.365": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3365.htm",
+  "Lei 8.987": "https://www.planalto.gov.br/ccivil_03/leis/l8987cons.htm",
+  "DL 200": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del0200.htm",
+  "Decreto 20.910": "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d20910.htm",
+  "LOMAN": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp35.htm",
+  "Lei 13.140": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13140.htm",
+  "Lei 13.146": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm",
+  "Estatuto de Roma": "https://www.planalto.gov.br/ccivil_03/decreto/2002/d4388.htm",
+  "Lei 7.960": "https://www.planalto.gov.br/ccivil_03/leis/l7960.htm",
+  "Lei 9.492": "https://www.planalto.gov.br/ccivil_03/leis/l9492.htm",
+  "Lei 13.775": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13775.htm",
+  "CLT": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm",
+  "Lei 7.783": "https://www.planalto.gov.br/ccivil_03/leis/l7783.htm",
+  "Lei 9.613": "https://www.planalto.gov.br/ccivil_03/leis/l9613.htm",
+  "Lei 13.869": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869.htm",
+  "Lei 11.340": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm",
+  "Lei 12.850": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12850.htm",
+  "Lei 9.882": "https://www.planalto.gov.br/ccivil_03/leis/l9882.htm",
+  "Lei 12.016": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12016.htm"
+ },
+ "readSource": {
+  "Lei 11.340": "https://www2.camara.leg.br/legin/fed/lei/2006/lei-11340-7-agosto-2006-545133-normaatualizada-pl.html"
+ },
+ "blocks": [
+  {
+   "id": "2026-09-15-10",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — Recursos: teoria geral, apelação e agravos",
+   "det": "Bloco mais cobrado do ENAM em Processo Civil (art. 1.015 19×, art. 1.010 8×, art. 1.003 8× na FGV; 'Recursos e Agravo de Instrumento' é o 1º assunto do CP Iuris).",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Recursos: Disposições Gerais",
+     "range": "994-1002",
+     "inc": 9
+    },
+    {
+     "lei": "CPC",
+     "r": "Apelação",
+     "range": "1009-1014",
+     "inc": 10
+    },
+    {
+     "lei": "CPC",
+     "r": "Agravo de Instrumento",
+     "range": "1017-1020",
+     "inc": 10
+    },
+    {
+     "lei": "CPC",
+     "r": "Agravo Interno e Embargos de Declaração",
+     "range": "1022-1026",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-11",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — Recursos aos tribunais superiores",
+   "det": "Recurso ordinário, especial e extraordinário e repetitivos (10 citações FGV; prequestionamento ficto art. 1.025; art. 1.032/1.033).",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Recurso Ordinário, Recurso Extraordinário e Recurso Especial",
+     "range": "1027-1035",
+     "inc": 8
+    },
+    {
+     "lei": "CPC",
+     "r": "Recursos Extraordinário e Especial Repetitivos",
+     "range": "1036-1041",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-12",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — Cumprimento de sentença",
+   "det": "Assunto nº 1 do Cebraspe e listado pelo CP Iuris; 23 citações FGV (arts. 515, 535, 525). O plano só tinha arts. 536-537.",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Cumprimento da Sentença: Disposições Gerais",
+     "range": "513-519",
+     "inc": 9
+    },
+    {
+     "lei": "CPC",
+     "r": "Cumprimento Provisório e Definitivo da Sentença que Reconhece Obrigação de Pagar",
+     "range": "520-527",
+     "inc": 9
+    },
+    {
+     "lei": "CPC",
+     "r": "Cumprimento de Sentença de Alimentos e contra a Fazenda Pública",
+     "range": "528-535",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-13",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — Sentença, remessa necessária e coisa julgada",
+   "det": "Coisa julgada (art. 503 §1º 3×), remessa necessária (art. 496 5×, Súmulas 45 e 490) e elementos da sentença (art. 489 3×), todos listados pelo CP Iuris.",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Elementos e Efeitos da Sentença",
+     "range": "489-495",
+     "inc": 8
+    },
+    {
+     "lei": "CPC",
+     "r": "Remessa Necessária e Tutela Específica nas Obrigações de Fazer, Não Fazer e Entregar Coisa",
+     "range": "496-501",
+     "inc": 8
+    },
+    {
+     "lei": "CPC",
+     "r": "Coisa Julgada",
+     "range": "502-508",
+     "inc": 9
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-14",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — Honorários, poderes do juiz e homologação de sentença estrangeira",
+   "det": "Honorários (art. 85: 7 citações FGV, Tema 1.190), poderes e impedimentos do juiz (arts. 139-148: 18 citações) e homologação de decisão estrangeira (CP Iuris).",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Honorários Advocatícios",
+     "range": "85-85",
+     "inc": 8
+    },
+    {
+     "lei": "CPC",
+     "r": "Poderes, Deveres e Responsabilidade do Juiz; Impedimentos e Suspeição",
+     "range": "139-148",
+     "inc": 7
+    },
+    {
+     "lei": "CPC",
+     "r": "Homologação de Decisão Estrangeira e Concessão do Exequatur",
+     "range": "960-965",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-15",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — Execução: títulos, responsabilidade patrimonial e penhora",
+   "det": "Títulos executivos (art. 784 6×), fraude à execução (art. 792 5× + Súmula 375) e penhora (art. 833: impenhorabilidade); 'Processo de Execução e Embargos' está no CP Iuris.",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Títulos Executivos",
+     "range": "783-788",
+     "inc": 8
+    },
+    {
+     "lei": "CPC",
+     "r": "Responsabilidade Patrimonial e Fraude à Execução",
+     "range": "789-796",
+     "inc": 9
+    },
+    {
+     "lei": "CPC",
+     "r": "Penhora: Objeto e Impenhorabilidade",
+     "range": "831-836",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-16",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC — IRDR, revelia e julgamento antecipado",
+   "det": "IRDR (13 citações FGV, art. 976 4×), julgamento antecipado parcial (art. 356, ENAM 2024/2), revelia e reconvenção (art. 341 4×).",
+   "groups": [
+    {
+     "lei": "CPC",
+     "r": "Incidente de Resolução de Demandas Repetitivas",
+     "range": "976-987",
+     "inc": 8
+    },
+    {
+     "lei": "CPC",
+     "r": "Revelia, Reconvenção e Julgamento Antecipado do Mérito",
+     "list": [
+      "341",
+      "342",
+      "343",
+      "344",
+      "345",
+      "346",
+      "354",
+      "355",
+      "356"
+     ],
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-20",
+   "mat": "Penal",
+   "t": "Lei seca: CP — Causalidade, penas e extinção da punibilidade",
+   "det": "Art. 13 (7 citações FGV, 2 no ENAM), pena de multa (10 citações), sursis e livramento, reabilitação e medidas de segurança, prescrição arts. 107-111 (art. 109 é o 3º dispositivo mais cobrado no Cebraspe).",
+   "groups": [
+    {
+     "lei": "CP",
+     "r": "Relação de Causalidade",
+     "range": "13-13",
+     "inc": 10
+    },
+    {
+     "lei": "CP",
+     "r": "Pena de Multa",
+     "range": "49-52",
+     "inc": 8
+    },
+    {
+     "lei": "CP",
+     "r": "Suspensão Condicional da Pena e Livramento Condicional",
+     "range": "77-90",
+     "inc": 7
+    },
+    {
+     "lei": "CP",
+     "r": "Reabilitação e Medidas de Segurança",
+     "range": "93-99",
+     "inc": 7
+    },
+    {
+     "lei": "CP",
+     "r": "Extinção da Punibilidade e Prescrição",
+     "range": "107-111",
+     "inc": 10
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-21",
+   "mat": "Penal",
+   "t": "Lei seca: CP — Lesão corporal, dignidade sexual, apropriação indébita e funcionário público",
+   "det": "Art. 129 é o 2º dispositivo mais cobrado da FGV; estupro e importunação (arts. 213, 215-A, 216-A/B, 225-226: ENAM 2025/1 e 2025/2); art. 168 (6×); art. 327 (ENAM 2024/1 e 2024/2).",
+   "groups": [
+    {
+     "lei": "CP",
+     "r": "Lesão Corporal e Periclitação da Vida e da Saúde",
+     "range": "129-136",
+     "inc": 9
+    },
+    {
+     "lei": "CP",
+     "r": "Crimes contra a Liberdade Sexual",
+     "list": [
+      "213",
+      "215",
+      "215-A",
+      "216-A",
+      "216-B"
+     ],
+     "inc": 9
+    },
+    {
+     "lei": "CP",
+     "r": "Ação Penal e Causas de Aumento nos Crimes contra a Dignidade Sexual",
+     "range": "225-226",
+     "inc": 8
+    },
+    {
+     "lei": "CP",
+     "r": "Apropriação Indébita",
+     "range": "168-170",
+     "inc": 7
+    },
+    {
+     "lei": "CP",
+     "r": "Funcionário Público: Conceito e Majorante",
+     "range": "325-327",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-22",
+   "mat": "Penal",
+   "t": "Lei seca: leis penais especiais — lavagem, abuso de autoridade, Maria da Penha, organização criminosa",
+   "det": "Lei 9.613 art. 1º (ENAM 2026/1), Lei 13.869 crimes em espécie e art. 15-A (ENAM 2026/1), Lei 11.340 arts. 5º-7º (trecho mais cobrado da lei), Lei 12.850 infiltração arts. 10-12 (ENAM 2025/1).",
+   "groups": [
+    {
+     "lei": "Lei 9.613",
+     "r": "Crime de Lavagem de Dinheiro: Tipo Penal",
+     "range": "1-1",
+     "inc": 9
+    },
+    {
+     "lei": "Lei 13.869",
+     "r": "Crimes de Abuso de Autoridade em Espécie",
+     "range": "9-25",
+     "inc": 7
+    },
+    {
+     "lei": "Lei 11.340",
+     "r": "Violência Doméstica e Familiar contra a Mulher: Conceito e Formas",
+     "range": "5-7",
+     "inc": 9
+    },
+    {
+     "lei": "Lei 12.850",
+     "r": "Infiltração de Agentes",
+     "range": "10-12",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-30",
+   "mat": "Civil",
+   "t": "Lei seca: CC — Bens, invalidade e enriquecimento sem causa",
+   "det": "Bens (25 citações FGV, 3 no ENAM), invalidade arts. 178-184 (o grupo antigo parava em 177), pagamento indevido e enriquecimento sem causa (21 citações, ENAM 2024/2 e 2025/1).",
+   "groups": [
+    {
+     "lei": "CC",
+     "r": "Bens: Classes e Bens Reciprocamente Considerados",
+     "range": "79-91",
+     "inc": 8
+    },
+    {
+     "lei": "CC",
+     "r": "Bens Públicos",
+     "range": "92-103",
+     "inc": 8
+    },
+    {
+     "lei": "CC",
+     "r": "Invalidade do Negócio Jurídico: Prazos e Efeitos",
+     "range": "178-184",
+     "inc": 7
+    },
+    {
+     "lei": "CC",
+     "r": "Pagamento Indevido e Enriquecimento sem Causa",
+     "range": "876-886",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-31",
+   "mat": "Civil",
+   "t": "Lei seca: CC — Responsabilidade civil, doação e seguro",
+   "det": "Responsabilidade por fato de terceiro e indenização (arts. 935, 937, 938, 940 citados; o grupo antigo cobria só 927-932); doação (17 citações FGV) e seguro (7, ENAM 2025/2).",
+   "groups": [
+    {
+     "lei": "CC",
+     "r": "Responsabilidade Civil por Fato de Terceiro e de Coisas",
+     "range": "933-943",
+     "inc": 8
+    },
+    {
+     "lei": "CC",
+     "r": "Indenização",
+     "range": "944-954",
+     "inc": 8
+    },
+    {
+     "lei": "CC",
+     "r": "Doação",
+     "range": "538-564",
+     "inc": 7
+    },
+    {
+     "lei": "CC",
+     "r": "Seguro: Disposições Gerais",
+     "range": "757-777",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-32",
+   "mat": "Civil",
+   "t": "Lei seca: CC — Condomínio edilício, regime de bens, união estável e sucessões",
+   "det": "Condomínio edilício está no topo do CP Iuris (ENAM 2025/2 e 2026/1); art. 1.659 é o dispositivo mais cobrado de família; união estável (ENAM 2024/2 e 2026/1); ordem da vocação hereditária e herdeiros necessários (56 citações FGV em sucessões).",
+   "groups": [
+    {
+     "lei": "CC",
+     "r": "Condomínio Edilício: Disposições Gerais",
+     "range": "1331-1346",
+     "inc": 9
+    },
+    {
+     "lei": "CC",
+     "r": "Regime de Comunhão Parcial",
+     "range": "1658-1666",
+     "inc": 8
+    },
+    {
+     "lei": "CC",
+     "r": "União Estável",
+     "range": "1723-1727",
+     "inc": 8
+    },
+    {
+     "lei": "CC",
+     "r": "Ordem da Vocação Hereditária e Herdeiros Necessários",
+     "range": "1829-1850",
+     "inc": 9
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-33",
+   "mat": "Civil",
+   "t": "Lei seca: CDC, bem de família e registro civil",
+   "det": "CDC arts. 12, 14, 17, 51 são os dispositivos mais cobrados de Consumidor (ENAM cobrou CDC diretamente); Lei 8.009 (4 questões FGV + Súmula 364); Registro Civil das Pessoas Naturais está no CP Iuris (ENAM 2026/1).",
+   "groups": [
+    {
+     "lei": "CDC",
+     "r": "Responsabilidade pelo Fato e pelo Vício do Produto e do Serviço",
+     "range": "12-25",
+     "inc": 9
+    },
+    {
+     "lei": "CDC",
+     "r": "Cláusulas Abusivas",
+     "range": "51-53",
+     "inc": 8
+    },
+    {
+     "lei": "Lei 8.009",
+     "r": "Impenhorabilidade do Bem de Família",
+     "range": "1-8",
+     "inc": 8
+    },
+    {
+     "lei": "LRP",
+     "r": "Registro Civil das Pessoas Naturais: Disposições Gerais e Nascimento",
+     "list": [
+      "29",
+      "30",
+      "31",
+      "32",
+      "50",
+      "51",
+      "52"
+     ],
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-40",
+   "mat": "Constitucional",
+   "t": "Lei seca: CF — Nacionalidade, direitos políticos, Estados, Municípios e intervenção",
+   "det": "Art. 12 (7 questões FGV), art. 14 (12 citações), art. 25 HOT (9 questões), art. 29 HOT (6), intervenção arts. 34-36 (36 citações; 2 questões ENAM no art. 36; CP Iuris lista).",
+   "groups": [
+    {
+     "lei": "CF",
+     "r": "Nacionalidade",
+     "range": "12-13",
+     "inc": 8
+    },
+    {
+     "lei": "CF",
+     "r": "Direitos Políticos",
+     "range": "14-14",
+     "inc": 8
+    },
+    {
+     "lei": "CF",
+     "r": "Estados Federados",
+     "range": "25-28",
+     "inc": 9
+    },
+    {
+     "lei": "CF",
+     "r": "Municípios",
+     "range": "29-31",
+     "inc": 8
+    },
+    {
+     "lei": "CF",
+     "r": "Intervenção",
+     "range": "34-36",
+     "inc": 9
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-41",
+   "mat": "Constitucional",
+   "t": "Lei seca: CF — Processo legislativo e Tribunais de Contas",
+   "det": "Art. 60 HOT (10 citações, 5 questões), arts. 63-69 (o plano tinha só 61-62), Tribunais de Contas arts. 70-75 (25 citações FGV, ENAM 2025/2; assunto nº 4 do Cebraspe).",
+   "groups": [
+    {
+     "lei": "CF",
+     "r": "Processo Legislativo: Disposição Geral e Emenda à Constituição",
+     "range": "59-60",
+     "inc": 9
+    },
+    {
+     "lei": "CF",
+     "r": "Processo Legislativo: das Leis",
+     "range": "63-69",
+     "inc": 8
+    },
+    {
+     "lei": "CF",
+     "r": "Fiscalização Contábil, Financeira e Orçamentária e Tribunais de Contas",
+     "range": "70-75",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-42",
+   "mat": "Constitucional",
+   "t": "Lei seca: CF — Poder Judiciário e Ministério Público",
+   "det": "Arts. 101-103-B (55 citações: STF, ADI, súmula vinculante, CNJ; coração do controle de constitucionalidade, topo do CP Iuris), arts. 92-97, STJ e TJs, Ministério Público (CP Iuris lista Funções Essenciais).",
+   "groups": [
+    {
+     "lei": "CF",
+     "r": "Poder Judiciário: Disposições Gerais",
+     "range": "92-97",
+     "inc": 9
+    },
+    {
+     "lei": "CF",
+     "r": "Supremo Tribunal Federal, Súmula Vinculante e Conselho Nacional de Justiça",
+     "list": [
+      "101",
+      "102",
+      "103",
+      "103-A",
+      "103-B"
+     ],
+     "inc": 10
+    },
+    {
+     "lei": "CF",
+     "r": "Superior Tribunal de Justiça e Tribunais e Juízes dos Estados",
+     "list": [
+      "104",
+      "105",
+      "106",
+      "125",
+      "126"
+     ],
+     "inc": 8
+    },
+    {
+     "lei": "CF",
+     "r": "Ministério Público",
+     "range": "127-130",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-43",
+   "mat": "Constitucional",
+   "t": "Lei seca: CF — Ordem econômica; ADPF e mandado de segurança",
+   "det": "Arts. 170-181 (38 citações FGV, ENAM 2026/1; CP Iuris lista Ordem Econômica); Lei 9.882 (6 questões FGV, 4 no ENAM) não tinha nenhum grupo; Lei 12.016 arts. 14-19 (2ª unidade mais citada da lei).",
+   "groups": [
+    {
+     "lei": "CF",
+     "r": "Princípios Gerais da Atividade Econômica",
+     "range": "170-181",
+     "inc": 8
+    },
+    {
+     "lei": "Lei 9.882",
+     "r": "Arguição de Descumprimento de Preceito Fundamental: Cabimento e Legitimidade",
+     "range": "1-6",
+     "inc": 9
+    },
+    {
+     "lei": "Lei 9.882",
+     "r": "Arguição de Descumprimento de Preceito Fundamental: Processo e Decisão",
+     "range": "7-14",
+     "inc": 8
+    },
+    {
+     "lei": "Lei 12.016",
+     "r": "Mandado de Segurança: Sentença, Recursos e Remessa Necessária",
+     "range": "14-19",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-50",
+   "mat": "Administrativo",
+   "t": "Lei seca: LIA — Procedimento administrativo, processo judicial e prescrição",
+   "det": "Capítulo mais citado da lei na FGV (32 citações, 3 HOTs, ENAM 2024/2, 2025/2 e 2026/1): indisponibilidade, art. 17 §§, ANPC art. 17-B, prescrição art. 23.",
+   "groups": [
+    {
+     "lei": "LIA",
+     "r": "Procedimento Administrativo e Processo Judicial (I)",
+     "range": "14-17",
+     "inc": 9,
+     "suffixes": true
+    },
+    {
+     "lei": "LIA",
+     "r": "Procedimento Administrativo e Processo Judicial (II) e Prescrição",
+     "range": "18-23",
+     "inc": 9
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-51",
+   "mat": "Administrativo",
+   "t": "Lei seca: Lei 14.133 — Modalidades, contratação direta e alteração dos contratos",
+   "det": "Modalidades (9 citações), contratação direta arts. 72-75 (12 citações, 3 no ENAM), alteração dos contratos arts. 124-130. O plano tinha só o art. 6º.",
+   "groups": [
+    {
+     "lei": "Lei 14.133",
+     "r": "Modalidades de Licitação",
+     "range": "28-32",
+     "inc": 9
+    },
+    {
+     "lei": "Lei 14.133",
+     "r": "Contratação Direta: Inexigibilidade e Dispensa",
+     "range": "72-75",
+     "inc": 9
+    },
+    {
+     "lei": "Lei 14.133",
+     "r": "Alteração dos Contratos e dos Preços",
+     "range": "124-130",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-52",
+   "mat": "Administrativo",
+   "t": "Lei seca: Lei 9.784 e Lei 8.112 — decisão, responsabilidades e PAD",
+   "det": "Lei 9.784: anulação/revogação/convalidação (15 citações, ENAM 2024/2 e 2025/1). Lei 8.112: as 7 questões FGV caem em responsabilidades, penalidades e PAD (ENAM 2024/1 e 2025/1); CP Iuris lista PAD.",
+   "groups": [
+    {
+     "lei": "Lei 9.784",
+     "r": "Decisão, Motivação, Anulação, Revogação e Convalidação",
+     "list": [
+      "48",
+      "49",
+      "50",
+      "51",
+      "52",
+      "53",
+      "54",
+      "55"
+     ],
+     "inc": 9
+    },
+    {
+     "lei": "Lei 8.112",
+     "r": "Responsabilidades e Penalidades do Servidor",
+     "range": "121-132",
+     "inc": 8
+    },
+    {
+     "lei": "Lei 8.112",
+     "r": "Processo Administrativo Disciplinar",
+     "range": "143-156",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-53",
+   "mat": "Administrativo",
+   "t": "Lei seca: desapropriação, concessões, organização administrativa e prescrição contra a Fazenda",
+   "det": "DL 3.365 arts. 9, 15 e 15-A (capítulo mais citado do decreto, ENAM 2025/1); Lei 8.987 art. 2º (concessão x permissão); DL 200 art. 4º (ENAM 2025/1 e 2025/2); Decreto 20.910 (ENAM 2024/1).",
+   "groups": [
+    {
+     "lei": "DL 3.365",
+     "r": "Desapropriação: Processo Judicial, Imissão Provisória e Indenização",
+     "range": "9-15",
+     "inc": 8
+    },
+    {
+     "lei": "Lei 8.987",
+     "r": "Concessão e Permissão de Serviço Público: Disposições Preliminares",
+     "range": "1-6",
+     "inc": 7
+    },
+    {
+     "lei": "DL 200",
+     "r": "Descentralização e Administração Indireta",
+     "range": "4-5",
+     "inc": 7
+    },
+    {
+     "lei": "Decreto 20.910",
+     "r": "Prescrição das Dívidas Passivas da Fazenda Pública",
+     "range": "1-10",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-60",
+   "mat": "Direitos Humanos",
+   "t": "Lei seca: Estatuto da Pessoa com Deficiência e Estatuto de Roma",
+   "det": "Estatuto da Pessoa com Deficiência está no CP Iuris (2 questões FGV, Cebraspe prioritário) e só existia a ADI 5.357; Estatuto de Roma e TPI listados pelo CP Iuris (ENAM 2026/1).",
+   "groups": [
+    {
+     "lei": "Lei 13.146",
+     "r": "Estatuto da Pessoa com Deficiência: Disposições Gerais e Igualdade",
+     "range": "1-8",
+     "inc": 8
+    },
+    {
+     "lei": "Lei 13.146",
+     "r": "Curatela e Tomada de Decisão Apoiada",
+     "range": "84-87",
+     "inc": 8
+    },
+    {
+     "lei": "Estatuto de Roma",
+     "r": "Tribunal Penal Internacional: Crimes de Competência",
+     "range": "5-8",
+     "inc": 8
+    },
+    {
+     "lei": "Estatuto de Roma",
+     "r": "Responsabilidade Penal Individual e Imprescritibilidade",
+     "range": "25-29",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-70",
+   "mat": "Humanística",
+   "t": "Lei seca: LOMAN e Lei de Mediação",
+   "det": "LOMAN arts. 78-88 é a unidade mais citada da lei (3 questões ENAM: 2024/1, 2025/1, 2026/1); Lei 13.140 princípios e impedimentos do mediador (2 questões ENAM).",
+   "groups": [
+    {
+     "lei": "LOMAN",
+     "r": "Ingresso, Promoção, Acesso e Remoção na Magistratura",
+     "range": "78-88",
+     "inc": 9
+    },
+    {
+     "lei": "Lei 13.140",
+     "r": "Mediação: Disposições Gerais e Mediadores",
+     "range": "1-8",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-80",
+   "mat": "Const. Tributário",
+   "t": "Lei seca: CTN — impostos em espécie, taxas, garantias do crédito; execução fiscal",
+   "det": "CTN 32-42 (11 citações FGV, ENAM 2024/1), taxas 77-80 (ENAM 2024/1), garantias 183-193 (ENAM 2024/1 e 2025/2); LEF sem lei seca no plano (Cebraspe 26 questões).",
+   "groups": [
+    {
+     "lei": "CTN",
+     "r": "Impostos sobre o Patrimônio: IPTU, ITBI e Transmissão de Bens",
+     "range": "32-42",
+     "inc": 8
+    },
+    {
+     "lei": "CTN",
+     "r": "Taxas",
+     "range": "77-80",
+     "inc": 8
+    },
+    {
+     "lei": "CTN",
+     "r": "Garantias e Privilégios do Crédito Tributário",
+     "range": "183-193",
+     "inc": 8
+    },
+    {
+     "lei": "LEF",
+     "r": "Execução Fiscal: Petição Inicial, Citação e Penhora",
+     "list": [
+      "4",
+      "5",
+      "6",
+      "7",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15"
+     ],
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-90",
+   "mat": "Normas Const. Proc. Penal",
+   "t": "Lei seca: CPP — Inquérito policial e acordo de não persecução penal",
+   "det": "Inquérito (20 citações FGV, questões ENAM; CP Iuris lista); art. 28-A é o dispositivo mais cobrado da FGV na matéria (9 citações).",
+   "groups": [
+    {
+     "lei": "CPP",
+     "r": "Inquérito Policial (I)",
+     "range": "4-12",
+     "inc": 8
+    },
+    {
+     "lei": "CPP",
+     "r": "Inquérito Policial (II)",
+     "range": "13-23",
+     "inc": 7
+    },
+    {
+     "lei": "CPP",
+     "r": "Acordo de Não Persecução Penal",
+     "list": [
+      "28-A"
+     ],
+     "inc": 10
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-91",
+   "mat": "Normas Const. Proc. Penal",
+   "t": "Lei seca: CPP — Competência e provas",
+   "det": "Competência (arts. 76-79 e 82 são os mais cobrados do título; o plano só tinha 74-75) e provas (topo do CP Iuris, mais de 40 citações FGV: arts. 155-157, cadeia de custódia 158-A a 158-F).",
+   "groups": [
+    {
+     "lei": "CPP",
+     "r": "Competência: Disposições Preliminares, Conexão e Continência",
+     "list": [
+      "69",
+      "70",
+      "71",
+      "72",
+      "73",
+      "76",
+      "77",
+      "78",
+      "79",
+      "80",
+      "81",
+      "82"
+     ],
+     "inc": 8
+    },
+    {
+     "lei": "CPP",
+     "r": "Competência por Prerrogativa de Função e Disposições Especiais",
+     "range": "83-91",
+     "inc": 7
+    },
+    {
+     "lei": "CPP",
+     "r": "Provas: Disposições Gerais e Cadeia de Custódia",
+     "list": [
+      "155",
+      "156",
+      "157",
+      "158",
+      "158-A",
+      "158-B",
+      "158-C",
+      "158-D",
+      "158-E",
+      "158-F"
+     ],
+     "inc": 9
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-92",
+   "mat": "Normas Const. Proc. Penal",
+   "t": "Lei seca: CPP — Audiência de custódia, cautelares diversas, liberdade provisória; prisão temporária",
+   "det": "Arts. 310, 319 e 320 (art. 319 com 5 citações) faltavam entre os grupos existentes; liberdade provisória e fiança (CP Iuris, FGV 326-328); Lei 7.960 (7 questões FGV, art. 1º HOT).",
+   "groups": [
+    {
+     "lei": "CPP",
+     "r": "Audiência de Custódia e Medidas Cautelares Diversas da Prisão",
+     "list": [
+      "310",
+      "319",
+      "320"
+     ],
+     "inc": 9
+    },
+    {
+     "lei": "CPP",
+     "r": "Liberdade Provisória e Fiança",
+     "range": "321-333",
+     "inc": 7
+    },
+    {
+     "lei": "Lei 7.960",
+     "r": "Prisão Temporária",
+     "range": "1-7",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-100",
+   "mat": "Empresarial",
+   "t": "Lei seca: LRF — Classificação de créditos, falência, revocatória e recuperação extrajudicial",
+   "det": "Arts. 129-138 (item nº 1 do ranking FGV, ENAM 2025/2), classificação dos créditos art. 83 (ENAM 2025/1), decretação da falência 94-101, recuperação extrajudicial 161-167. O plano parava no art. 54.",
+   "groups": [
+    {
+     "lei": "LRF",
+     "r": "Classificação dos Créditos na Falência",
+     "range": "83-86",
+     "inc": 9
+    },
+    {
+     "lei": "LRF",
+     "r": "Decretação da Falência",
+     "range": "94-101",
+     "inc": 8
+    },
+    {
+     "lei": "LRF",
+     "r": "Ineficácia e Revogação de Atos Praticados antes da Falência",
+     "range": "129-138",
+     "inc": 10
+    },
+    {
+     "lei": "LRF",
+     "r": "Recuperação Extrajudicial",
+     "range": "161-167",
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-101",
+   "mat": "Empresarial",
+   "t": "Lei seca: CC — Sociedade limitada; LSA — acionistas, assembleia e administração",
+   "det": "Sociedade limitada está no topo do CP Iuris e não tinha lei seca (Cebraspe 1.060, 1.057, 1.052); LSA praticamente sem lei seca apesar de 12 questões FGV (acionistas 109-117, assembleia 121-122, administração 153-159; ENAM 2025/1 e 2026/1).",
+   "groups": [
+    {
+     "lei": "CC",
+     "r": "Sociedade Limitada: Disposições Preliminares, Quotas e Administração",
+     "range": "1052-1065",
+     "inc": 9
+    },
+    {
+     "lei": "LSA",
+     "r": "Acionistas: Direitos, Deveres e Acionista Controlador",
+     "range": "106-120",
+     "inc": 8
+    },
+    {
+     "lei": "LSA",
+     "r": "Assembleia Geral e Deveres dos Administradores",
+     "list": [
+      "121",
+      "122",
+      "153",
+      "154",
+      "155",
+      "156",
+      "157",
+      "158",
+      "159"
+     ],
+     "inc": 8
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-102",
+   "mat": "Empresarial",
+   "t": "Lei seca: protesto de títulos e duplicata escritural",
+   "det": "Lei 9.492 (3 questões FGV, ENAM 2024/2; nominal no CP Iuris) e Lei 13.775 (ENAM 2026/1) sem nenhuma atividade.",
+   "groups": [
+    {
+     "lei": "Lei 9.492",
+     "r": "Protesto de Títulos: Competência, Apresentação, Prazos e Cancelamento",
+     "list": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "26",
+      "27"
+     ],
+     "inc": 7
+    },
+    {
+     "lei": "Lei 13.775",
+     "r": "Duplicata Escritural",
+     "range": "1-7",
+     "inc": 7
+    }
+   ]
+  },
+  {
+   "id": "2026-09-15-110",
+   "mat": "Const. Trabalho",
+   "t": "Lei seca: negociado sobre legislado, greve e ADCT",
+   "det": "CLT 611-A/611-B e Tema 1.046 (HOT art. 7º no ENAM; art. 611 é o dispositivo mais citado da matéria no Cebraspe); greve (ENAM 2024/1 e 2024/2); ADCT art. 10 (ENAM 2024/1).",
+   "groups": [
+    {
+     "lei": "CLT",
+     "r": "Convenções Coletivas: Prevalência do Negociado sobre o Legislado",
+     "list": [
+      "611-A",
+      "611-B"
+     ],
+     "inc": 9
+    },
+    {
+     "lei": "Lei 7.783",
+     "r": "Direito de Greve",
+     "range": "1-9",
+     "inc": 8
+    },
+    {
+     "lei": "CF",
+     "r": "ADCT: Estabilidade Provisória e Direitos Trabalhistas Transitórios",
+     "list": [
+      "10"
+     ],
+     "adct": true,
+     "inc": 7
+    }
+   ]
+  }
+ ],
+ "ebooks": [
+  {
+   "mat": "Proc. Civil",
+   "eb": "proc-civil",
+   "cap": 15,
+   "inc": 9,
+   "why": "Cumprimento de sentença e embargos: tema nº 1 do Cebraspe e do CP Iuris"
+  },
+  {
+   "mat": "Proc. Civil",
+   "eb": "proc-civil",
+   "cap": 20,
+   "inc": 8,
+   "why": "Juizados Especiais: listado pelo CP Iuris"
+  },
+  {
+   "mat": "Penal",
+   "eb": "penal-geral",
+   "cap": 14,
+   "inc": 8,
+   "why": "Efeitos da condenação: CP Iuris, 23 citações FGV"
+  },
+  {
+   "mat": "Penal",
+   "eb": "penal-especial",
+   "cap": 4,
+   "inc": 9,
+   "why": "Dignidade sexual: CP Iuris, 39 citações FGV"
+  },
+  {
+   "mat": "Administrativo",
+   "eb": "administrativo",
+   "cap": 8,
+   "inc": 8,
+   "why": "Concessões: incidência regular"
+  },
+  {
+   "mat": "Administrativo",
+   "eb": "administrativo",
+   "cap": 9,
+   "inc": 9,
+   "why": "Agentes públicos: art. 37 é o dispositivo mais cobrado da matéria"
+  },
+  {
+   "mat": "Const. Tributário",
+   "eb": "tributario",
+   "cap": 8,
+   "inc": 8,
+   "why": "Obrigação tributária: CP Iuris"
+  },
+  {
+   "mat": "Const. Tributário",
+   "eb": "tributario",
+   "cap": 9,
+   "inc": 8,
+   "why": "Responsabilidade tributária: CP Iuris"
+  },
+  {
+   "mat": "Const. Tributário",
+   "eb": "tributario",
+   "cap": 16,
+   "inc": 8,
+   "why": "Impostos estaduais: CP Iuris"
+  },
+  {
+   "mat": "Normas Const. Proc. Penal",
+   "eb": "proc-penal",
+   "cap": 14,
+   "inc": 8,
+   "why": "Provas: topo do CP Iuris"
+  },
+  {
+   "mat": "Normas Const. Proc. Penal",
+   "eb": "proc-penal",
+   "cap": 8,
+   "inc": 8,
+   "why": "Competência: CP Iuris"
+  },
+  {
+   "mat": "Normas Const. Proc. Penal",
+   "eb": "proc-penal",
+   "cap": 5,
+   "inc": 8,
+   "why": "Inquérito: CP Iuris"
+  },
+  {
+   "mat": "Normas Const. Proc. Penal",
+   "eb": "proc-penal",
+   "cap": 2,
+   "inc": 7,
+   "why": "Princípios: CP Iuris"
+  },
+  {
+   "mat": "Normas Const. Proc. Penal",
+   "eb": "proc-penal",
+   "cap": 6,
+   "inc": 8,
+   "why": "Ação penal e ANPP"
+  },
+  {
+   "mat": "Civil",
+   "eb": "consumidor",
+   "cap": 2,
+   "inc": 8,
+   "why": "Consumidor: CP Iuris, ENAM cobrou CDC"
+  },
+  {
+   "mat": "Civil",
+   "eb": "consumidor",
+   "cap": 3,
+   "inc": 8,
+   "why": "Teoria da qualidade: CDC arts. 12-25"
+  },
+  {
+   "mat": "Civil",
+   "eb": "consumidor",
+   "cap": 4,
+   "inc": 7,
+   "why": "Prescrição e decadência no CDC (arts. 26-27 no ENAM)"
+  },
+  {
+   "mat": "Empresarial",
+   "eb": "empresarial",
+   "cap": 11,
+   "inc": 8,
+   "why": "Contratos empresariais: CP Iuris"
+  },
+  {
+   "mat": "Empresarial",
+   "eb": "empresarial",
+   "cap": 12,
+   "inc": 7,
+   "why": "Contratos bancários e alienação fiduciária: CP Iuris"
+  },
+  {
+   "mat": "Const. Trabalho",
+   "eb": "trabalho",
+   "cap": 6,
+   "inc": 7,
+   "why": "Trabalho infantil: CP Iuris, art. 7º XXXIII no ENAM 2024/1"
+  }
+ ]
+}

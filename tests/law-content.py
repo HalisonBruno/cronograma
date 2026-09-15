@@ -15,14 +15,14 @@ GROUPS={g['id']:g for j in FILES.values() for g in j['g']}
 class PublishedLawTests(unittest.TestCase):
     def test_all_exact_files_and_scopes_exist(self):
         self.assertEqual(set(DATA['leigroups']),set(FILES))
-        self.assertEqual(len(GROUPS),467)
+        self.assertEqual(len(GROUPS),618)
         for bid,gs in DATA['leigroups'].items():
             self.assertEqual(FILES[bid]['id'],bid)
             self.assertEqual([g['id'] for g in gs],[g['id'] for g in FILES[bid]['g']])
             for g in FILES[bid]['g']:
                 self.assertTrue(g['a'], (bid,g['id']))
                 self.assertEqual(g['audit']['status'],'source-reviewed')
-                self.assertEqual(g['audit']['checkedAt'],'2026-09-11')
+                self.assertIn(g['audit']['checkedAt'],{'2026-09-11','2026-09-15'})
                 for a in g['a']:
                     self.assertTrue(a['t'].strip())
                     self.assertNotIn('\ufffd',a['t'])
@@ -35,7 +35,13 @@ class PublishedLawTests(unittest.TestCase):
             for g in gs:
                 g.pop('readTitle',None)
                 g.pop('readSourceUrl',None)
-        self.assertEqual(current,old, 'Only display titles and direct sources may change DATA')
+        # Blocos criados em 15/09/2026 (scripts/law-additions-2026-09-15.json) sao novos; os antigos
+        # so podem mudar rotulos de leitura e fonte direta.
+        for bid,gs in old['leigroups'].items():
+            self.assertEqual(current['leigroups'][bid],gs,bid)
+        for bid in current['leigroups']:
+            if bid not in old['leigroups']:
+                self.assertTrue(bid.startswith('2026-09-15-'),bid)
 
     def test_last_fragment_does_not_append_remainder(self):
         spec=importlib.util.spec_from_file_location('apply',ROOT/'scripts/apply-law-refresh.py')
@@ -71,7 +77,7 @@ class PublishedLawTests(unittest.TestCase):
         self.assertIn('cancelad',json.dumps(tst,ensure_ascii=False).lower())
         report=json.loads((ROOT/'auditoria-lei-seca.json').read_text(encoding='utf8'))
         self.assertEqual(report['unresolved'],[])
-        self.assertEqual(report['groups'],467)
-        self.assertEqual(len(report['sourceManifest']),80)
+        self.assertEqual(report['groups'],618)
+        self.assertEqual(len(report['sourceManifest']),84)
 
 if __name__=='__main__':unittest.main(verbosity=2)

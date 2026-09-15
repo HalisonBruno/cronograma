@@ -96,7 +96,7 @@ assert(!newPlan.moves.some(m => m.key === future.key), 'future activity already 
 assert(newPlan.moves.some(m => m.from > m.to), 'future pending activities are pulled forward into gaps');
 app.applyRegen(newPlan);
 assert.equal(JSON.stringify(app.S.kv[future.key]), completion, 'tick and timestamp survive apply');
-assert.equal(app.G('mvu:' + future.key), oldDate, 'completed item placement stays intact');
+assert(app.G('mvu:' + future.key) <= DAY && app.G('mvu:' + future.key) !== oldDate, 'completed item leaves the future day and is recorded on its completion day');
 app.undoRegen();
 assert.equal(JSON.stringify(app.G('planner:details')), oldPlan, 'undo restores the previous plan');
 assert.equal(JSON.stringify(app.S.kv[future.key]), completion, 'undo never erases completion');

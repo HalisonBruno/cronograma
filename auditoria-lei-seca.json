@@ -1,10 +1,10 @@
 {
   "generatedAt": "2026-09-11T18:39:26.804792+00:00",
   "checkedAt": "2026-09-11",
-  "files": 123,
-  "groups": 467,
-  "articleOccurrences": 4072,
-  "sources": 80,
+  "files": 155,
+  "groups": 618,
+  "articleOccurrences": 4923,
+  "sources": 84,
   "changedArticles": 2745,
   "unresolved": [],
   "issues": {},
@@ -568,7 +568,221 @@
       "retrievedAt": "2026-09-11T13:37:25.197180+00:00",
       "sha256": "0c436e9c1ce57442f55544306e1c66216fba9b3d38b345551b17e6a47adb21e4",
       "sourceKind": "official-direct-page"
+    },
+    {
+      "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del0200.htm",
+      "finalUrl": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del0200.htm",
+      "retrievedAt": "2026-09-15T17:35:50.599212+00:00",
+      "sha256": "85007fedc826e5376d03469ce9bc63936114fbcb5dbea465ffba01dd9cfbfcfe",
+      "sourceKind": "official-direct-page"
+    },
+    {
+      "url": "https://www.planalto.gov.br/ccivil_03/decreto/2002/d4388.htm",
+      "finalUrl": "https://www.planalto.gov.br/ccivil_03/decreto/2002/d4388.htm",
+      "retrievedAt": "2026-09-15T17:35:59.304558+00:00",
+      "sha256": "f5c24d70e1448072524d3752a56abb5c33f2b25008c80d7bfbc54c7969947db5",
+      "sourceKind": "official-direct-page"
+    },
+    {
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm",
+      "finalUrl": "https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm",
+      "retrievedAt": "2026-09-15T17:36:07.450330+00:00",
+      "sha256": "9290b78493fa61896445d68a1e69e984eb171231181f4076323452ae6b5e87dd",
+      "sourceKind": "official-direct-page"
+    },
+    {
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/l7783.htm",
+      "finalUrl": "https://www.planalto.gov.br/ccivil_03/leis/l7783.htm",
+      "retrievedAt": "2026-09-15T17:36:10.656401+00:00",
+      "sha256": "fb3fb9e9c425e830a90e98c4b77049ad8a145caadfb5fe20c11189eaf9006449",
+      "sourceKind": "official-direct-page"
     }
   ],
-  "specialReview": "scripts/law-special-review.json"
+  "specialReview": "scripts/law-special-review.json",
+  "additions": [
+    {
+      "checkedAt": "2026-09-15",
+      "spec": "scripts/law-additions-2026-09-15.json",
+      "report": "scripts/law-additions-report.json",
+      "blocks": 52,
+      "groups": 151,
+      "sourcesRefetched": [
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11101.htm",
+          "sha256": "703bf17eedd817b9cf62f16dd9fe24b80f648c9bc006931de5c8baa58f735910",
+          "retrievedAt": "2026-09-15T17:35:36.250191+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm",
+          "sha256": "b02420f09f0ce1a4de35f39efe44c79e4d6953a64342d2155813c7485fe92f8a",
+          "retrievedAt": "2026-09-15T17:35:38.003177+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12016.htm",
+          "sha256": "f89eae55928261a0730a38eb8d7b53a1a8ae2512137bf7bb0745337e6fdc4a54",
+          "retrievedAt": "2026-09-15T17:35:38.483014+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12850.htm",
+          "sha256": "b4c429202ab431048536ce703415191445edb025b3f83e580c209faa46d20eae",
+          "retrievedAt": "2026-09-15T17:35:39.034489+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm",
+          "sha256": "4c1d4af3b7097ec629c4f6410b35a320dcd96080c367cfc2cf3ead0257ad1804",
+          "retrievedAt": "2026-09-15T17:35:39.787770+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13140.htm",
+          "sha256": "3f663c305d28c3e90b3c25813e08ea8fb5b3497d8c58d66e9ee9c6f6bc4e5096",
+          "retrievedAt": "2026-09-15T17:35:43.866218+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm",
+          "sha256": "dc09bbd8e31c7764ed315e94370c6ef12a3f416e0c40904135b6761ba56513ab",
+          "retrievedAt": "2026-09-15T17:35:44.441393+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13775.htm",
+          "sha256": "c4081386c07a983aee4be7dd795c73ca312321b55a4a75fe198b7b1cd41e7f6b",
+          "retrievedAt": "2026-09-15T17:35:45.248471+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2019/lei/l13869.htm",
+          "sha256": "0290f15af4936f2bf8d7710dc74ab6c335f8313c6c925dfdb19b35232009c631",
+          "retrievedAt": "2026-09-15T17:35:45.725863+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm",
+          "sha256": "10352008ff86c3a44062fdc5ad3248aba60797fb77b5432337b5e18e56fc6bb9",
+          "retrievedAt": "2026-09-15T17:35:46.297839+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm",
+          "sha256": "2bdc2c62c9f4c5c8f92dfcfcf04f46e7a61294b7c1377080757c1b65959317ef",
+          "retrievedAt": "2026-09-15T17:35:47.919742+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del0200.htm",
+          "sha256": "85007fedc826e5376d03469ce9bc63936114fbcb5dbea465ffba01dd9cfbfcfe",
+          "retrievedAt": "2026-09-15T17:35:50.599212+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm",
+          "sha256": "4b018b2e8022b9706f9c4f8999117e6cba03842b82028ee508f35d7c8f320a5b",
+          "retrievedAt": "2026-09-15T17:35:51.602109+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3365.htm",
+          "sha256": "6d25a8b5a3d44a33ff0b952ef1438b2895a9c9b95d67e6e1b3d02f08d65ebd9c",
+          "retrievedAt": "2026-09-15T17:35:53.335981+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689compilado.htm",
+          "sha256": "a66556a77988f33be8d654224b3c55645693e20ebb964550fd923ab0bb33059d",
+          "retrievedAt": "2026-09-15T17:35:54.030098+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm",
+          "sha256": "96017ee094cd9655d7e448f9d094549dd767e5287c8d0c4db4412efd769e78c7",
+          "retrievedAt": "2026-09-15T17:35:56.171326+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto/2002/d4388.htm",
+          "sha256": "f5c24d70e1448072524d3752a56abb5c33f2b25008c80d7bfbc54c7969947db5",
+          "retrievedAt": "2026-09-15T17:35:59.304558+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/decreto/antigos/d20910.htm",
+          "sha256": "7cdf0cd4365f8d00df17cea2e33f4895b5d1f6783c97a9a00646a5e068221065",
+          "retrievedAt": "2026-09-15T17:36:00.316033+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm",
+          "sha256": "236ad156f15e7ab6cb6889936b17ab154cc1e5b7d895fe606dcedf3d82a80501",
+          "retrievedAt": "2026-09-15T17:36:00.852733+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm",
+          "sha256": "383dd7e1b8a2e03e2ae1ad3e8169743a08c2c382ee405be397f01588c4c469eb",
+          "retrievedAt": "2026-09-15T17:36:06.466042+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm",
+          "sha256": "9290b78493fa61896445d68a1e69e984eb171231181f4076323452ae6b5e87dd",
+          "retrievedAt": "2026-09-15T17:36:07.450330+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l6404compilada.htm",
+          "sha256": "e66c6b4097a7f539bc376cbe3be71b6d76df454523de4580fb427cd5c9dc02ec",
+          "retrievedAt": "2026-09-15T17:36:08.697373+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l6830.htm",
+          "sha256": "81a5d6789dd680d96d8c6f984c3bf0e66477177a65cff116fcf6f020109c77bc",
+          "retrievedAt": "2026-09-15T17:36:10.078960+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l7783.htm",
+          "sha256": "fb3fb9e9c425e830a90e98c4b77049ad8a145caadfb5fe20c11189eaf9006449",
+          "retrievedAt": "2026-09-15T17:36:10.656401+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l7960.htm",
+          "sha256": "2cb11bd16ec1d66cc59bffe05a48ec3692c36e62bd753f47b276b28cd272f064",
+          "retrievedAt": "2026-09-15T17:36:11.119638+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l8009.htm",
+          "sha256": "cee6a84075cf90cd01b2bc5a65306c0683b5c3f96ac678500654f108fce8ecdf",
+          "retrievedAt": "2026-09-15T17:36:11.585521+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm",
+          "sha256": "4842332c5723d7ec263d729c72b43d4287bc69f185dc8ec7ae0db7967ca27669",
+          "retrievedAt": "2026-09-15T17:36:12.046347+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l8112cons.htm",
+          "sha256": "b27b243b49c278b76c2b3034d3de06f564d3fc53f8d58ec712a8dbdfcef9a66d",
+          "retrievedAt": "2026-09-15T17:36:12.833993+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l8429.htm",
+          "sha256": "8b86a262c958dab18d7caf1ae84e0ef37fef5d8b8fd18253bad3ba3f1ced89dd",
+          "retrievedAt": "2026-09-15T17:36:14.563476+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l8987cons.htm",
+          "sha256": "9c8fa7549df7619378c039e31d01119aff858251c7fdb2984312a31eef42a937",
+          "retrievedAt": "2026-09-15T17:36:15.434497+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l9492.htm",
+          "sha256": "ffd6ef839962e3797565c8b1cfd03a3a97eeba1b3a541fc549a98d74ac5e5a67",
+          "retrievedAt": "2026-09-15T17:36:16.138246+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l9613.htm",
+          "sha256": "88ca51d275f393c59db6cd092efe937dd3b3eadacb0655a8a3c45c6280e6164c",
+          "retrievedAt": "2026-09-15T17:36:16.793150+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l9784.htm",
+          "sha256": "c2d54d7fc57cb41406e37a224a533824ac8b6ceb59908d43a48461ae4d02713c",
+          "retrievedAt": "2026-09-15T17:36:17.551517+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/l9882.htm",
+          "sha256": "c0c24d9380887622f778110f1e80f99bae021696e88dc1fc791e2e5ae7774fee",
+          "retrievedAt": "2026-09-15T17:36:18.275306+00:00"
+        },
+        {
+          "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp35.htm",
+          "sha256": "b867dd3ae48e1a1f4e1226c62bf0f077af00a31641a8cb5316f9b573ab4eff36",
+          "retrievedAt": "2026-09-15T17:36:18.723743+00:00"
+        }
+      ]
+    }
+  ]
 }
