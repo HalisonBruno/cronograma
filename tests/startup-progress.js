@@ -22,7 +22,7 @@ let cases = 0;
 
 async function main() {
   {
-    const t=loadApp({'profile:120-weekdays:v1':[1,now]});
+    const t=loadApp({'profile:120-weekdays:v1':[1,now],'profile:prio-bancas:v1':[1,now]});
     const a=t.app;
     const civil=a.allBlocks.filter(b=>b.mat==='Civil').flatMap(b=>a.unitsOf(b)).find(u=>u.key.startsWith('eb:'));
     assert(civil);
@@ -34,7 +34,7 @@ async function main() {
     cases++;
   }
   {
-    const t = loadApp({'profile:120-weekdays:v1':[1,now]});
+    const t = loadApp({'profile:120-weekdays:v1':[1,now],'profile:prio-bancas:v1':[1,now]});
     const a = t.app;
     const original = a.allBlocks.filter(b => !b.opt).flatMap(b => a.unitsOf(b));
     const originalKeys = new Set(original.map(u => u.key));
@@ -82,7 +82,7 @@ async function main() {
     assert.deepEqual(calls, ['GET'], 'POST não atropela a primeira leitura');
     const remotePlan = JSON.stringify({generatedAt:old, cap:120, days:['2026-10-01'], fila:[], library:[]});
     const remote = {
-      'profile:90-weekdays:v1':[1,old], 'profile:120-weekdays:v1':[1,old], 'cfg:cap':[120,old],
+      'profile:90-weekdays:v1':[1,old], 'profile:120-weekdays:v1':[1,old],'profile:prio-bancas:v1':[1,old], 'cfg:cap':[120,old],
       'planner:details':[remotePlan,old],
       [remoteKey]:[1,old], ['mvu:' + remoteKey]:['2026-10-01',old]
     };
