@@ -62,4 +62,16 @@ assert.match(el.innerHTML, /(dias úteis|dia útil) (adiantado|atrasado)|em dia/
 a.SET(a.PLAN_MARCO_KEY, JSON.stringify(a.buildPlanMarco()));
 v = a.scheduleVariance();
 assert.equal(v.on, marco.days[5]); assert.equal(v.diff, 0, 'novo marco: em dia');
+// Conclusão pela equivalência (aula ↔ capítulo) não é estudo: sai do crédito e do total do marco.
+const base = a.scheduleVariance();
+const novo = a.planMarco();
+const pend = a.planningUnits(false).filter(u => novo.u[u.key] && !a.unitDone(u));
+const auto = pend[0], manual = pend.find(u => u.b.id !== auto.b.id);
+a.SET(auto.key, 'auto');
+v = a.scheduleVariance();
+assert.equal(v.earned, base.earned, 'equivalência automática não dá crédito');
+assert.equal(v.total, base.total - novo.u[auto.key][1], 'e sai do total do marco');
+a.SET(manual.key, manual.key.startsWith('st:') ? 'done' : 1);
+v = a.scheduleVariance();
+assert.equal(v.earned, base.earned + novo.u[manual.key][1], 'estudo marcado dá crédito só dos próprios minutos');
 console.log('schedule-variance: ok (' + Object.keys(marco.u).length + ' atividades no marco, ' + Math.round(sizeKB) + ' KB)');

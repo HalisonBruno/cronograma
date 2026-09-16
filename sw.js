@@ -28,15 +28,19 @@ self.addEventListener("fetch", e => {
   });
   // O service worker pode continuar vivo ate a copia ser gravada, mesmo que a pagina ja tenha a resposta.
   e.waitUntil(network.then(() => {}, () => {}));
+  // Erro HTTP (404/5xx) conta como falha de rede quando existe copia guardada: a leitura nao troca o texto
+  // salvo por uma pagina de erro. Sem copia, a pagina recebe a resposta original do servidor.
+  const networkOk = network.then(r => { if (!r.ok && r.status >= 400) throw r; return r; });
+  networkOk.catch(() => {});   // tratada abaixo; evita rejeicao "sem tratamento" enquanto o cache e consultado
   e.respondWith((async () => {
     const isData = DATA_FILE.test(new URL(req.url).pathname);
     const cached = isData ? await caches.match(req) : null;
     if (cached) {
       const timeout = new Promise(res => setTimeout(() => res(cached), DATA_TIMEOUT_MS));
-      return Promise.race([network.catch(() => cached), timeout]);
+      return Promise.race([networkOk.catch(() => cached), timeout]);
     }
     try {
-      return await network;
+      return await networkOk;
     } catch (err) {
       const hit = await caches.match(req, {ignoreSearch: req.mode === "navigate"});
       if (hit) return hit;
@@ -44,6 +48,8 @@ self.addEventListener("fetch", e => {
         const page = await caches.match("./index.html");
         if (page) return page;
       }
+      if (typeof Response !== "undefined" && err instanceof Response) return err;
+      if (err && typeof err.status === "number") return err;
       throw err;
     }
   })());

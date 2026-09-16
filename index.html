@@ -454,7 +454,7 @@ document.getElementById("tokenSave").addEventListener("click",()=>{
   if(syncInFlight){toast("Aguarde a sincronização atual antes de trocar o código.");return;}
   const v=document.getElementById("tokenInput").value.trim();
   if(!v)return;
-  token=v;profileReady=false;localStorage.setItem(TKEY,v);localStorage.setItem("enam-local-mode","0");hideSetup();syncNow();
+  token=v;profileReady=false;localStorage.setItem(TKEY,v);localStorage.setItem("enam-local-mode","0");hideSetup();syncNow().then(()=>warmOfflineCache());
 });
 document.getElementById("tokenSkip").addEventListener("click",()=>{localStorage.setItem("enam-local-mode","1");profileReady=true;hideSetup();render();setSync("off");warmOfflineCache()});
 document.getElementById("syncpill").addEventListener("click",()=>syncNow());
@@ -1026,7 +1026,7 @@ function heatOf(lawId,art){
   if(!_HEATIDX){_HEATIDX=new Map();
     for(const k in HEAT){const i=k.indexOf("|");if(i<0)continue;const id=heatLawIdOfSig(k.slice(0,i));if(!id)continue;
       const key=id+"|"+k.slice(i+1).trim();_HEATIDX.set(key,Math.max(_HEATIDX.get(key)||0,+HEAT[k]||0))}}
-  return _HEATIDX.get(lawId+"|"+String(art).trim())||0;
+  return _HEATIDX.get(lawId+"|"+String(art).replace(/\s*\(cont\.?\)\s*$/i,"").trim())||0;
 }
 function stars(v){return v>=12?"★★★":v>=6?"★★":v>0?"★":""}
 // ---------- filtros TEC baseados no que foi ESTUDADO ----------
@@ -1258,7 +1258,7 @@ function qdCard(dstr){
     const mat=div.querySelector("#qdmat").value,ban=div.querySelector("#qdban").value;
     const n=+div.querySelector("#qdn").value,a=+div.querySelector("#qda").value;
     if(!n){toast("Diga quantas questões você respondeu.");return}
-    if(isNaN(a)||a>n){toast("Acertos deve ser um número até o total de questões.");return}
+    if(isNaN(a)||a<0||a>n||n<0){toast("Acertos deve ser um número de 0 até o total de questões.");return}
     const ass=assSel?assSel.value:"";
     SET("qd:"+dstr+":"+Date.now(),JSON.stringify(ass?{mat,banca:ban,n,ac:a,assunto:ass}:{mat,banca:ban,n,ac:a}));
     render();toast("Registrado: "+mat+(ass?" · "+ass:"")+" · "+ban+" · "+n+"q · "+a+" acertos.");
@@ -1499,7 +1499,7 @@ function lawChips(b,g){return lawSourceLink(g&&(g.readSourceUrl||g.u),"abrir lei
 function artHtml(rot,a,parentAudit,sourceUrl,lawId){
   const h=heatOf(lawId,a.n),st=stars(h);
   const links=[...new Map((a.sourceLinks||[]).filter(l=>/reda[çc][ãa]o|inclu[íi]d|acrescid|revogad|vig[êe]ncia|produ[çc][ãa]o de efeitos/i.test(l.text||"")).map(l=>[l.url,l])).values()];
-  return '<div class="artg'+(h>=6?' hot':'')+'"><span class="an">'+(/TST|Súmula/i.test(rot)?"Súmula ":"Art. ")+esc(a.n)+'</span> '+(st?'<span class="star" title="'+h+' citações nas provas analisadas">'+st+'</span>':"")+
+  return '<div class="artg'+(h>=6?' hot':'')+'"><span class="an">'+(/TST|Súmula/i.test(rot)?"Súmula ":"Art. ")+esc(a.n)+'</span> '+(st?'<span class="star" title="incidência nas provas analisadas: '+(Math.round(h*10)/10).toLocaleString("pt-BR")+'">'+st+'</span>':"")+
     lawAuditHtml(a.audit||parentAudit,a.sourceUrl||(a.audit&&a.audit.sourceUrl)||sourceUrl)+
     '<div>'+esc(a.t).replace(/\n/g,"<br>")+'</div>'+
     (links.length?'<details class="mmin"><summary>Alterações e vigência — fontes oficiais</summary>'+links.map(l=>lawSourceLink(l.url,l.text+" ↗")).join(" ")+'</details>':"")+
@@ -1977,10 +1977,10 @@ function vDesempenho(root){
     '<button id="qxok" style="background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600">salvar</button></div>';
   f.querySelector("#qxok").addEventListener("click",()=>{
     const mat=f.querySelector("#qxmat").value,n=+f.querySelector("#qxn").value,p=+f.querySelector("#qxp").value;
-    if(!n||isNaN(p)){toast("Preencha nº de questões e % de acerto.");return}
+    if(!n||n<0||isNaN(p)||p<0||p>100){toast("Preencha nº de questões e um % de acerto entre 0 e 100.");return}
     SET("qx:"+Date.now(),JSON.stringify({mat,n,pct:p}));render();toast("Registrado: "+mat+" · "+n+" questões · "+p+"%");});
   root.appendChild(f);
-  if(!regs.length){root.insertAdjacentHTML("beforeend",'<div class="note">Nenhum bloco reportado ainda. Ao terminar um bloco TEC, preencha o campo "% acerto" no card do dia — tudo aparece aqui.</div>');return}
+  if(!regs.length){root.insertAdjacentHTML("beforeend",'<div class="note">Nenhuma questão registrada ainda. Registre no card “Questões do dia”, na aba Hoje, ou no formulário acima.</div>');return}
   // resumo geral
   const totQ=regs.reduce((a,r)=>a+r.n,0);
   const media=regs.reduce((a,r)=>a+r.pct*r.n,0)/Math.max(1,totQ);
@@ -2247,7 +2247,13 @@ function scheduleVariance(marco=planMarco()){
   if(!marco)return null;
   const byKey=new Map(planningUnits(true).map(u=>[u.key,u])),perDay=marco.days.map(()=>0);
   let earned=0,total=0,missing=0;
-  for(const k in marco.u){const [di,min]=marco.u[k];perDay[di]+=min;total+=min;const u=byKey.get(k);if(!u){missing++;continue}if(unitDone(u))earned+=min}
+  // Conclusão por equivalência (aula ↔ capítulo) não é estudo: sai do crédito e do total, senão 22 min de aula
+  // viravam 100 min de crédito. Atividade que sumiu num deploy também sai do total (não trava o dia dela).
+  for(const k in marco.u){const [di,min]=marco.u[k];
+    let u=byKey.get(k);if(!u){const m=k.match(/^lg2:([^:]+):[0-9a-f]{6}$/);if(m&&(LG[m[1]]||[]).filter(g=>!g.x).length===1)u=byKey.get("st:"+m[1])}
+    if(!u){missing++;continue}
+    const v=G(u.key),bv=G("st:"+u.b.id);if(!manualStudy(v)&&(v==="auto"||(!v&&bv==="done-auto")))continue;
+    perDay[di]+=min;total+=min;if(unitDone(u))earned+=min}
   let cum=0,covered=0;for(let i=0;i<perDay.length;i++){if(cum+perDay[i]>earned)break;cum+=perDay[i];covered=i+1}
   const hoje=todayStr(),before=marco.days.filter(d=>d<hoje).length,upTo=marco.days.filter(d=>d<=hoje).length;
   // Antes de hoje terminar, estar entre "tudo até ontem" e "tudo até hoje" é estar em dia.
@@ -2300,7 +2306,9 @@ function vProg(root){
     let t=0,d=0,pt2=0,pd=0;const seen=new Set();
     bl.forEach(b=>unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);t++;const p=pesoOf(u);pt2+=p;if(unitDone(u)){d++;pd+=p}}));
     (MATJURIS[m]||[]).forEach(()=>{});
-    const rg=regsPorMat[m]||[],nq=rg.reduce((a,r)=>a+(+r.n||0),0);
+    // Os % antigos por bloco (pct:, com o número de questões do título) podem repetir o que já está nos
+    // registros do dia: só entram quando a matéria não tem nenhum registro novo.
+    const rgAll=regsPorMat[m]||[],rg=rgAll.some(r=>r.origem==="dia")?rgAll.filter(r=>r.origem!=="plano"):rgAll,nq=rg.reduce((a,r)=>a+(+r.n||0),0);
     const avg=nq?Math.round(rg.reduce((a,r)=>a+r.pct*(+r.n||0),0)/nq):null;
     const fp=t?Math.round(d/t*100):0,np=pt2?Math.round(pd/pt2*100):0;
     const sinal=np>=80&&(avg==null||avg>=70)?"✓":(np<40?"!":"·");
@@ -2926,7 +2934,7 @@ function catalogUnits(){
     // Uma data antiga, sozinha, não mantém no acervo uma revisão cuja origem
     // deixou de existir. Revisões concluídas permanecem no histórico.
     if(!G(key))continue;
-    const match=key.match(/^rv:(.+):(\d+)$/);if(!match)continue;
+    const match=key.match(/^rv:(.+):(\d+)$/);if(!match||![3,10,30].includes(+match[2]))continue;
     const original=byKey.get(match[1]);if(!original)continue;
     add({key,title:"Revisar "+original.title+" (D+"+match[2]+")",min:10,val:G(key),done:!!G(key),
       b:{id:"catalog:"+key,tipo:"REV",mat:original.b.mat,day:"",t:"Revisar "+original.title}});
@@ -3059,7 +3067,9 @@ function warmOfflineCache(){
   try{
     if(!("serviceWorker" in navigator)||location.protocol==="file:"||navigator.onLine===false)return;
     if(navigator.connection&&navigator.connection.saveData)return;
-    const files=offlineFiles(),sig=OFFLINE_WARM_VERSION+":"+files.length+":"+((DATA.prio&&DATA.prio.versao)||0)+":"+allBlocks.length;
+    // Uma vez por dia: o texto de uma lei pode mudar num deploy sem mudar nenhuma contagem. Arquivo sem
+    // mudança volta 304 pela ETag do servidor, então a renovação diária custa pouco.
+    const files=offlineFiles(),sig=OFFLINE_WARM_VERSION+":"+files.length+":"+((DATA.prio&&DATA.prio.versao)||0)+":"+allBlocks.length+":"+todayStr();
     let done=null;try{done=localStorage.getItem(OFFLINE_WARM_KEY)}catch(e){}
     if(done===sig)return;
     const run=()=>{

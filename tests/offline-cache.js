@@ -7,13 +7,13 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 class Resp {
-  constructor(body, ok = true) { this.body = body; this.ok = ok; this.bodyUsed = false; }
+  constructor(body, ok = true) { this.body = body; this.ok = ok; this.status = ok ? 200 : 503; this.bodyUsed = false; }
   clone() { if (this.bodyUsed) throw new TypeError('Response body is already used'); return new Resp(this.body, this.ok); }
 }
 const ioDelay = () => new Promise(r => setImmediate(r));   // gravação em cache é assíncrona, como no navegador
 
-function loadSW({network, timersFireNow = false}) {
-  const store = new Map(), listeners = {};
+function loadSW({network, timersFireNow = false, cacheNames = []}) {
+  const store = new Map(), listeners = {}, deleted = [];
   const keyOf = (req, opts) => { const u = typeof req === 'string' ? new URL(req, 'https://app.test/cronograma/').href : req.url; return opts && opts.ignoreSearch ? u.split('?')[0] : u; };
   const cache = {
     put: async (req, resp) => { await ioDelay(); store.set(keyOf(req), resp); },
@@ -22,7 +22,7 @@ function loadSW({network, timersFireNow = false}) {
   };
   const context = {
     self: {addEventListener: (t, fn) => { listeners[t] = fn; }, skipWaiting() {}, clients: {claim() {}}},
-    caches: {open: async () => { await ioDelay(); return cache; }, match: (req, opts) => cache.match(req, opts), keys: async () => [], delete: async () => true},
+    caches: {open: async () => { await ioDelay(); return cache; }, match: (req, opts) => cache.match(req, opts), keys: async () => cacheNames, delete: async name => { deleted.push(name); return true; }},
     fetch: req => network(req),
     location: {origin: 'https://app.test'},
     URL, Promise, setTimeout: timersFireNow ? (fn => setImmediate(fn)) : setTimeout, console,
@@ -37,7 +37,7 @@ function loadSW({network, timersFireNow = false}) {
     void waits; for (let i = 0; i < 8; i++) await ioDelay();
     return {resp, intercepted: !!responded};
   };
-  return {store, dispatch, listeners, cache};
+  return {store, dispatch, listeners, cache, deleted};
 }
 const LAW = 'https://app.test/cronograma/leis/2026-09-15-50.json';
 
@@ -72,6 +72,32 @@ async function main() {
     for (let i = 0; i < 5; i++) await ioDelay();
     const {resp} = await sw.dispatch('https://app.test/cronograma/?tab=prog', 'navigate');
     assert(resp && /core:\.\/(index\.html)?$/.test(resp.body), 'a página abre do cache sem rede: ' + (resp && resp.body));
+  }
+  // 6. Rede rápida com cópia guardada: vale o texto novo, e a cópia é atualizada (não vira cache primeiro).
+  {
+    const sw = loadSW({network: async () => new Resp('lei-nova')});
+    sw.store.set(LAW, new Resp('lei-guardada'));
+    const {resp} = await sw.dispatch(LAW);
+    assert.equal(resp.body, 'lei-nova', 'online, a lei nova chega à página');
+    assert.equal(sw.store.get(LAW).body, 'lei-nova', 'e substitui a cópia guardada');
+  }
+  // 7. Erro do servidor (404/5xx) não substitui a cópia guardada; sem cópia, a página recebe o erro original.
+  {
+    const sw = loadSW({network: async () => new Resp('erro 503', false)});
+    sw.store.set(LAW, new Resp('lei-guardada'));
+    const {resp} = await sw.dispatch(LAW);
+    assert.equal(resp.body, 'lei-guardada', 'erro HTTP cai na cópia');
+    const other = 'https://app.test/cronograma/leis/sem-copia.json';
+    const r2 = await sw.dispatch(other);
+    assert(r2.resp && r2.resp.ok === false, 'sem cópia, a resposta de erro do servidor chega à página');
+  }
+  // 8. Ativação apaga só os caches de versões anteriores.
+  {
+    const sw = loadSW({network: async () => new Resp('x'), cacheNames: ['enam-v13-manual-sync', 'enam-v14-offline']});
+    const waits = [];
+    sw.listeners.activate({waitUntil: p => waits.push(p)});
+    await Promise.all(waits);
+    assert.deepEqual(sw.deleted, ['enam-v13-manual-sync']);
   }
   // 5. Outra origem (sincronização na nuvem) não é interceptada.
   {
