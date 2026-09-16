@@ -997,7 +997,11 @@ function prioAbs(key){
     _PRIO.map=map}
   const v=_PRIO.map.get(key);return v==null?0:v;
 }
-function prioDot(key){if(!PESO[key])return "";const s=prioAbs(key),inc=(DATA.inc||{})[key];return '<span class="pdot" title="incidência nas bancas: '+(inc!=null?'nota '+inc+' de 10 · ':'')+'rendimento no percentil '+Math.round(s*100)+'" style="display:inline-block;width:10px;height:10px;border-radius:99px;background:'+prioColor(s)+';vertical-align:middle;margin-left:6px"></span>'}
+// Informativos não têm nota de incidência: são reserva obrigatória do plano (núcleo por definição). Recebem
+// cor própria, fora da escala vermelho → azul, em vez de parecerem a menor prioridade (16/09/2026).
+const INFO_COR="var(--juris)";
+function prioCorDe(key){return String(key||"").startsWith("inf:")?INFO_COR:prioColor(prioAbs(key||""))}
+function prioDot(key){if(String(key||"").startsWith("inf:"))return '<span class="pdot" title="informativo: reserva obrigatória do plano, fora da escala de incidência" style="display:inline-block;width:10px;height:10px;border-radius:99px;background:'+INFO_COR+';vertical-align:middle;margin-left:6px"></span>';if(!PESO[key])return "";const s=prioAbs(key),inc=(DATA.inc||{})[key];return '<span class="pdot" title="incidência nas bancas: '+(inc!=null?'nota '+inc+' de 10 · ':'')+'rendimento no percentil '+Math.round(s*100)+'" style="display:inline-block;width:10px;height:10px;border-radius:99px;background:'+prioColor(s)+';vertical-align:middle;margin-left:6px"></span>'}
 function qphBadge(u){const r=rendOf(u);if(!r)return "";
   return '<span class="qph" title="questões esperadas por hora de estudo, a partir das provas anteriores">~'+(r>=10?Math.round(r):r.toFixed(1))+' q/h</span>'+(isNucleo(u)?'<span class="nucleo" title="faz parte do núcleo: as atividades que somam 80% das questões esperadas">★ núcleo</span>':"")}
 // mapa de calor por artigo: HEAT["CP|121"] = citações nas provas analisadas.
@@ -2452,14 +2456,14 @@ function appendItems(root,items){
   if(nucleoOnly){const nu=nucleoSet();const f=arr.filter(o=>o.dn||nu.has(o.k||""));if(f.length)arr=f}
   // Cor ABSOLUTA por incidencia (prioAbs): a mesma em qualquer secao, modo ou dia; feitos mantem a cor.
   arr.forEach(o=>{const el=o.el();
-    el.style.setProperty("--pc",prioColor(prioAbs(o.k||"")));
+    el.style.setProperty("--pc",prioCorDe(o.k));
     root.appendChild(el)});
   if(!arr.length)root.insertAdjacentHTML("beforeend",'<div class="note">Nada aqui.</div>');
 }
 function vMats(root){
   if(!matSel){
     const lg=legendaPrio();
-    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>. As conclusões e equivalências não alteram os pesos das pesquisas. Equivalências avançam os blocos sem duplicar minutos.</div>');
+    root.insertAdjacentHTML("beforeend",'<div class="note" style="margin-top:12px">Todas as atividades de cada matéria, por prioridade: <b style="color:'+lg[0]+'">vermelho = alta</b> → <b style="color:'+lg[1]+'">azul claro = baixa</b>; <b style="color:var(--juris)">roxo = informativos</b>, reserva obrigatória do plano, fora dessa escala. As conclusões e equivalências não alteram os pesos das pesquisas. Equivalências avançam os blocos sem duplicar minutos.</div>');
     const g=document.createElement("div");g.className="matgrid";
     gradeBusca(root);
     const PM=progressoPorMateria();
@@ -2599,7 +2603,7 @@ function vInfos(root){
   lista.slice(0,300).forEach(o=>{
     const dn=!!G("inf:"+o.id);
     const el=document.createElement("div");el.className="pitem"+(dn?" done":"");
-    el.style.setProperty("--pc",(o.pids&&o.pids.length)?"var(--juris)":"var(--rev)");
+    el.style.setProperty("--pc",INFO_COR);
     el.innerHTML='<input type="checkbox" class="ck" '+(dn?"checked":"")+'><div style="flex:1"><b>'+o.n+".</b> "+esc(o.tit)+
       '<div class="mmin">'+o.trib+" \u00b7 "+esc(o.mat)+" \u00b7 "+esc(o.arq)+" \u00b7 p."+o.pg+" \u00b7 "+o.min+"min"+((o.pids||[]).length?' \u00b7 <span style="color:var(--juris)">'+o.pids.length+" juris ligada"+(o.pids.length>1?"s":"")+"</span>":"")+"</div>"+
       infLeitorHtml()+'</div>';
