@@ -6,7 +6,7 @@ const path = require('node:path');
 const harness = fs.readFileSync(path.join(__dirname, 'study-minutes.js'), 'utf8')
   .split('async function main()')[0]
   .replace('studyMinutesOn, SET, G, S, unitsOf, allBlocks, INFOS, DATA, LG, EBK,',
-    'studyMinutesOn, SET, G, S, unitsOf, allBlocks, INFOS, DATA, LG, EBK, CALENDAR, planRegen, applyRegen, undoRegen, planningUnits, unitsOn, unitDate, unitDone, minRestante, capMin, isStudyDay, coreStudyMinutesOn, revPend, ensureStudyProfile,');
+    'studyMinutesOn, SET, G, S, unitsOf, allBlocks, INFOS, DATA, LG, EBK, CALENDAR, planRegen, applyRegen, undoRegen, planningUnits, unitsOn, unitDate, unitDone, minRestante, capMin, isStudyDay, coreStudyMinutesOn, ensureStudyProfile,');
 const {loadApp, setClock} = new Function('require', '__dirname', harness + '\nreturn {loadApp, setClock: value => { clock = value; }};')(require, __dirname);
 const DAY = '2026-09-08';
 const at = d => new Date(d + 'T12:00:00').getTime();

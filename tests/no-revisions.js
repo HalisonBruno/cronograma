@@ -10,7 +10,7 @@ assert(!/Flashcards \(/.test(html), 'o botão de flashcards não existe mais');
 
 const harness = fs.readFileSync(path.join(__dirname, 'study-minutes.js'), 'utf8')
   .split('async function main()')[0]
-  .replace('updateStats, unitCard,', 'updateStats, revPend, planningUnits, unitsOf, allBlocks, DATA, studyMinutesOn, migrateSingleGroup, unitDone, unitCard,');
+  .replace('updateStats, unitCard,', 'updateStats, planningUnits, unitsOf, unitsOn, allBlocks, DATA, studyMinutesOn, migrateSingleGroup, unitDone, unitCard,');
 const {loadApp} = new Function('require', '__dirname', harness + '\nreturn {loadApp};')(require, __dirname);
 const DAY = '2026-09-08';
 const at = new Date(DAY + 'T12:00:00').getTime();
@@ -28,7 +28,9 @@ const at = new Date(DAY + 'T12:00:00').getTime();
   // só as chaves rv: e o rótulo "Revisão —" de grupo de lei contam como revisão.
   const revUnits = units.filter(u => u.key.startsWith('rv:') || /📜.*—\s*Revisão\s*—/i.test(String(u.title || '')));
   assert.equal(revUnits.length, 0, 'atividades de revisão no plano: ' + JSON.stringify(revUnits.slice(0, 5).map(u => u.key)));
-  assert.equal(a.revPend(DAY, true).length, 0, 'os cards automáticos "Revisar (D+n)" não são gerados');
+  assert(!/function revPend|function cardsDue|function vCards|const SRS_STEPS|const REV_STEPS/.test(html), 'o gerador de revisões e os flashcards não existem mais no código');
+  const day = a.unitsOn ? a.unitsOn(DAY) : [];
+  assert(!day.some(u => u.key.startsWith('rv:')), 'nenhum card "Revisar (D+n)" aparece no dia');
   // as seis "revisões" que eram a única leitura do artigo continuam no plano como leitura simples
   const removed = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'scripts', 'revisions-removed-2026-09-16.json'), 'utf8'));
   for (const c of removed.convertedGroups) {

@@ -2,7 +2,17 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
-const {chromium} = require('playwright');
+// playwright-core (devDependency) sem download de navegador: usa CHROME_PATH ou um Chromium já instalado.
+let chromium;
+try { ({chromium} = require('playwright')); } catch (e) { ({chromium} = require('playwright-core')); }
+const localBrowser = () => {
+  const local = process.env.LOCALAPPDATA || '';
+  const candidates = [process.env.CHROME_PATH,
+    ...(() => { try { return fs.readdirSync(path.join(local, 'ms-playwright')).filter(d => /^chromium-[0-9]+$/.test(d)).sort().reverse().map(d => path.join(local, 'ms-playwright', d, 'chrome-win64', 'chrome.exe')); } catch (e) { return []; } })(),
+    'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    '/usr/bin/chromium', '/usr/bin/google-chrome'];
+  return candidates.find(p => p && fs.existsSync(p));
+};
 
 // Exercise the actual DOM, asynchronous readers and pull() implementation.
 // No account, user backup, real token or external network is used.
@@ -26,17 +36,20 @@ const cardSelector = key => '[data-reader-key=' + JSON.stringify(key) + ']';
 async function main() {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = 'http://127.0.0.1:' + server.address().port;
-  browser = await chromium.launch({headless: true, ...(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {})});
+  const executablePath = localBrowser();
+  browser = await chromium.launch({headless: true, ...(executablePath ? {executablePath} : {})});
   const context = await browser.newContext({viewport: {width: 390, height: 844}, serviceWorkers: 'block'});
   const page = await context.newPage(), errors = [];
   page.on('pageerror', error => errors.push(String(error)));
   await page.route('**/*', route => route.request().url().startsWith(base + '/') ? route.continue() : route.abort());
-  await page.addInitScript(() => {
+  // A régua de bancas já aplicada na versão atual: a primeira sincronização não reaplica o plano.
+  const prioVersao = +(fs.readFileSync(path.join(root, 'index.html'), 'utf8').match(/"versao":([0-9]+)/) || [0, 1])[1];
+  await page.addInitScript(prioVersao => {
     localStorage.setItem('enam-local-mode', '1');
     localStorage.setItem('enam-cron-v2', JSON.stringify({kv: {
-      'profile:120-weekdays:v1': [1, 1], 'profile:90-weekdays:v1': [1, 1], 'mig:v7': [1, 1]
+      'profile:120-weekdays:v1': [1, 1], 'profile:90-weekdays:v1': [1, 1], 'mig:v7': [1, 1], 'profile:prio-bancas:v1': [prioVersao, 1]
     }}));
-  });
+  }, prioVersao);
   await page.goto(base + '/');
   const fixture = await page.evaluate(() => {
     hideSetup(); clearTimeout(forecastTimer); forecastRun++; scheduleCompletionForecast = () => {};

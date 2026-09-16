@@ -1,0 +1,11 @@
+{
+  "name": "cronograma-enam",
+  "private": true,
+  "description": "Cronograma ENAM (app de pagina unica). Dependencias so para testes locais.",
+  "scripts": {
+    "test": "node tests/run-all.js"
+  },
+  "devDependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

@@ -1,3 +1,4 @@
 __pycache__/
 *.pyc
 official-law-cache/
+node_modules/
