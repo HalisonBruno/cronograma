@@ -69,6 +69,27 @@ async function main() {
   t.timers.clear();
   a.scheduleCompletionForecast();
   assert.equal(t.timers.size, 0, 'mesmo estado: resultado servido do cache');
+  // Um acervo diferente (deploy com blocos novos no mesmo dia) invalida o cache do aparelho.
+  const before = a.forecastFingerprint();
+  a.allBlocks.push({id: 'novo-bloco', mat: 'Teste', tipo: 'REV', min: 30, t: 'Bloco novo', day: DAY});
+  assert.notEqual(a.forecastFingerprint(), before, 'a assinatura do acervo entra na chave');
+  a.scheduleCompletionForecast();
+  assert.equal(t.timers.size, 1, 'acervo novo: recalcula em vez de servir o cache');
+}
+
+// 3. Uma sincronização que nunca responde não prende o cálculo para sempre: após ~10 s ele segue.
+{
+  const t = loadApp({'profile:120-weekdays:v1': [1, at], 'profile:90-weekdays:v1': [1, at], 'cfg:cap': [120, at]}, {token: 'test-only', localMode: false, fetch: () => new Promise(() => {})});
+  const a = small(t);
+  t.timers.clear();
+  a.syncNow();   // GET que nunca responde
+  a.updateStats();
+  let waited = 0;
+  while (t.timers.size && waited < 60) { runTimer(t); waited++; if (t.nodes.get('stEnd').textContent !== 'Calculando…') break; }
+  assert(waited >= 30 && waited < 60, 'espera limitada: ' + waited + ' passos');
+  let guard = 0;
+  while (t.timers.size && guard++ < 40) runTimer(t);
+  assert.match(t.nodes.get('stEnd').textContent, /^\d\d\/\d\d\/\d{4}$/, 'a data aparece mesmo com a sincronização travada');
 }
 console.log('forecast-steps: ok');
 }

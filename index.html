@@ -559,7 +559,9 @@ function planRegen(options={}){
   preservedToday.forEach(remember);
   // extDays: dias fechados por margem pedagógica, em conjunto (a lista era varrida por dia e por item).
   const extDays=new Set();
-  const place=(u,d,reason)=>{const m=item(u);setLoad(d,load[d]+m.min);const mv={...m,to:d,finishReason:reason||""};moves.push(mv);if(!movesByDay.has(d))movesByDay.set(d,[]);movesByDay.get(d).push(mv);if(reason){extensions.push({key:u.key,day:d,reason});extDays.add(d)}remember(u)};
+  // seq = posição em moves: os índices por dia mantêm a ordem de colocação (roomFor percorre os
+  // informativos de um dia na mesma ordem em que o filtro sobre moves percorria; revisão de 16/09).
+  const place=(u,d,reason)=>{const m=item(u);setLoad(d,load[d]+m.min);const mv={...m,to:d,finishReason:reason||"",seq:moves.length};moves.push(mv);if(!movesByDay.has(d))movesByDay.set(d,[]);movesByDay.get(d).push(mv);if(reason){extensions.push({key:u.key,day:d,reason});extDays.add(d)}remember(u)};
   // Um simulado de cinco horas não vira tarefa obrigatória de um dia de 120 minutos.
   // Sessões curtas também entram na reconstrução: a antiga data de estudo
   // não pode manter um dia vazio enquanto há um simulado pendente que cabe.
@@ -585,7 +587,7 @@ function planRegen(options={}){
   // Índice dos informativos por dia: roomFor consultava a lista inteira de movimentos a cada dia
   // e a cada item (83% do tempo da previsão no perfil de 15/09); o índice acompanha as trocas de dia.
   const infoByDay=new Map();moves.forEach(x=>{if(x.tipo!=="INFO")return;if(!infoByDay.has(x.to))infoByDay.set(x.to,[]);infoByDay.get(x.to).push(x)});
-  const moveInfo=(x,from,to)=>{for(const idx of [infoByDay,movesByDay]){const a=idx.get(from);if(a){const i=a.indexOf(x);if(i>=0)a.splice(i,1)}if(!idx.has(to))idx.set(to,[]);idx.get(to).push(x)}x.to=to};
+  const moveInfo=(x,from,to)=>{for(const idx of [infoByDay,movesByDay]){const a=idx.get(from);if(a){const i=a.indexOf(x);if(i>=0)a.splice(i,1)}if(!idx.has(to))idx.set(to,[]);const b=idx.get(to);let j=b.length;while(j>0&&b[j-1].seq>x.seq)j--;b.splice(j,0,x)}x.to=to};
   // Blocos longos podem ocupar um dia sem perder sua vez na prioridade. Move
   // somente a reserva de informativos para outros dias, sem excluir nenhum.
   const roomFor=(u)=>{
@@ -2070,7 +2072,10 @@ const forecastUi={nucleo:{month:"",day:""},acervo:{month:"",day:""}};
 function forecastFingerprint(){
   const rows=[];
   for(const k in S.kv)if(k==="cfg:cap"||/^(st|au|eb|lg2|lg|jur|js|inf|xdone|rv|study|tm|pg|spd|ext|qd|qx|pct):/.test(k))rows.push(k+"="+JSON.stringify(S.kv[k]));
-  rows.sort();return "forecast:"+FORECAST_VERSION+"|"+todayStr()+"|"+rows.join("|");
+  // A assinatura do acervo entra na chave: um deploy com blocos novos no mesmo dia invalida o cache
+  // guardado no aparelho (revisão de 16/09); contagens são O(1), a soma de minutos percorre 500 blocos.
+  const cat=allBlocks.length+"/"+INFOS.length+"/"+(DATA.juris||[]).length+"/"+(DATA.ebooks||[]).length+"/"+(DATA.cursos||[]).length+"/"+allBlocks.reduce((s,b)=>s+(+b.min||0),0)+"/"+(DATA.prio&&DATA.prio.versao||1);
+  rows.sort();return "forecast:"+FORECAST_VERSION+"|"+cat+"|"+todayStr()+"|"+rows.join("|");
 }
 function firstStudyDate(d=todayStr()){while(!isStudyDay(d))d=datePlus(d,1);return d}
 function endForStudyDays(n,start=todayStr()){
@@ -2249,10 +2254,12 @@ function scheduleCompletionForecast(force){
   // Cada passo é uma simulação do plano; entre passos a página volta a responder e a sincronização
   // termina antes (o selo "sincronizando…" nunca fica preso atrás do cálculo). Com dados pequenos
   // (testes) um passo conclui a etapa inteira dentro do orçamento de tempo.
-  let pool=null,gen=null,stage=0,all=null;
+  let pool=null,gen=null,stage=0,all=null,waits=0;
   const tick=()=>{
     if(run!==forecastRun)return;
-    if(syncInFlight){forecastTimer=setTimeout(tick,300);return;}
+    // Espera a sincronização por até ~10 s (contador, não relógio: o harness fixa o relógio); uma
+    // requisição travada não pode deixar o cabeçalho em "Calculando…" para sempre.
+    if(syncInFlight&&waits++<34){forecastTimer=setTimeout(tick,300);return;}
     if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
     if(!gen){pool=planningUnits(true);gen=completionPlanSteps("acervo",allHint,pool);}
     const t0=Date.now();let r=gen.next();while(!r.done&&Date.now()-t0<40)r=gen.next();
