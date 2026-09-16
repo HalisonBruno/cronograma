@@ -456,7 +456,7 @@ document.getElementById("tokenSave").addEventListener("click",()=>{
   if(!v)return;
   token=v;profileReady=false;localStorage.setItem(TKEY,v);localStorage.setItem("enam-local-mode","0");hideSetup();syncNow();
 });
-document.getElementById("tokenSkip").addEventListener("click",()=>{localStorage.setItem("enam-local-mode","1");profileReady=true;hideSetup();render();setSync("off")});
+document.getElementById("tokenSkip").addEventListener("click",()=>{localStorage.setItem("enam-local-mode","1");profileReady=true;hideSetup();render();setSync("off");warmOfflineCache()});
 document.getElementById("syncpill").addEventListener("click",()=>syncNow());
 function isStudyDay(d){const n=new Date(d+"T12:00:00").getDay();return n>=1&&n<=5}
 function datePlus(d,n){const t=new Date(d+"T12:00:00");t.setDate(t.getDate()+n);return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0")}
@@ -2928,7 +2928,40 @@ tnav.addEventListener("scroll",tabsFade,{passive:true});addEventListener("resize
 render();
 tabsFade();
 setSync(syncState);
-if(!token)showSetup();else syncNow();
+// Leitura sem internet (16/09/2026): depois da abertura, baixa em segundo plano os textos de lei e os
+// informativos para o cache do service worker, uma vez por versão do acervo. Respeita o modo de economia
+// de dados, espera a sincronização terminar e só marca como feito quando todos os arquivos chegaram.
+const OFFLINE_WARM_KEY="enam-offline-warm",OFFLINE_WARM_VERSION=1;
+function offlineFiles(){
+  const leis=Object.keys(LG).filter(bid=>(LG[bid]||[]).length).map(bid=>"leis/"+bid+".json");
+  const infos=[...new Set(INFOS.map(o=>o.arq))].map(a=>"infos/"+a.replace(/[^a-zA-Z0-9]/g,"_")+".json");
+  return leis.concat(infos);
+}
+function warmOfflineCache(){
+  try{
+    if(!("serviceWorker" in navigator)||location.protocol==="file:"||navigator.onLine===false)return;
+    if(navigator.connection&&navigator.connection.saveData)return;
+    const files=offlineFiles(),sig=OFFLINE_WARM_VERSION+":"+files.length+":"+((DATA.prio&&DATA.prio.versao)||0)+":"+allBlocks.length;
+    let done=null;try{done=localStorage.getItem(OFFLINE_WARM_KEY)}catch(e){}
+    if(done===sig)return;
+    const run=()=>{
+      if(syncInFlight){setTimeout(run,2000);return}
+      let i=0,active=0,fail=0;
+      const next=()=>{
+        while(active<3&&i<files.length){
+          const f=files[i++];active++;
+          fetch(f).then(r=>{if(!r.ok)fail++}).catch(()=>{fail++}).finally(()=>{active--;
+            if(i>=files.length&&!active){if(!fail)try{localStorage.setItem(OFFLINE_WARM_KEY,sig)}catch(e){}}else next()});
+        }
+      };
+      next();
+    };
+    const start=()=>setTimeout(run,5000);
+    if(navigator.serviceWorker.controller)start();
+    else navigator.serviceWorker.addEventListener("controllerchange",start,{once:true});
+  }catch(e){}
+}
+if(!token){showSetup();if(profileReady)warmOfflineCache()}else syncNow().then(()=>warmOfflineCache());
 if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
