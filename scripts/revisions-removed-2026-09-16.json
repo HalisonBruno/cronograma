@@ -1,0 +1,1039 @@
+{
+ "checkedAt": "2026-09-16",
+ "summary": {
+  "hiddenGroups": 46,
+  "convertedGroups": 6,
+  "deletedBlocks": 84,
+  "deletedMinutes": 2084,
+  "prioVersao": 4
+ },
+ "hiddenGroups": [
+  {
+   "block": "2026-08-20-0",
+   "id": "017461",
+   "sub": "CP · arts. 18–20 (revisão)",
+   "m": 10
+  },
+  {
+   "block": "2026-09-16-0",
+   "id": "afefa5",
+   "sub": "CF · arts. 100 (1/3: caput–I) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-09-16-0",
+   "id": "668037",
+   "sub": "CF · arts. 100 (2/3: II–§ 25) (revisão)",
+   "m": 26
+  },
+  {
+   "block": "2026-09-16-0",
+   "id": "445c95",
+   "sub": "CF · arts. 100 (3/3: § 26–§ 30) (revisão)",
+   "m": 10
+  },
+  {
+   "block": "2026-09-21-0",
+   "id": "666536",
+   "sub": "CF · arts. 5 (4/4: LXXV–§ 4) (revisão)",
+   "m": 11
+  },
+  {
+   "block": "2026-10-08-0",
+   "id": "eeb662",
+   "sub": "CP · arts. 155 (revisão)",
+   "m": 24
+  },
+  {
+   "block": "2026-10-09-0",
+   "id": "d1cc37",
+   "sub": "CF · arts. 70–71 (revisão)",
+   "m": 18
+  },
+  {
+   "block": "2026-10-12-0",
+   "id": "90a9b2",
+   "sub": "CF · arts. 5 (1/4: caput–XXIV) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-10-12-0",
+   "id": "e5b7c5",
+   "sub": "CF · arts. 5 (1/2: caput–XXXIX) (revisão)",
+   "m": 20
+  },
+  {
+   "block": "2026-10-12-0",
+   "id": "7a3ed3",
+   "sub": "CF · arts. 5 (2/2: XL–XLIX) (revisão)",
+   "m": 16
+  },
+  {
+   "block": "2026-10-12-0",
+   "id": "455750",
+   "sub": "CF · arts. 5 (3/4: L–LXXIV) (revisão)",
+   "m": 28
+  },
+  {
+   "block": "2026-10-12-0",
+   "id": "6e10e4",
+   "sub": "CF · arts. 5 (4/4: LXXV–§ 4) (revisão)",
+   "m": 11
+  },
+  {
+   "block": "2026-10-13-0",
+   "id": "e0b910",
+   "sub": "CC · arts. 189–196, 1647, 1829, 1845",
+   "m": 20
+  },
+  {
+   "block": "2026-10-14-0",
+   "id": "ad7d5d",
+   "sub": "CPC · arts. 1–2, 1015",
+   "m": 17
+  },
+  {
+   "block": "2026-08-18-0~2",
+   "id": "e5dcd7",
+   "sub": "LINDB · arts. 20–26 (revisão)",
+   "m": 20
+  },
+  {
+   "block": "2026-08-22-0~2",
+   "id": "a170b5",
+   "sub": "CC · arts. 50 (revisão)",
+   "m": 10
+  },
+  {
+   "block": "2026-09-07-0~2",
+   "id": "33dead",
+   "sub": "CF · arts. 5 (1/4: caput–XXIV) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-09-07-0~2",
+   "id": "972e03",
+   "sub": "CF · arts. 5 (1/2: caput–XXXIX) (revisão)",
+   "m": 20
+  },
+  {
+   "block": "2026-09-07-0~2",
+   "id": "16abc0",
+   "sub": "CF · arts. 5 (2/2: XL–XLIX) (revisão)",
+   "m": 16
+  },
+  {
+   "block": "2026-09-07-0~2",
+   "id": "2397ff",
+   "sub": "CF · arts. 5 (3/4: L–LXXIV) (revisão)",
+   "m": 28
+  },
+  {
+   "block": "2026-09-07-0~2",
+   "id": "f2b7a2",
+   "sub": "CF · arts. 5 (4/4: LXXV–§ 4) (revisão)",
+   "m": 11
+  },
+  {
+   "block": "2026-09-14-0~2",
+   "id": "515cf4",
+   "sub": "CF · arts. 84 (1/2: caput–XV) (revisão)",
+   "m": 17
+  },
+  {
+   "block": "2026-09-14-0~2",
+   "id": "b32ac2",
+   "sub": "CF · arts. 84 (2/2: XVI–Parágrafo único) (revisão)",
+   "m": 15
+  },
+  {
+   "block": "2026-09-14-0~2",
+   "id": "677a18",
+   "sub": "CF · arts. 114 (revisão)",
+   "m": 5
+  },
+  {
+   "block": "2026-09-14-0~2",
+   "id": "491ed7",
+   "sub": "CF · arts. 5 (1/4: caput–XXIV) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-09-14-0~2",
+   "id": "dbaa89",
+   "sub": "CF · arts. 5 (3/4: L–LXXIV) (revisão)",
+   "m": 28
+  },
+  {
+   "block": "2026-09-18-0~2",
+   "id": "c1b810",
+   "sub": "CF · arts. 5 (1/4: caput–XXIV) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-09-18-0~2",
+   "id": "6aab1c",
+   "sub": "CF · arts. 5 (1/2: caput–XXXIX) (revisão)",
+   "m": 20
+  },
+  {
+   "block": "2026-09-18-0~2",
+   "id": "fd5019",
+   "sub": "CF · arts. 5 (2/2: XL–XLIX) (revisão)",
+   "m": 16
+  },
+  {
+   "block": "2026-09-18-0~2",
+   "id": "c3e69b",
+   "sub": "CF · arts. 5 (3/4: L–LXXIV) (revisão)",
+   "m": 28
+  },
+  {
+   "block": "2026-09-18-0~2",
+   "id": "f7b809",
+   "sub": "CF · arts. 5 (4/4: LXXV–§ 4) (revisão)",
+   "m": 11
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "c9724a",
+   "sub": "CF · arts. 37 (1/2: caput–§ 2) (revisão)",
+   "m": 27
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "8cbfb2",
+   "sub": "CF · arts. 37 (2/2: § 3–§ 16) (revisão)",
+   "m": 21
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "56136c",
+   "sub": "CF · arts. 5 (1/4: caput–XXIV) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "b1203a",
+   "sub": "CF · arts. 5 (1/2: caput–XXXIX) (revisão)",
+   "m": 20
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "dc942a",
+   "sub": "CF · arts. 5 (2/2: XL–XLIX) (revisão)",
+   "m": 16
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "b9c3c5",
+   "sub": "CF · arts. 5 (3/4: L–LXXIV) (revisão)",
+   "m": 28
+  },
+  {
+   "block": "2026-09-25-0~2",
+   "id": "580d74",
+   "sub": "CF · arts. 5 (4/4: LXXV–§ 4) (revisão)",
+   "m": 11
+  },
+  {
+   "block": "2026-09-28-0~2",
+   "id": "5de4d6",
+   "sub": "CF · arts. 7 (1/2: caput–XXIV) (revisão)",
+   "m": 25
+  },
+  {
+   "block": "2026-09-28-0~2",
+   "id": "734d05",
+   "sub": "CF · arts. 7 (2/2: XXV–Parágrafo único) (revisão)",
+   "m": 14
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "3f89c5",
+   "sub": "Lei 12.016 · arts. 1, 5, 22–23",
+   "m": 13
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "37b8ef",
+   "sub": "Lei 13.300 · arts. 2, 8–9",
+   "m": 10
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "d4fbfd",
+   "sub": "LIA · arts. 16 (revisão)",
+   "m": 17
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "68eaee",
+   "sub": "LIA · arts. 17 (1/3: caput–§ 9) (revisão)",
+   "m": 16
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "ec5013",
+   "sub": "LIA · arts. 17 (2/3: § 10–§ 15) (revisão)",
+   "m": 17
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "3adb32",
+   "sub": "LIA · arts. 17 (3/3: § 16–§ 21) (revisão)",
+   "m": 11
+  }
+ ],
+ "convertedGroups": [
+  {
+   "block": "2026-10-10-0",
+   "id": "f0b715",
+   "sub": "LRF · arts. 6",
+   "m": 72,
+   "onlyReadingOf": [
+    "6"
+   ],
+   "r": "Recuperação e Falência · Disposições Comuns À Recuperação Judicial E À Falência + Recuperação J"
+  },
+  {
+   "block": "2026-10-10-0",
+   "id": "e4dee9",
+   "sub": "Lei 6.404 · arts. 129, 137–138",
+   "m": 66,
+   "onlyReadingOf": [
+    "129",
+    "137",
+    "138"
+   ],
+   "r": "Sociedades por Ações · Assembléia-Geral + Conselho de Administração e Diretoria …"
+  },
+  {
+   "block": "2026-10-01-0~2",
+   "id": "7d2e1b",
+   "sub": "CF · arts. 225",
+   "m": 48,
+   "onlyReadingOf": [
+    "225"
+   ],
+   "r": "CF · Ordem Social"
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "8fd83a",
+   "sub": "Lei 4.717 · arts. 1–2, 6",
+   "m": 66,
+   "onlyReadingOf": [
+    "1",
+    "2",
+    "6"
+   ],
+   "r": "Ação Popular"
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "a49af4",
+   "sub": "CDC · arts. 81–82, 103",
+   "m": 63,
+   "onlyReadingOf": [
+    "81",
+    "82"
+   ],
+   "r": "CDC · Defesa do Consumidor em Juízo"
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "081ffe",
+   "sub": "Lei 9.507 · arts. 1–2, 4–6, 8–9, 16–17, 22–23",
+   "m": 57,
+   "onlyReadingOf": [
+    "1",
+    "2",
+    "4",
+    "5",
+    "6",
+    "8",
+    "9",
+    "16",
+    "17",
+    "22",
+    "23"
+   ],
+   "r": "Habeas Data"
+  }
+ ],
+ "deletedBlocks": [
+  {
+   "id": "2026-08-13-5",
+   "day": "2026-08-22",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-14-4",
+   "day": "2026-08-26",
+   "mat": "Administrativo",
+   "t": "Fecho — Administrativo (erros + flashcards)",
+   "min": 20,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-15-3",
+   "day": "2026-08-30",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-15-7",
+   "day": "2026-08-31",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-15-11",
+   "day": "2026-09-01",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-17-4",
+   "day": "2026-09-04",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-18-3",
+   "day": "2026-09-08",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-19-3",
+   "day": "2026-09-12",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-20-4",
+   "day": "2026-09-14",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-21-4",
+   "day": "2026-09-19",
+   "mat": "Const. Tributário",
+   "t": "Fecho — Const. Tributário (erros + flashcards)",
+   "min": 20,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-22-3",
+   "day": "2026-09-23",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-22-7",
+   "day": "2026-09-24",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-22-11",
+   "day": "2026-09-24",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-23-0",
+   "day": "2026-09-26",
+   "mat": "Revisão",
+   "t": "Correção comentada do último simulado",
+   "min": 60,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-23-4",
+   "day": "2026-09-27",
+   "mat": "Revisão",
+   "t": "Fecho da semana (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-24-4",
+   "day": "2026-09-29",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-25-3",
+   "day": "2026-10-03",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-26-3",
+   "day": "2026-10-07",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-27-4",
+   "day": "2026-10-11",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-28-3",
+   "day": "2026-10-14",
+   "mat": "Administrativo",
+   "t": "Fecho — Administrativo (erros + flashcards)",
+   "min": 20,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-29-3",
+   "day": "2026-10-16",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-29-7",
+   "day": "2026-10-17",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-29-11",
+   "day": "2026-10-17",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-08-31-4",
+   "day": "2026-10-22",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-01-3",
+   "day": "2026-10-26",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-02-3",
+   "day": "2026-10-30",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-03-4",
+   "day": "2026-11-03",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-04-3",
+   "day": "2026-11-08",
+   "mat": "Const. Trabalho",
+   "t": "Fecho — Const. Trabalho (erros + flashcards)",
+   "min": 20,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-05-3",
+   "day": "2026-11-10",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-05-7",
+   "day": "2026-11-10",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-05-10",
+   "day": "2026-11-11",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-06-0",
+   "day": "2026-11-12",
+   "mat": "Revisão",
+   "t": "Correção comentada do último simulado",
+   "min": 60,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-06-4",
+   "day": "2026-11-13",
+   "mat": "Revisão",
+   "t": "Fecho da semana (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-07-4",
+   "day": "2026-11-16",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-08-3",
+   "day": "2026-11-17",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-09-3",
+   "day": "2026-11-21",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-10-4",
+   "day": "2026-11-25",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-11-4",
+   "day": "2026-11-28",
+   "mat": "Administrativo",
+   "t": "Fecho — Administrativo (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-12-3",
+   "day": "2026-12-01",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-12-7",
+   "day": "2026-12-02",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-12-11",
+   "day": "2026-12-02",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-14-4",
+   "day": "2026-12-07",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-15-3",
+   "day": "2026-12-09",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-16-3",
+   "day": "2026-12-12",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-17-4",
+   "day": "2026-12-16",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-18-4",
+   "day": "2026-12-19",
+   "mat": "Normas Const. Proc. Penal",
+   "t": "Fecho — Normas Const. Proc. Penal (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-19-3",
+   "day": "2026-12-23",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-19-7",
+   "day": "2026-12-24",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-19-10",
+   "day": "2026-12-24",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-20-0",
+   "day": "2026-12-25",
+   "mat": "Revisão",
+   "t": "Correção comentada do último simulado",
+   "min": 60,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-20-4",
+   "day": "2026-12-26",
+   "mat": "Revisão",
+   "t": "Fecho da semana (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-21-4",
+   "day": "2026-12-29",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-22-3",
+   "day": "2026-12-31",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-23-3",
+   "day": "2027-01-04",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-24-3",
+   "day": "2027-01-08",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-25-0~2",
+   "day": "2027-01-10",
+   "mat": "Administrativo",
+   "t": "Lei seca: CF + Lei 8.112 + Lei 13.460 — parte 2/2",
+   "min": 148,
+   "why": "only revision groups"
+  },
+  {
+   "id": "2026-09-25-4",
+   "day": "2027-01-10",
+   "mat": "Administrativo",
+   "t": "Fecho — Administrativo (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-26-3",
+   "day": "2027-01-13",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-26-7",
+   "day": "2027-01-14",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-26-11",
+   "day": "2027-01-14",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-28-4",
+   "day": "2027-01-18",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-29-3",
+   "day": "2027-01-22",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-09-30-3",
+   "day": "2027-01-26",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-01-4",
+   "day": "2027-01-29",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-02-2",
+   "day": "2027-01-30",
+   "mat": "Const. Tributário",
+   "t": "Fecho — Const. Tributário (erros + flashcards)",
+   "min": 30,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-03-1",
+   "day": "2027-01-31",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 40,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-03-4",
+   "day": "2027-01-31",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-03-7",
+   "day": "2027-02-01",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 10,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-05-4",
+   "day": "2027-02-05",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-06-3",
+   "day": "2027-02-09",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-07-3",
+   "day": "2027-02-13",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-08-0",
+   "day": "2027-02-14",
+   "mat": "Penal",
+   "t": "Lei seca: CP",
+   "min": 24,
+   "why": "only revision groups"
+  },
+  {
+   "id": "2026-10-08-2",
+   "day": "2027-02-14",
+   "mat": "Penal",
+   "t": "Fecho — Penal (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-09-3",
+   "day": "2027-02-16",
+   "mat": "Administrativo",
+   "t": "Fecho — Administrativo (erros + flashcards)",
+   "min": 20,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-10-2",
+   "day": "2027-02-17",
+   "mat": "Empresarial",
+   "t": "Fecho — Empresarial (erros + flashcards)",
+   "min": 20,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-10-5",
+   "day": "2027-02-18",
+   "mat": "Direitos Humanos",
+   "t": "Fecho — Direitos Humanos (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-10-8",
+   "day": "2027-02-18",
+   "mat": "Humanística",
+   "t": "Fecho — Humanística (erros + flashcards)",
+   "min": 15,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-12-0",
+   "day": "2027-02-21",
+   "mat": "Constitucional",
+   "t": "Lei seca: CF",
+   "min": 100,
+   "why": "only revision groups"
+  },
+  {
+   "id": "2026-10-12-3",
+   "day": "2027-02-21",
+   "mat": "Constitucional",
+   "t": "Fecho — Constitucional (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-13-0",
+   "day": "2027-02-22",
+   "mat": "Civil",
+   "t": "Lei seca: CC",
+   "min": 20,
+   "why": "only revision groups"
+  },
+  {
+   "id": "2026-10-13-2",
+   "day": "2027-02-22",
+   "mat": "Civil",
+   "t": "Fecho — Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-14-0",
+   "day": "2027-02-23",
+   "mat": "Proc. Civil",
+   "t": "Lei seca: CPC",
+   "min": 17,
+   "why": "only revision groups"
+  },
+  {
+   "id": "2026-10-14-2",
+   "day": "2027-02-23",
+   "mat": "Proc. Civil",
+   "t": "Fecho — Proc. Civil (erros + flashcards)",
+   "min": 25,
+   "why": "revision block"
+  },
+  {
+   "id": "2026-10-15-0",
+   "day": "2027-04-15",
+   "mat": "Penal",
+   "t": "Véspera: revisão leve de Penal",
+   "min": 90,
+   "why": "revision block"
+  }
+ ]
+}

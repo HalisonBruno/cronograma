@@ -31,14 +31,34 @@ class PublishedLawTests(unittest.TestCase):
     def test_researched_data_and_completion_ids_preserved(self):
         old=data(subprocess.check_output(['git','show','adf6de9:index.html'],cwd=ROOT).decode('utf8'))
         current=json.loads(json.dumps(DATA))
+        # 16/09/2026: grupos de revisao ficaram ocultos (x) e seis "revisoes" que eram a unica leitura
+        # do artigo viraram leitura simples (scripts/revisions-removed-2026-09-16.json).
+        removed=json.loads((ROOT/'scripts/revisions-removed-2026-09-16.json').read_text(encoding='utf8'))
+        converted={c['id'] for c in removed['convertedGroups']}
+        self.assertEqual(len(converted),6)
         for gs in current['leigroups'].values():
             for g in gs:
                 g.pop('readTitle',None)
                 g.pop('readSourceUrl',None)
+                if g.get('rev'):
+                    self.assertTrue(g.get('x'),('revisao visivel',g['id']))
+                if g.get('x') and g.get('rev'):
+                    g.pop('x',None)
+        for gs in old['leigroups'].values():
+            for g in gs:
+                g.pop('readTitle',None)
+                g.pop('readSourceUrl',None)
+                if g.get('x') and g.get('rev'):
+                    g.pop('x',None)
         # Blocos criados em 15/09/2026 (scripts/law-additions-2026-09-15.json) sao novos; os antigos
         # so podem mudar rotulos de leitura e fonte direta.
         for bid,gs in old['leigroups'].items():
-            self.assertEqual(current['leigroups'][bid],gs,bid)
+            cur=[g for g in current['leigroups'][bid] if g['id'] not in converted]
+            exp=[g for g in gs if g['id'] not in converted]
+            self.assertEqual(cur,exp,bid)
+            for g in current['leigroups'][bid]:
+                if g['id'] in converted:
+                    self.assertFalse(g.get('rev'));self.assertFalse(g.get('x'));self.assertNotIn('revisão',g['sub'])
         for bid in current['leigroups']:
             if bid not in old['leigroups']:
                 self.assertTrue(bid.startswith('2026-09-15-'),bid)

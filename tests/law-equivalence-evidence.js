@@ -36,18 +36,19 @@ function evidence(a, target, eq) {
 }
 
 // Reported incident: theory chapters 1-5 are not the entire CF article 5.
+// (bloco 2026-08-13-1~2 = CF art. 5 partes 2-4; o bloco de revisao 2026-10-12-0 foi apagado em 16/09/2026)
 {
   const { app: a } = load();
   for (let c = 1; c <= 5; c++) a.SET('eb:constitucional:' + c, 1);
   a.syncEquiv();
-  assert.equal(a.G('st:2026-10-12-0'), null);
-  assert(a.unitsOf(a.allBlocks.find(b => b.id === '2026-10-12-0')).every(u => !a.unitDone(u)));
+  assert.equal(a.G('st:2026-08-13-1~2'), null);
+  assert(a.unitsOf(a.allBlocks.find(b => b.id === '2026-08-13-1~2')).every(u => !a.unitDone(u)));
   cases++;
 }
 // A manual law parent must not be reinterpreted as reading its theory supplement.
 {
   const { app: a } = load();
-  a.SET('st:2026-10-12-0', 'done'); a.syncEquiv();
+  a.SET('st:2026-08-13-1~2', 'done'); a.syncEquiv();
   for (let c = 1; c <= 5; c++) assert.equal(a.G('eb:constitucional:' + c), null);
   const ebook = a.allBlocks.find(b => b.tipo === 'EBOOK' && b.eb === 'constitucional');
   assert(a.unitsOf(ebook).every(u => !a.unitDone(u)), 'planIv cannot infer reading from a law parent');
@@ -125,13 +126,13 @@ for (const fromVideo of [true, false]) {
 }
 // Derived migration repair preserves every manual key and its original timestamp.
 {
-  const initial = { 'st:2026-10-12-0': ['done-auto', stamp],
-    'lg2:2026-10-12-0:90a9b2': ['auto', stamp] };
+  const initial = { 'st:2026-08-13-1~2': ['done-auto', stamp],
+    'lg2:2026-08-13-1~2:1dd748': ['auto', stamp] };
   for (let c = 1; c <= 5; c++) initial['eb:constitucional:' + c] = [1, stamp - c];
   const { app: a } = load(initial);
   a.syncEquiv();
-  assert.equal(a.G('st:2026-10-12-0'), null);
-  assert.equal(a.G('lg2:2026-10-12-0:90a9b2'), null);
+  assert.equal(a.G('st:2026-08-13-1~2'), null);
+  assert.equal(a.G('lg2:2026-08-13-1~2:1dd748'), null);
   for (let c = 1; c <= 5; c++)
     assert.equal(JSON.stringify(a.S.kv['eb:constitucional:' + c]), JSON.stringify(initial['eb:constitucional:' + c]));
   const saved = JSON.stringify(a.S.kv); a.syncEquiv();
