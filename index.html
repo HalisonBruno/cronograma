@@ -1000,11 +1000,30 @@ function prioAbs(key){
 function prioDot(key){if(!PESO[key])return "";const s=prioAbs(key),inc=(DATA.inc||{})[key];return '<span class="pdot" title="incidência nas bancas: '+(inc!=null?'nota '+inc+' de 10 · ':'')+'rendimento no percentil '+Math.round(s*100)+'" style="display:inline-block;width:10px;height:10px;border-radius:99px;background:'+prioColor(s)+';vertical-align:middle;margin-left:6px"></span>'}
 function qphBadge(u){const r=rendOf(u);if(!r)return "";
   return '<span class="qph" title="questões esperadas por hora de estudo, a partir das provas anteriores">~'+(r>=10?Math.round(r):r.toFixed(1))+' q/h</span>'+(isNucleo(u)?'<span class="nucleo" title="faz parte do núcleo: as atividades que somam 80% das questões esperadas">★ núcleo</span>':"")}
-// mapa de calor por artigo: HEAT["CP|121"] = citacoes
-function heatOf(rotulo,art){const r=(rotulo||"").toUpperCase();
-  for(const k in HEAT){const p=k.split("|");if(p[1]!==String(art))continue;
-    const sig=p[0];if(r.indexOf(sig)>=0||r.replace(/\./g,"").indexOf(sig.replace(/\./g,""))>=0)return HEAT[k]}
-  return 0}
+// mapa de calor por artigo: HEAT["CP|121"] = citações nas provas analisadas.
+// As siglas do mapa variam ("CP", "LEI 8.429", "L8429", "LREF"); o grupo de lei traz a URL oficial. As duas
+// viram o mesmo identificador (número da norma ou "cf") e o artigo casa exato. Antes a função recebia o
+// título temático do grupo e quase nunca achava a sigla (estrela em 32 de 2.616 dispositivos), e por
+// substring confundia CP com CPC e CPP (16/09/2026). ADCT não herda estrela do corpo da CF.
+const HEAT_NOMES={"CF":"cf","CP":"2848","CPP":"3689","CC":"10406","CPC":"13105","CTN":"5172","LINDB":"4657","CDC":"8078","ECA":"8069","CLT":"5452","LOMAN":"35","CADH":"678","PIDCP":"592","LGPD":"13709","MARCO CIVIL":"12965","LRP":"6015","LSA":"6404","LREF":"11101","LPI":"9279"};
+function heatLawIdOfSig(sig){
+  const s=String(sig||"").toUpperCase().trim();if(HEAT_NOMES[s])return HEAT_NOMES[s];
+  const m=s.match(/^(?:LEI|L|LC|DL)\s*(?:N[º°.]?\s*)?([0-9][0-9.]*)$/);return m?m[1].replace(/\./g,"").replace(/^0+/,""):"";
+}
+function heatLawIdOfGroup(g){
+  if(!g||/\bADCT\b/.test(String(g.sub||"")+" "+String(g.readTitle||"")))return "";
+  const seg=(String(g.u||"").toLowerCase().split("/").pop()||"").replace(/\.html?$/,"").replace(/(compilad[oa]|cons|orig)$/,"");
+  if(seg==="constituicao")return "cf";
+  const m=seg.match(/^(?:l|lcp|del|d)([0-9][0-9.]*)$/);return m?m[1].replace(/\./g,"").replace(/^0+/,""):"";
+}
+let _HEATIDX=null;
+function heatOf(lawId,art){
+  if(!lawId)return 0;
+  if(!_HEATIDX){_HEATIDX=new Map();
+    for(const k in HEAT){const i=k.indexOf("|");if(i<0)continue;const id=heatLawIdOfSig(k.slice(0,i));if(!id)continue;
+      const key=id+"|"+k.slice(i+1).trim();_HEATIDX.set(key,Math.max(_HEATIDX.get(key)||0,+HEAT[k]||0))}}
+  return _HEATIDX.get(lawId+"|"+String(art).trim())||0;
+}
 function stars(v){return v>=12?"★★★":v>=6?"★★":v>0?"★":""}
 // ---------- filtros TEC baseados no que foi ESTUDADO ----------
 function tecStudied(mat){
@@ -1459,8 +1478,8 @@ function lawDocLink(id){
   return id?'<a class="lch" target="_blank" rel="noopener" href="'+dlink(id)+'" title="A revisão legislativa exibida no app não se aplica a este DOCX anterior.">📄 DOCX anterior — não revisado ↗</a>':"";
 }
 function lawChips(b,g){return lawSourceLink(g&&(g.readSourceUrl||g.u),"abrir lei oficial ↗")+lawDocLink(g&&LDOCG[g.id]||LDOC[b.id])}
-function artHtml(rot,a,parentAudit,sourceUrl){
-  const h=heatOf(rot,a.n),st=stars(h);
+function artHtml(rot,a,parentAudit,sourceUrl,lawId){
+  const h=heatOf(lawId,a.n),st=stars(h);
   const links=[...new Map((a.sourceLinks||[]).filter(l=>/reda[çc][ãa]o|inclu[íi]d|acrescid|revogad|vig[êe]ncia|produ[çc][ãa]o de efeitos/i.test(l.text||"")).map(l=>[l.url,l])).values()];
   return '<div class="artg'+(h>=6?' hot':'')+'"><span class="an">'+(/TST|Súmula/i.test(rot)?"Súmula ":"Art. ")+esc(a.n)+'</span> '+(st?'<span class="star" title="'+h+' citações nas provas analisadas">'+st+'</span>':"")+
     lawAuditHtml(a.audit||parentAudit,a.sourceUrl||(a.audit&&a.audit.sourceUrl)||sourceUrl)+
@@ -1483,7 +1502,7 @@ async function textoDe(u){
     const g=meta&&j&&(j.g||[]).find(x=>x.id===meta.id);
     if(!g||!Array.isArray(g.a)||!g.a.length)return '<div class="law-missing" role="status">O texto deste bloco exato ainda não está disponível. Nenhum outro trecho foi colocado no lugar.'+(meta?'<br><b>'+esc(meta.readTitle||meta.sub||meta.r||"")+'</b> '+lawSourceLink(meta.readSourceUrl||meta.u):"")+'</div>';
     const audit=g.audit||(j&&j.audit),sourceUrl=(audit&&audit.sourceUrl)||g.u||meta.u;
-    return '<h3 style="font-family:Georgia,serif;font-size:1rem;margin:0 0 8px">'+esc(meta.readTitle||meta.sub||g.sub||g.r||"")+'</h3>'+g.a.map(a=>artHtml(g.r,a,audit,sourceUrl)).join("");
+    return '<h3 style="font-family:Georgia,serif;font-size:1rem;margin:0 0 8px">'+esc(meta.readTitle||meta.sub||g.sub||g.r||"")+'</h3>'+g.a.map(a=>artHtml(g.r,a,audit,sourceUrl,heatLawIdOfGroup(meta&&meta.u?meta:g))).join("");
   }
   return "";
 }
