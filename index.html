@@ -536,6 +536,11 @@ function planRegen(options={}){
   }
   const end=options.end||planEnd(),days=studyDays(hoje,end).filter(d=>includeToday||d>hoje),cap=capMin(),load={},initialLoad={},moves=[],fila=[],library=[],selected=new Set(),byKey=new Map(),extensions=[];
   days.forEach(d=>{load[d]=initialLoad[d]=d===hoje?Math.min(cap,coreStudyMinutesOn(d)):0});
+  // Folga total do horizonte mantida de forma incremental: um item maior que a folga (mais a margem)
+  // não tem onde entrar e vai direto para a fila, sem varrer os dias (perfil de 16/09: era 80% do tempo).
+  let totalFree=days.reduce((n,d)=>n+Math.max(0,cap-load[d]),0);
+  const setLoad=(d,v)=>{totalFree-=Math.max(0,cap-load[d]);load[d]=v;totalFree+=Math.max(0,cap-load[d])};
+  const movesByDay=new Map(),onDay=d=>movesByDay.get(d)||[];
   const perf={},agg={};
   qdTodos().forEach(o=>{const a=agg[o.mat]=agg[o.mat]||{n:0,ac:0};a.n+=+o.n||0;a.ac+=+o.ac||0});
   for(const m in agg)if(agg[m].n>=10)perf[m]=Math.round(agg[m].ac/agg[m].n*100);
@@ -552,7 +557,9 @@ function planRegen(options={}){
   const rememberInfoFamily=(id,includeJudgments)=>{const todo=[id],seen=new Set();while(todo.length){const x=todo.pop();if(seen.has(x))continue;seen.add(x);selected.add("covers:inf:"+x);if(includeJudgments)(INFO_BY_ID[x]?.pids||[]).forEach(pid=>selected.add("covers:jur:"+pid));(DATA.infgem?.[x]||[]).forEach(v=>todo.push(v));for(const [k,v]of Object.entries(DATA.infgem||{}))if(v.includes(x))todo.push(k)}};
   const remember=u=>{selected.add(u.key);const sig=lawSignature(u);if(sig)selected.add("law:"+sig);if(u.key.startsWith("inf:"))rememberInfoFamily(u.key.slice(4),true)};
   preservedToday.forEach(remember);
-  const place=(u,d,reason)=>{const m=item(u);load[d]+=m.min;moves.push({...m,to:d,finishReason:reason||""});if(reason)extensions.push({key:u.key,day:d,reason});remember(u)};
+  // extDays: dias fechados por margem pedagógica, em conjunto (a lista era varrida por dia e por item).
+  const extDays=new Set();
+  const place=(u,d,reason)=>{const m=item(u);setLoad(d,load[d]+m.min);const mv={...m,to:d,finishReason:reason||""};moves.push(mv);if(!movesByDay.has(d))movesByDay.set(d,[]);movesByDay.get(d).push(mv);if(reason){extensions.push({key:u.key,day:d,reason});extDays.add(d)}remember(u)};
   // Um simulado de cinco horas não vira tarefa obrigatória de um dia de 120 minutos.
   // Sessões curtas também entram na reconstrução: a antiga data de estudo
   // não pode manter um dia vazio enquanto há um simulado pendente que cabe.
@@ -574,21 +581,34 @@ function planRegen(options={}){
     }
   });
   waiting.forEach(u=>fila.push({...item(u),reason:"Informativo obrigatório sem capacidade no horizonte atual; permanece na demanda integral."}));
+  const minInfoMin=infos.reduce((n,u)=>Math.min(n,item(u).min),Infinity)===Infinity?4:infos.reduce((n,u)=>Math.min(n,item(u).min),Infinity);
+  // Índice dos informativos por dia: roomFor consultava a lista inteira de movimentos a cada dia
+  // e a cada item (83% do tempo da previsão no perfil de 15/09); o índice acompanha as trocas de dia.
+  const infoByDay=new Map();moves.forEach(x=>{if(x.tipo!=="INFO")return;if(!infoByDay.has(x.to))infoByDay.set(x.to,[]);infoByDay.get(x.to).push(x)});
+  const moveInfo=(x,from,to)=>{for(const idx of [infoByDay,movesByDay]){const a=idx.get(from);if(a){const i=a.indexOf(x);if(i>=0)a.splice(i,1)}if(!idx.has(to))idx.set(to,[]);idx.get(to).push(x)}x.to=to};
   // Blocos longos podem ocupar um dia sem perder sua vez na prioridade. Move
   // somente a reserva de informativos para outros dias, sem excluir nenhum.
   const roomFor=(u)=>{
     // Um bloco único acima do teto (até a margem de 15 min) ocupa o dia inteiro: sem isso, lei seca de
     // 121–135 min nunca recebia data (revisão de 15/09/2026) e a previsão de conclusão não fechava.
     const m=item(u),closing=pedagogicalFinish(u,[])||(m.min>cap&&m.min<=cap+15?LONG_BLOCK_DAY:""),limit=closing?cap+15:cap;if(m.min>limit)return null;
-    if(days.reduce((n,d)=>n+Math.max(0,cap-load[d]),0)+(closing?15:0)<m.min)return null;
+    const freeOf=d=>Math.max(0,cap-load[d]);
+    if(totalFree+(closing?15:0)<m.min)return null;
+    // Destinos possíveis para um informativo deslocado: só dias com folga para o menor informativo.
+    // Sobras de 1–3 min em centenas de dias eram varridas a cada candidato (70% do tempo da previsão);
+    // com a folga utilizável somada uma vez por chamada, um dia sem saída é descartado em tempo constante.
+    const usable=[];let usableTotal=0;for(const v of days){const f=freeOf(v);if(f>=minInfoMin){usable.push(v);usableTotal+=f}}
     for(const d of days){
-      if(extensions.some(x=>x.day===d))continue;
+      if(extDays.has(d))continue;
       const need=load[d]+m.min-limit;if(need<=0)return d;
-      const candidates=moves.filter(x=>x.to===d&&x.tipo==="INFO"),simLoad={...load},changes=[];let freed=0;
+      const fd=freeOf(d);if(usableTotal-(fd>=minInfoMin?fd:0)<need)continue;
+      const candidates=infoByDay.get(d)||[];
       if(candidates.reduce((n,x)=>n+x.min,0)<need)continue;
-      for(const x of candidates){const dest=days.find(v=>v!==d&&simLoad[v]+x.min<=cap);if(!dest)continue;simLoad[dest]+=x.min;simLoad[d]-=x.min;changes.push([x,dest]);freed+=x.min;if(freed>=need)break}
+      const simFree=new Map(),changes=[];let freed=0;
+      const free=v=>simFree.has(v)?simFree.get(v):freeOf(v);
+      for(const x of candidates){const dest=usable.find(v=>v!==d&&free(v)>=x.min);if(!dest)continue;simFree.set(dest,free(dest)-x.min);changes.push([x,dest]);freed+=x.min;if(freed>=need)break}
       if(freed<need)continue;
-      changes.forEach(([x,dest])=>{load[d]-=x.min;load[dest]+=x.min;x.to=dest});return d;
+      changes.forEach(([x,dest])=>{setLoad(d,load[d]-x.min);setLoad(dest,load[dest]+x.min);moveInfo(x,d,dest)});return d;
     }return null;
   };
   // Mantém os pesos/rendimentos das pesquisas; desempenho só desempata a mesma prioridade.
@@ -598,9 +618,11 @@ function planRegen(options={}){
   ordinary.forEach(u=>{
     const m=item(u),alternative=scheduleAlternative(u,selected);
     if(alternative){library.push({...m,reason:alternative});return}
-    let d=days.find(day=>load[day]+m.min<=cap),finish="";
-    if(!d){d=days.find(day=>{if(load[day]+m.min>cap+15||extensions.some(x=>x.day===day))return false;const why=pedagogicalFinish(u,moves.filter(x=>x.to===day).map(x=>byKey.get(x.key)));if(why){finish=why;return true}return false})}
-    if(!d){d=roomFor(u);if(d&&load[d]+m.min>cap)finish=pedagogicalFinish(u,[])||LONG_BLOCK_DAY}
+    // Sem folga (mais a margem) para o item, nenhuma passagem pelos dias pode encaixá-lo.
+    const roomLeft=totalFree+15>=m.min;
+    let d=roomLeft?days.find(day=>load[day]+m.min<=cap):null,finish="";
+    if(!d&&roomLeft){d=days.find(day=>{if(load[day]+m.min>cap+15||extDays.has(day))return false;const why=pedagogicalFinish(u,onDay(day).map(x=>byKey.get(x.key)));if(why){finish=why;return true}return false})}
+    if(!d&&roomLeft){d=roomFor(u);if(d&&load[d]+m.min>cap)finish=pedagogicalFinish(u,[])||LONG_BLOCK_DAY}
     if(d)place(u,d,finish);else{fila.push({...m,reason:!queueFits(m,cap)?"Bloco de "+m.min+" min excede até a margem pedagógica; "+(u.b.tipo==="EBOOK"?"use o marcador de página para registrar uma leitura parcial ou ajuste a duração real.":"divida o bloco ou ajuste a duração real."):"Sem capacidade no horizonte atual, após informativos e prioridades. Veja a prévia para concluir todo o plano."});remember(u)}
   });
   // Não basta caber no teto: dias com conclusões antecipadas precisam de
@@ -608,7 +630,7 @@ function planRegen(options={}){
   // duplicar equivalentes ou ultrapassar a base de 120 min. Nunca esvazia o dia doador.
   const count={};days.forEach(d=>count[d]=0);moves.forEach(m=>count[m.to]++);
   days.filter(d=>!count[d]).forEach(d=>{
-    const candidates=moves.filter(m=>count[m.to]>1&&load[d]+m.min<=cap&&!extensions.some(x=>x.day===m.to));
+    const candidates=moves.filter(m=>count[m.to]>1&&load[d]+m.min<=cap&&!extDays.has(m.to));
     // Preenche lacunas com o próximo trabalho; para uma cauda vazia, transfere
     // o último trabalho do último dia carregado. Simulados são a última opção.
     candidates.sort((a,b)=>(a.tipo==="SIM")-(b.tipo==="SIM")||
@@ -2067,21 +2089,33 @@ function workdayDelta(base,current){
 // (LEI/AULA/REV) ou acima do teto + margem (capítulo) nunca encaixa: fica como "sem encaixe",
 // e a busca do horizonte não pode correr atrás dele (antes corria até 2029 e sumia a data).
 function forecastSoftQueue(plan){return plan.fila.filter(m=>queueFits(m,plan.cap))}
-function findCompletionPlan(scope,hintEnd,sharedPool){
+// A busca do horizonte roda em passos (uma simulação do plano por passo): a interface avança o
+// gerador entre macrotarefas, para a página continuar respondendo e a sincronização terminar
+// primeiro; findCompletionPlan drena tudo de uma vez (testes e chamadas síncronas).
+function* completionPlanSteps(scope,hintEnd,sharedPool){
   // O render/SET já reconciliou equivalências. Aqui a simulação é estritamente
   // somente leitura: nem cada tentativa da busca pode regravar estados automáticos.
   const includeOptional=scope==="acervo",planOptions={includeToday:true,scope,includeOptional,skipSync:true,skipState:true,unitPool:sharedPool||planningUnits(true)};
-  const memo=new Map(),at=n=>{n=Math.max(1,Math.round(n)||1);if(!memo.has(n))memo.set(n,planRegen({...planOptions,end:endForStudyDays(n)}));return memo.get(n)};
-  const feasible=p=>forecastSoftQueue(p).length===0;
-  let hint=Math.max(1,studyDaysThrough(hintEnd||planEnd())),high=hint,highPlan=at(high);
+  const memo=new Map(),norm=n=>Math.max(1,Math.round(n)||1);
+  function* at(n){n=norm(n);if(!memo.has(n)){yield n;memo.set(n,planRegen({...planOptions,end:endForStudyDays(n)}))}return memo.get(n)}
+  function* until(end){yield end;return planRegen({...planOptions,end})}
+  const feasible=p=>forecastSoftQueue(p).length===0,hoje=todayStr(),cap=capMin();
+  let hint=Math.max(1,studyDaysThrough(hintEnd||planEnd())),high=hint,highPlan=yield* at(high);
   // Na rotina normal o último término fica a um dia do novo. Testar os
   // vizinhos primeiro deixa o contador vivo rápido depois de cada marcação.
   if(!feasible(highPlan)){
-    for(let step=1;step<=3&&!feasible(highPlan);step++){const p=at(hint+step);if(feasible(p)){high=hint+step;highPlan=p;break}}
+    for(let step=1;step<=3&&!feasible(highPlan);step++){const p=yield* at(hint+step);if(feasible(p)){high=hint+step;highPlan=p;break}}
     if(!feasible(highPlan)){
-      const ext=planRegen({...planOptions,end:highPlan.end,extend:true});
+      // Extensão do horizonte (a mesma regra de planRegen({extend:true}), um passo por tentativa).
+      let ext=highPlan,attempt=0;
+      while(ext.fila.some(m=>queueFits(m,cap))&&attempt++<12){
+        const remaining=ext.fila.filter(m=>queueFits(m,cap)).reduce((n,m)=>n+m.min,0);
+        let last=ext.end>hoje?ext.end:hoje;
+        for(let n=0;n<Math.max(5,Math.ceil(remaining/cap)+5);){last=datePlus(last,1);if(isStudyDay(last))n++}
+        ext=yield* until(last);
+      }
       high=Math.max(high,studyDaysThrough(ext.end));memo.set(high,ext);highPlan=ext;
-      let guard=0;while(!feasible(highPlan)&&guard++<12){const rem=forecastSoftQueue(highPlan).reduce((n,m)=>n+m.min,0);high+=Math.max(5,Math.ceil(rem/capMin())+1);highPlan=at(high)}
+      let guard=0;while(!feasible(highPlan)&&guard++<12){const rem=forecastSoftQueue(highPlan).reduce((n,m)=>n+m.min,0);high+=Math.max(5,Math.ceil(rem/cap)+1);highPlan=yield* at(high)}
     }
   }
   if(!feasible(highPlan)){
@@ -2094,19 +2128,25 @@ function findCompletionPlan(scope,hintEnd,sharedPool){
   const initial=Object.values(highPlan.initialLoad||{}).reduce((n,v)=>n+(+v||0),0),work=highPlan.moves.reduce((n,m)=>n+m.min,0);
   let low=Math.max(1,Math.ceil((work+initial)/(highPlan.cap+15)));
   // Se o palpite anterior ainda é o primeiro horizonte viável, evitar a busca.
-  if(high>1&&feasible(at(high-1))){
+  if(high>1&&feasible(yield* at(high-1))){
     // Um tique costuma adiantar o término em um ou dois dias: sondar os vizinhos evita a bissecção
     // completa (oito simulações a mais) a cada marcação.
     let hi=high-1,probe=0;
-    while(hi>1&&probe<3&&feasible(at(hi-1))){hi--;probe++}
-    if(probe>=3){let lo=Math.min(low,hi);while(lo<hi){const mid=Math.floor((lo+hi)/2);if(feasible(at(mid)))hi=mid;else lo=mid+1}}
-    high=hi;highPlan=at(high);
-  }else if(high===1)highPlan=at(1);
+    while(hi>1&&probe<3&&feasible(yield* at(hi-1))){hi--;probe++}
+    if(probe>=3){let lo=Math.min(low,hi);while(lo<hi){const mid=Math.floor((lo+hi)/2);if(feasible(yield* at(mid)))hi=mid;else lo=mid+1}}
+    high=hi;highPlan=yield* at(high);
+  }else if(high===1)highPlan=yield* at(1);
   const moves=highPlan.moves,finish=moves.length?moves[moves.length-1].to:todayStr();
   const special=highPlan.library.filter(m=>m.tipo==="SIM").length;
   return {scope,plan:highPlan,end:finish,windowEnd:highPlan.end,studyDays:moves.length?studyDaysThrough(finish):0,tasks:moves.length,blocks:moves.length+highPlan.library.length+highPlan.fila.length,minutes:moves.reduce((n,m)=>n+m.min,0),complete:forecastSoftQueue(highPlan).length===0&&highPlan.fila.length===0,unresolved:highPlan.fila.length,library:highPlan.library.length,special};
 }
+function findCompletionPlan(scope,hintEnd,sharedPool){const g=completionPlanSteps(scope,hintEnd,sharedPool);let r=g.next();while(!r.done)r=g.next();return r.value}
 function parseForecastValue(key){try{const o=JSON.parse(G(key)||"null");return o&&o.version===FORECAST_VERSION?o:null}catch(e){return null}}
+// Cache da previsão por aparelho (chave = impressão digital do progresso): reabrir a página com o
+// mesmo estado não recalcula nada. É cache recalculável, não estado de estudo: fica fora da nuvem.
+const FORECAST_STORE="enam-forecast-cache";
+function loadStoredForecast(key){try{const o=JSON.parse(localStorage.getItem(FORECAST_STORE)||"null");return o&&o.key===key&&o.value&&o.value.version===FORECAST_VERSION?o.value:null}catch(e){return null}}
+function storeForecast(key,value){try{localStorage.setItem(FORECAST_STORE,JSON.stringify({key,value}))}catch(e){}}
 function forecastCatalogCounts(){
   const units=catalogUnits(),byKey=new Map(units.map(u=>[u.key,u]));
   return {all:units.length,core:units.filter(u=>inPlanningScope(u,"nucleo",byKey)).length};
@@ -2193,6 +2233,7 @@ function renderHeaderForecast(snapshot,pending=false){
 function scheduleCompletionForecast(force){
   if(!profileReady&&!G("profile:120-weekdays:v1"))return;
   const host=document.getElementById("completionForecast"),key=forecastFingerprint();
+  if(!force&&forecastCache.key!==key){const stored=loadStoredForecast(key);if(stored)forecastCache={key,value:stored}}
   if(!force&&forecastCache.key===key&&forecastCache.value){
     if(forecastPendingKey){clearTimeout(forecastTimer);forecastRun++;forecastPendingKey="";forecastPendingValue=null;}
     renderHeaderForecast(forecastCache.value);if(host)renderCompletionForecast(host,forecastCache.value);return;
@@ -2205,24 +2246,28 @@ function scheduleCompletionForecast(force){
   forecastPendingValue=forecastCache.value||last;
   renderHeaderForecast(forecastPendingValue,true);
   if(host)host.innerHTML='<div class="forecast-loading">Calculando a previsão de conclusão…</div>';
-  forecastTimer=setTimeout(()=>{
+  // Cada passo é uma simulação do plano; entre passos a página volta a responder e a sincronização
+  // termina antes (o selo "sincronizando…" nunca fica preso atrás do cálculo). Com dados pequenos
+  // (testes) um passo conclui a etapa inteira dentro do orçamento de tempo.
+  let pool=null,gen=null,stage=0,all=null;
+  const tick=()=>{
     if(run!==forecastRun)return;
+    if(syncInFlight){forecastTimer=setTimeout(tick,300);return;}
     if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
-    const pool=planningUnits(true),all=findCompletionPlan("acervo",allHint,pool);
-    if(run!==forecastRun)return;
-    forecastPendingValue={...forecastPendingValue,all};
-    renderHeaderForecast(forecastPendingValue,nucleoOnly);
-    forecastTimer=setTimeout(()=>{
-      if(run!==forecastRun)return;
-      if(key!==forecastFingerprint()){forecastPendingKey="";scheduleCompletionForecast();return;}
-      const core=findCompletionPlan("nucleo",coreHint,pool);if(run!==forecastRun)return;
-      const snapshot={version:FORECAST_VERSION,today:todayStr(),cap:capMin(),counts:forecastCatalogCounts(),core,all};
-      forecastCache={key,value:snapshot};forecastPendingKey="";forecastPendingValue=null;
-      renderHeaderForecast(snapshot);
-      if(profileReady)rememberForecast(snapshot);
-      const currentHost=document.getElementById("completionForecast");if(currentHost)renderCompletionForecast(currentHost,snapshot);
-    },0);
-  },20);
+    if(!gen){pool=planningUnits(true);gen=completionPlanSteps("acervo",allHint,pool);}
+    const t0=Date.now();let r=gen.next();while(!r.done&&Date.now()-t0<40)r=gen.next();
+    if(!r.done){forecastTimer=setTimeout(tick,0);return;}
+    if(stage===0){
+      all=r.value;forecastPendingValue={...forecastPendingValue,all};renderHeaderForecast(forecastPendingValue,nucleoOnly);
+      stage=1;gen=completionPlanSteps("nucleo",coreHint,pool);forecastTimer=setTimeout(tick,0);return;
+    }
+    const core=r.value,snapshot={version:FORECAST_VERSION,today:todayStr(),cap:capMin(),counts:forecastCatalogCounts(),core,all};
+    forecastCache={key,value:snapshot};forecastPendingKey="";forecastPendingValue=null;storeForecast(key,snapshot);
+    renderHeaderForecast(snapshot);
+    if(profileReady)rememberForecast(snapshot);
+    const currentHost=document.getElementById("completionForecast");if(currentHost)renderCompletionForecast(currentHost,snapshot);
+  };
+  forecastTimer=setTimeout(tick,20);
 }
 function vProg(root){
   const forecast=document.createElement("section");forecast.id="completionForecast";forecast.className="forecast-shell";forecast.setAttribute("aria-live","polite");forecast.innerHTML='<div class="forecast-loading">Preparando as duas previsões…</div>';root.appendChild(forecast);scheduleCompletionForecast();
