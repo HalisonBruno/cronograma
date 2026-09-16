@@ -410,7 +410,7 @@ async function pull(rerender){if(!token){setSync("off");return false}
     // Redesenha quando a régua de bancas vai ser reaplicada (flag ausente OU de versão anterior); uma
     // sincronização sem novidade, com a régua em dia, não desmonta o leitor aberto.
     const needsProfile=!G("profile:120-weekdays:v1"),needsPrio=G("profile:prio-bancas:v1")!==((DATA.prio&&DATA.prio.versao)||1);
-    syncEquiv();ensureStudyProfile();ensurePrioOrder();
+    syncEquiv();ensureStudyProfile();ensurePrioOrder();ensurePlanMarco();
     // Uma consulta sem novidades não pode desmontar o texto que está sendo lido.
     if(rerender!==false&&(firstPull||ch||needsProfile||needsPrio))render();
     setSync(syncInFlight?"sync":syncDirty?"pending":"ok");updateStats();
@@ -2218,8 +2218,64 @@ function scheduleCompletionForecast(force){
   };
   forecastTimer=setTimeout(tick,20);
 }
+// ---------- ritmo frente ao cronograma original (16/09/2026) ----------
+// Marco = fotografia do plano em vigor: cada atividade pendente com a data que o replanejador lhe deu e os
+// minutos daquele momento. O saldo compara o que já foi concluído com essa fotografia: soma os minutos das
+// atividades do marco que estão concluídas (em qualquer ordem), acha até que dia do marco essa soma cobre e
+// compara com os dias úteis do marco já passados. Replanejar depois não mexe no marco; atividades criadas
+// depois dele não entram na conta. A fotografia sincroniza entre aparelhos e só muda em "Redefinir marco".
+const PLAN_MARCO_KEY="plan:marco:v1";
+function buildPlanMarco(){
+  const hoje=todayStr(),found={};
+  for(const u of planningUnits(false)){
+    if(unitDone(u))continue;const d=unitDate(u);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d||"")||d<hoje)continue;   // fila, biblioteca e atrasados antigos ficam fora
+    found[u.key]=[d,Math.max(1,Math.ceil(+minRestante(u)||0))];
+  }
+  const days=[...new Set(Object.values(found).map(x=>x[0]))].sort(),idx={};days.forEach((d,i)=>idx[d]=i);
+  const u={};for(const k in found)u[k]=[idx[found[k][0]],found[k][1]];
+  return {v:1,on:hoje,cap:capMin(),days,u};
+}
+function planMarco(){try{const m=JSON.parse(G(PLAN_MARCO_KEY)||"null");return m&&m.v===1&&Array.isArray(m.days)&&m.u?m:null}catch(e){return null}}
+function ensurePlanMarco(){
+  if(!profileReady||!G("profile:120-weekdays:v1")||planMarco())return;
+  // Com nuvem, espera a régua de bancas da versão atual ser aplicada, para fotografar o plano já reordenado.
+  if(token&&G("profile:prio-bancas:v1")!==((DATA.prio&&DATA.prio.versao)||1))return;
+  SET(PLAN_MARCO_KEY,JSON.stringify(buildPlanMarco()));
+}
+function scheduleVariance(marco=planMarco()){
+  if(!marco)return null;
+  const byKey=new Map(planningUnits(true).map(u=>[u.key,u])),perDay=marco.days.map(()=>0);
+  let earned=0,total=0,missing=0;
+  for(const k in marco.u){const [di,min]=marco.u[k];perDay[di]+=min;total+=min;const u=byKey.get(k);if(!u){missing++;continue}if(unitDone(u))earned+=min}
+  let cum=0,covered=0;for(let i=0;i<perDay.length;i++){if(cum+perDay[i]>earned)break;cum+=perDay[i];covered=i+1}
+  const hoje=todayStr(),before=marco.days.filter(d=>d<hoje).length,upTo=marco.days.filter(d=>d<=hoje).length;
+  // Antes de hoje terminar, estar entre "tudo até ontem" e "tudo até hoje" é estar em dia.
+  const diff=covered<before?covered-before:(covered>upTo?covered-upTo:0);
+  return {on:marco.on,diff,earned,total,missing,covered,before,upTo,days:marco.days.length,
+    lastCovered:covered?marco.days[covered-1]:null,next:marco.days[covered]||null,partial:Math.max(0,earned-cum)};
+}
+function planVarianceEl(){
+  const box=document.createElement("section");box.className="card";box.id="plan-variance";box.style.margin="12px 0";
+  const v=scheduleVariance();
+  if(!v){box.innerHTML='<b>Ritmo frente ao cronograma</b><div class="note">O marco do cronograma é criado assim que o plano estiver carregado.</div>';return box}
+  const dias=n=>n+(n===1?" dia útil":" dias úteis"),h=min=>(Math.round(min/6)/10).toLocaleString("pt-BR")+" h";
+  const titulo=v.diff>0?dias(v.diff)+" adiantado":v.diff<0?dias(-v.diff)+" atrasado":"em dia";
+  const cor=v.diff>0?"var(--done)":v.diff<0?"var(--warn)":"var(--ink)";
+  box.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline"><b>Ritmo frente ao cronograma de '+fullDate(v.on)+'</b><button type="button" class="marco-reset" style="background:var(--surface2);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:5px 10px;font-size:.75rem;cursor:pointer">Redefinir marco</button></div>'+
+    '<div style="font-size:1.6rem;font-weight:700;color:'+cor+';margin:4px 0;font-variant-numeric:tabular-nums">'+titulo+'</div>'+
+    '<div class="mmin">'+(v.lastCovered?"Feito tudo o que o marco previa até "+wdName(v.lastCovered)+" "+fullDate(v.lastCovered):"Ainda não fechou o primeiro dia do marco")+(v.partial&&v.next?" · mais "+v.partial+" min de "+fullDate(v.next):"")+'</div>'+
+    '<div class="mmin">'+h(v.earned)+" de "+h(v.total)+" do cronograma original concluídas · "+dias(v.before)+" do marco já passados"+'</div>'+
+    '<div class="note">Compara o que você concluiu, em qualquer ordem, com as datas do cronograma no dia do marco. Replanejar não muda o marco. Atividades criadas depois dele não entram na conta.'+(v.missing?" "+v.missing+" atividades do marco não existem mais no acervo.":"")+'</div>';
+  box.querySelector(".marco-reset").addEventListener("click",()=>{
+    if(!confirm("Usar o plano de hoje como novo marco? O saldo de dias adiantados ou atrasados volta a zero."))return;
+    SET(PLAN_MARCO_KEY,JSON.stringify(buildPlanMarco()));render();toast("Novo marco do cronograma: "+fullDate(todayStr())+".");
+  });
+  return box;
+}
 function vProg(root){
   const forecast=document.createElement("section");forecast.id="completionForecast";forecast.className="forecast-shell";forecast.setAttribute("aria-live","polite");forecast.innerHTML='<div class="forecast-loading">Preparando as duas previsões…</div>';root.appendChild(forecast);scheduleCompletionForecast();
+  ensurePlanMarco();root.appendChild(planVarianceEl());
   vDesempenho(root);
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Simulados oficiais</h2><div class="note">Registre os acertos ao corrigir. Meta em 80 questões.</div>');
   const tw=document.createElement("div");tw.className="tablewrap";
