@@ -44,7 +44,25 @@ for (const m of a.MATLIST) {
 assert(checked > 500, 'todas as matérias com lei seca verificadas: ' + checked);
 assert(stKeys > 0, 'o caso do bloco com um único grupo (chave st:) está coberto');
 
-// 3. O caderno TEC é anexado dentro de "ferramentas da matéria", não solto na página.
+// 3. E-books: na ordem do cadastro (Parte Geral antes da Especial) e com o nome curto do livro quando
+//    a matéria tem mais de um (os dois "Cap. 1" de Penal eram indistinguíveis).
+{
+  const t2 = loadApp({'profile:120-weekdays:v1': [1, at], 'profile:90-weekdays:v1': [1, at], 'cfg:cap': [120, at]});
+  const src = fs.readFileSync(path.join(__dirname, 'study-minutes.js'), 'utf8');
+  assert(src.includes('updateStats, unitCard,'));
+  const h2 = src.split('async function main()')[0].replace('updateStats, unitCard,', 'updateStats, ebPrefix, ordChave, unitCard,');
+  const b = new Function('require', '__dirname', h2 + '\nreturn {loadApp};')(require, __dirname).loadApp({'profile:120-weekdays:v1': [1, at]}).app;
+  assert.equal(b.ebPrefix('penal-geral'), 'Parte Geral · ');
+  assert.equal(b.ebPrefix('penal-especial'), 'Parte Especial · ');
+  assert.equal(b.ebPrefix('civil-gerais'), 'Temas Gerais · ');
+  assert.equal(b.ebPrefix('consumidor'), 'Consumidor · ');
+  assert.equal(b.ebPrefix('administrativo'), '', 'matéria com um só e-book não ganha prefixo');
+  const kg = b.ordChave({k: 'eb:penal-geral:16'}), ke = b.ordChave({k: 'eb:penal-especial:1'});
+  assert(kg[1] < ke[1], 'Parte Geral vem antes da Parte Especial na ordem do material');
+  void t2;
+}
+
+// 4. O caderno TEC é anexado dentro de "ferramentas da matéria", não solto na página.
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 assert(/ferr\.appendChild\(tecNotebookPanel\(m\)\)/.test(html), 'o painel TEC entra no details das ferramentas');
 assert(!/root\.appendChild\(tecNotebookPanel\(/.test(html), 'o painel TEC não fica solto na página');

@@ -1479,6 +1479,19 @@ function blockCard(b,showOrigin){
   return div;
 }
 // ---------- apresentacao dual: cada capitulo mostra as aulas equivalentes e cada aula os capitulos equivalentes ----------
+// Nome curto do e-book antes do capítulo quando a matéria tem mais de um livro (Penal: Parte Geral e
+// Parte Especial; Civil: Temas Gerais, Temas Específicos e Consumidor). Sem isso os dois "Cap. 1" de
+// Penal eram indistinguíveis e a Parte Geral parecia ausente da lista (16/09/2026).
+let _EBPFX=null;
+function ebPrefix(k){
+  if(!_EBPFX){
+    _EBPFX={};const mapa=EB2MAT;
+    const porMat={};(DATA.ebooks||[]).forEach(e=>{const m=mapa[e.k]||e.k;(porMat[m]=porMat[m]||[]).push(e)});
+    (DATA.ebooks||[]).forEach(e=>{const m=mapa[e.k]||e.k;if((porMat[m]||[]).length<2){_EBPFX[e.k]="";return}
+      const n=String(e.nome||e.k),i=n.lastIndexOf(" - ");_EBPFX[e.k]=(i>=0?n.slice(i+3):n.replace(/^Direitos?\s+(d[aeo]s?\s+)?/i,""))+" · "});
+  }
+  return _EBPFX[k]||"";
+}
 function altAulasHtml(eb,cap){
   const all=CAP2AULAS[eb+":"+cap]||[];if(!all.length)return "";
   const tot=all.filter(x=>x.grau==="total"),par=all.filter(x=>x.grau!=="total");
@@ -1492,7 +1505,7 @@ function altCapsHtml(aulaKey){
   const all=AULA2CAPS[aulaKey]||[];if(!all.length)return "";
   const tot=all.filter(x=>x.grau==="total"),par=all.filter(x=>x.grau!=="total");
   const fmtC=x=>{const bk=EBK[x.eb];const c=bk&&bk.caps.find(y=>y.n===x.cap);const u=capLink(x.eb,x.cap)||ebFallback(x.eb);const rd=capLido(x.eb,x.cap);
-    return '<a class="lch" target="_blank" rel="noopener" href="'+u+'" style="'+(rd?"opacity:.6":"")+'" title="'+esc(c?c.t:"")+'">'+(rd?"✓ ":"")+'Cap. '+x.cap+(c?" ("+c.pi+"-"+c.pf+")":"")+' ↗</a>'};
+    return '<a class="lch" target="_blank" rel="noopener" href="'+u+'" style="'+(rd?"opacity:.6":"")+'" title="'+esc(c?c.t:"")+'">'+(rd?"✓ ":"")+ebPrefix(x.eb)+'Cap. '+x.cap+(c?" ("+c.pi+"-"+c.pf+")":"")+' ↗</a>'};
   const faltaC=all.filter(x=>!capLido(x.eb,x.cap)).length;
   const dicaC=tot.length?"":(faltaC?' <span class="mmin">(faltam '+faltaC+')</span>':' <span class="mmin">— aula coberta</span>');
   const resumoC=(all.length-faltaC)+"/"+all.length;
@@ -1580,7 +1593,7 @@ function unitsOf(b){
   if(b.tipo==="EBOOK"&&b.eb&&b.pg&&EBK[b.eb]){
     const rng=(k2,pg)=>{const cs=capsIn(k2,pg);const per=cs.length?Math.round(b.min/cs.length):b.min;
       cs.forEach(c=>{const k="eb:"+k2+":"+c.n;const u=capLink(k2,c.n)||ebFallback(k2);
-        push(k,"<b>Cap. "+c.n+"</b> "+esc(c.t),per+"min · semana "+b.wk,'<a class="lch" target="_blank" rel="noopener" href="'+u+'">📖 abrir na p. '+Math.max(c.pi,pg[0])+' ↗</a>'+altAulasHtml(k2,c.n),per,rangeCovered(planIv(k2,true),c.pi,c.pf))})};
+        push(k,"<b>"+ebPrefix(k2)+"Cap. "+c.n+"</b> "+esc(c.t),per+"min · semana "+b.wk,'<a class="lch" target="_blank" rel="noopener" href="'+u+'">📖 abrir na p. '+Math.max(c.pi,pg[0])+' ↗</a>'+altAulasHtml(k2,c.n),per,rangeCovered(planIv(k2,true),c.pi,c.pf))})};
     rng(b.eb,b.pg);if(b.pg2)rng(b.eb2||b.eb,b.pg2);
     if(!U.length)push("st:"+b.id,esc(b.t),"",'<a class="lch" target="_blank" rel="noopener" href="'+ebFallback(b.eb)+'">📄 e-book ↗</a>',b.min);
     return U;
@@ -2519,7 +2532,8 @@ function lawOrderKey(g){
 function ordChave(x){
   // ordem natural do material: capitulo 1,2,3... / aula 1,2,3... / artigos crescentes / juris por citacao
   const k=x.k||"";
-  let m=k.match(/^eb:(.+):(\d+)$/);   if(m)return [0,m[1],+m[2],0];
+  // e-books na ordem do cadastro (Parte Geral antes da Especial; Temas Gerais antes dos Específicos)
+  let m=k.match(/^eb:(.+):(\d+)$/);   if(m){const i=(DATA.ebooks||[]).findIndex(e=>e.k===m[1]);return [0,i<0?999:i,+m[2],0]}
   m=k.match(/^au:(.+):(\d+)$/);       if(m)return [1,m[1],+m[2],0];
   m=k.match(/^lg2:([^:]+):([0-9a-f]{6})$/);
   if(m){const g=(LG[m[1]]||[]).find(y=>y.id===m[2]);return g?lawOrderKey(g):[2,"￿",m[1],0,0,0]}
@@ -2620,7 +2634,7 @@ function vMats(root){
       const s=c.out?0.02:wkScore(wk===99?10:wk);   // prioridade NUNCA cai por cobertura parcial (regra do usuario)
       const dn=!!G("eb:"+k+":"+c.n)||rangeCovered(planIv(k,true),c.pi,c.pf);
       const lk=capLink(k,c.n)||ebFallback(k);
-      items.push({k:"eb:"+k+":"+c.n,s,dn,r:REND["eb:"+k+":"+c.n]||0,el:()=>pitem("eb:"+k+":"+c.n,"<b>Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+altAulasHtml(k,c.n)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · semana "+wk:""),s)});
+      items.push({k:"eb:"+k+":"+c.n,s,dn,r:REND["eb:"+k+":"+c.n]||0,el:()=>pitem("eb:"+k+":"+c.n,"<b>"+ebPrefix(k)+"Cap. "+c.n+"</b> "+esc(c.t)+autoBadge(G("eb:"+k+":"+c.n),"pela aula")+" <a class='lch' target='_blank' rel='noopener' href='"+lk+"'>abrir na p. "+c.pi+" ↗</a>"+altAulasHtml(k,c.n)+(c.out?' <span class="badge-moved" style="background:var(--warn-soft);color:var(--warn)">fora do plano</span>':"")+(covered?' <span class="badge-moved" style="background:var(--done-soft);color:var(--done)">▶ coberto por vídeo</span>':""),"p. "+c.pi+"-"+c.pf+(wk<99?" · semana "+wk:""),s)});
     })});
   appendItems(root,items);
   // 2) artigos de lei (blocos de lei seca)
@@ -2943,7 +2957,7 @@ function catalogUnits(){
   allBlocks.filter(b=>b.opt).forEach(b=>unitsOf(b).forEach(add));
   Object.values(EBK).forEach(bk=>bk.caps.forEach(c=>{
     const key="eb:"+bk.k+":"+c.n;
-    add({key,title:"Cap. "+c.n+" "+c.t,min:Math.round((c.pf-c.pi+1)*ritmoPag()),val:G(key),done:!!G(key),catalogOnly:true,
+    add({key,title:ebPrefix(bk.k)+"Cap. "+c.n+" "+c.t,min:Math.round((c.pf-c.pi+1)*ritmoPag()),val:G(key),done:!!G(key),catalogOnly:true,
       b:{id:"catalog:"+key,tipo:"EBOOK",mat:EB2MAT[bk.k]||bk.nome,day:"",eb:bk.k,pg:[c.pi,c.pf],t:c.t}});
   }));
   (DATA.cursos||[]).forEach(c=>c.aulas.forEach(a=>{
