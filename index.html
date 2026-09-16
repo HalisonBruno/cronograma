@@ -1028,21 +1028,28 @@ function stars(v){return v>=12?"★★★":v>=6?"★★":v>0?"★":""}
 // ---------- filtros TEC baseados no que foi ESTUDADO ----------
 function tecStudied(mat){
   // assuntos das atividades feitas (capitulos, aulas, grupos de lei) + dos blocos de questoes ja feitos
-  const st={};const seen=new Set();const add=(t,src)=>{if(!t||seen.has(src+"\n"+t))return;seen.add(src+"\n"+t);st[t]=st[t]||{n:0,tested:false,pcts:[]};st[t].n++};
+  const st={};const seen=new Set();const add=(t,src)=>{if(!t||seen.has(src+"\n"+t))return;seen.add(src+"\n"+t);st[t]=st[t]||{n:0,tested:false,qn:0,qac:0};st[t].n++};
   allBlocks.forEach(b=>{if(mat&&b.mat!==mat)return;unitsOf(b).forEach(u=>{if(!unitDone(u))return;(TECMAP[u.key]||[]).forEach(t=>add(t,u.key))})});
   // Capitulos estudados pela pagina da materia tambem contam quando estao fora das datas do plano.
   Object.keys(TECMAP).filter(k=>k.startsWith("eb:")&&G(k)).forEach(k=>{if(!mat||EB2MAT[k.split(":")[1]]===mat)TECMAP[k].forEach(t=>add(t,k))});
-  allBlocks.forEach(b=>{if(b.tipo!=="QUEST"||(mat&&b.mat!==mat))return;const p=G("pct:"+b.id);(b.tec||[]).forEach(t=>{if(!st[t])return;if(isDone(b)||p!=null){st[t].tested=true;if(p!=null)st[t].pcts.push(p)}})});
+  // Questões registradas com assunto no card "Questões do dia" marcam o assunto como testado e dão o acerto.
+  qdTodos().forEach(o=>{if(mat&&o.mat!==mat)return;const t=o.assunto;if(!t||!st[t])return;st[t].tested=true;st[t].qn+=+o.n||0;st[t].qac+=+o.ac||0});
   return st;
 }
 function tecPick(mat,modo){
-  const st=tecStudied(mat);const arr=Object.entries(st).map(([t,v])=>({t,n:v.n,tested:v.tested,avg:v.pcts.length?v.pcts.reduce((a,c)=>a+c,0)/v.pcts.length:null}));
-  // revisoes vencidas: assuntos de blocos REV/EBOOK antigos (>14 dias) sem teste recente
-  const hoje=todayStr();
-  const errs=[];for(const k in S.kv){if(!k.startsWith("err:"))continue;const v=S.kv[k][0];if(!v)continue;const b=allBlocks.find(x=>"err:"+x.id===k);if(mat&&b&&b.mat!==mat)continue;String(v).split(",").forEach(x=>{const t=x.trim();if(t)errs.push(t)})}
-  if(modo==="pior"){const base=arr.filter(x=>x.avg!=null&&x.avg<70).sort((a,b)=>a.avg-b.avg).map(x=>x.t);return errs.concat(base.filter(t=>errs.indexOf(t)<0))}
+  // avg = acerto das questões registradas com o assunto (null quando não há registro)
+  const st=tecStudied(mat);const arr=Object.entries(st).map(([t,v])=>({t,n:v.n,tested:v.tested,avg:v.qn?100*v.qac/v.qn:null}));
+  if(modo==="pior")return arr.filter(x=>x.avg!=null&&x.avg<70).sort((a,b)=>a.avg-b.avg).map(x=>x.t);
   // ordem: nao testado > <70% > mais estudado
   return arr.sort((a,b)=>(a.tested?1:0)-(b.tested?1:0)||((a.avg!=null&&a.avg<70)?-1:0)-((b.avg!=null&&b.avg<70)?-1:0)||b.n-a.n).map(x=>x.t);
+}
+// Assuntos TEC de uma matéria para o registro de questões: os já estudados primeiro, depois os demais mapeados.
+function tecTopicsOf(mat){
+  const studied=new Set(Object.keys(tecStudied(mat))),all=new Set();
+  allBlocks.forEach(b=>{if(b.mat!==mat)return;unitsOf(b).forEach(u=>(TECMAP[u.key]||[]).forEach(t=>all.add(t)))});
+  Object.keys(TECMAP).forEach(k=>{const m=k.match(/^eb:([^:]+):/);if(m&&EB2MAT[m[1]]===mat)TECMAP[k].forEach(t=>all.add(t))});
+  const cmp=(x,y)=>x.localeCompare(y,"pt");
+  return {studied:[...studied].sort(cmp),others:[...all].filter(t=>!studied.has(t)).sort(cmp)};
 }
 function tecCopy(mat,modo){
   matSel=mat;curTab="mats";render();const el=document.getElementById("tec-notebook");if(el)el.scrollIntoView({block:"start",behavior:"smooth"});
@@ -1210,7 +1217,7 @@ function qdCard(dstr){
   let lista="";
   regs.forEach(r=>{
     const er=(+r.n||0)-(+r.ac||0);
-    lista+='<div class="mmin" style="display:flex;gap:8px;align-items:center;margin-top:4px"><b>'+esc(r.mat)+'</b> · '+esc(r.banca)+' · '+r.n+'q · <span style="color:var(--done)">'+r.ac+' acertos</span> · <span style="color:var(--danger)">'+er+' erros</span> · '+(r.n?Math.round(r.ac/r.n*100):0)+'%'+
+    lista+='<div class="mmin" style="display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap"><b>'+esc(r.mat)+'</b>'+(r.assunto?' · '+esc(r.assunto):'')+' · '+esc(r.banca)+' · '+r.n+'q · <span style="color:var(--done)">'+r.ac+' acertos</span> · <span style="color:var(--danger)">'+er+' erros</span> · '+(r.n?Math.round(r.ac/r.n*100):0)+'%'+
       '<button class="qdel" data-k="'+esc(r.key)+'" style="background:none;border:0;color:var(--muted);cursor:pointer">✕</button></div>';
   });
   div.innerHTML='<div class="bt"><b>✏ Questões do dia</b> <span class="mmin">— registre aqui TODAS as questões que fizer (qualquer matéria, quantas vezes quiser)</span></div>'+
@@ -1232,18 +1239,25 @@ function qdCard(dstr){
     '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">'+
     '<select id="qdmat" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">'+opts+'</select>'+
     '<select id="qdban" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)">'+bops+'</select>'+
+    '<select id="qdass" aria-label="assunto das questões (opcional)" style="padding:7px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%;flex:1 1 220px"></select>'+
     '<input id="qdn" class="pct" type="number" min="1" max="300" placeholder="questões" style="width:86px">'+
     '<input id="qda" class="pct" type="number" min="0" max="300" placeholder="acertos" style="width:80px">'+
     '<button id="qdok" style="background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600">registrar</button>'+
     '<a class="lch" target="_blank" rel="noopener" href="https://www.tecconcursos.com.br/questoes/cadernos">abrir TEC ↗</a></div>';
   if(matsHoje.length){const sel=div.querySelector("#qdmat");if(sel&&[...sel.options].some(o=>o.value===matsHoje[0]))sel.value=matsHoje[0]}
+  // Assunto opcional (os mesmos rótulos do caderno TEC): alimenta o diagnóstico por assunto no Progresso.
+  const assSel=div.querySelector("#qdass");
+  const fillAss=()=>{const tp=tecTopicsOf(div.querySelector("#qdmat").value),opt=t=>'<option>'+esc(t)+'</option>';
+    assSel.innerHTML='<option value="">assunto (opcional)</option>'+(tp.studied.length?'<optgroup label="estudados">'+tp.studied.map(opt).join("")+'</optgroup>':"")+(tp.others.length?'<optgroup label="demais assuntos da matéria">'+tp.others.map(opt).join("")+'</optgroup>':"")};
+  if(assSel){fillAss();div.querySelector("#qdmat").addEventListener("change",fillAss)}
   div.querySelector("#qdok").addEventListener("click",()=>{
     const mat=div.querySelector("#qdmat").value,ban=div.querySelector("#qdban").value;
     const n=+div.querySelector("#qdn").value,a=+div.querySelector("#qda").value;
     if(!n){toast("Diga quantas questões você respondeu.");return}
     if(isNaN(a)||a>n){toast("Acertos deve ser um número até o total de questões.");return}
-    SET("qd:"+dstr+":"+Date.now(),JSON.stringify({mat,banca:ban,n,ac:a}));
-    render();toast("Registrado: "+mat+" · "+ban+" · "+n+"q · "+a+" acertos.");
+    const ass=assSel?assSel.value:"";
+    SET("qd:"+dstr+":"+Date.now(),JSON.stringify(ass?{mat,banca:ban,n,ac:a,assunto:ass}:{mat,banca:ban,n,ac:a}));
+    render();toast("Registrado: "+mat+(ass?" · "+ass:"")+" · "+ban+" · "+n+"q · "+a+" acertos.");
   });
   div.querySelectorAll(".qdel").forEach(bt=>bt.addEventListener("click",()=>{SET(bt.dataset.k,null);render()}));
   return div;
@@ -1903,6 +1917,29 @@ function qRegistrosLegado(){
   }
   return out.filter(r=>!isNaN(r.pct)).sort((a,b)=>a.ts-b.ts);
 }
+// Diagnóstico por assunto (16/09/2026): só leitura. Soma as questões registradas com assunto e classifica
+// com faixas usuais de plataformas de questões (crítico < 50%, fraco 50–75%, forte > 75%) a partir de
+// DIAG_MIN_Q questões. Não agenda nada nem reordena o plano: insumo para o projeto futuro de releituras.
+const DIAG_MIN_Q=10;
+function diagnosticoAssuntos(){
+  const por={};let semAssunto=0;
+  qdTodos().forEach(o=>{const n=+o.n||0;if(!n)return;if(!o.assunto){semAssunto+=n;return}
+    const k=o.mat+"|"+o.assunto,x=por[k]=por[k]||{mat:o.mat,assunto:o.assunto,n:0,ac:0};x.n+=n;x.ac+=+o.ac||0});
+  const faixa=x=>x.n<DIAG_MIN_Q?"poucas":(x.pct<50?"critico":(x.pct<=75?"fraco":"forte")),ordem={critico:0,fraco:1,forte:2,poucas:3};
+  const rows=Object.values(por).map(x=>({...x,pct:Math.round(100*x.ac/x.n)})).map(x=>({...x,faixa:faixa(x)}));
+  rows.sort((a,b)=>ordem[a.faixa]-ordem[b.faixa]||a.pct-b.pct||b.n-a.n);
+  return {rows,semAssunto};
+}
+function diagnosticoAssuntosEl(){
+  const {rows,semAssunto}=diagnosticoAssuntos(),box=document.createElement("div");
+  const rot={critico:["crítico","var(--danger)"],fraco:["fraco","var(--warn)"],forte:["forte","var(--done)"],poucas:["poucas questões","var(--muted)"]};
+  let h='<div class="note" style="margin-top:12px"><b>Diagnóstico por assunto</b> · só leitura: não agenda nada nem muda a ordem do plano. Crítico abaixo de 50%, fraco de 50% a 75%, forte acima de 75%, a partir de '+DIAG_MIN_Q+' questões no assunto. Escolha o assunto ao registrar no card “Questões do dia”.</div>';
+  if(!rows.length)h+='<div class="note">Nenhuma questão registrada com assunto ainda.'+(semAssunto?' '+semAssunto+' questões registradas sem assunto.':"")+'</div>';
+  else h+='<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>Assunto</th><th>Matéria</th><th style="text-align:right">questões</th><th style="text-align:right">acerto</th><th>faixa</th></tr>'+
+    rows.map(x=>'<tr><td>'+esc(x.assunto)+'</td><td>'+esc(x.mat)+'</td><td style="text-align:right">'+x.n+'</td><td style="text-align:right;font-weight:700;color:'+pctCor(x.pct)+'">'+x.pct+'%</td><td><span style="color:'+rot[x.faixa][1]+';font-weight:600">'+rot[x.faixa][0]+'</span></td></tr>').join("")+'</table></div>'+
+    (semAssunto?'<div class="note">'+semAssunto+' questões registradas sem assunto ficam fora deste quadro.</div>':"");
+  box.innerHTML=h;return box;
+}
 function pctCor(p){return p>=70?"var(--done)":p>=50?"var(--warn)":"var(--danger)"}
 function vDesempenho(root){
   const regs=qRegistros();
@@ -1924,6 +1961,7 @@ function vDesempenho(root){
       rows+='<tr><td>'+esc(b)+'</td><td style="text-align:right">'+x.n+'</td><td style="text-align:right;font-weight:700;color:'+pctCor(p)+'">'+p+'%</td></tr>'});
     root.insertAdjacentHTML("beforeend",'<div class="tablewrap"><table class="panel" style="width:100%"><tr><th>Banca</th><th style="text-align:right">questões</th><th style="text-align:right">acerto</th></tr>'+rows+'</table></div>');
   }
+  root.appendChild(diagnosticoAssuntosEl());
   // formulario de registro avulso
   const f=document.createElement("div");f.className="sem";f.style.display="block";
   let opts="";MATLIST.filter(m=>m!=="Informativos 10x").forEach(m=>opts+='<option>'+esc(m)+'</option>');
@@ -2193,20 +2231,21 @@ function vProg(root){
   });
   tw.appendChild(tb);root.appendChild(tw);
   root.appendChild(semaforoEl());
-  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Onde estou</h2><div class="note">Feito = atividades concluídas. Núcleo = quanto das questões esperadas você já cobriu (é o número que importa). Acerto = média dos blocos de questões registrados.</div>');
+  root.insertAdjacentHTML("beforeend",'<h2 class="sec">Onde estou</h2><div class="note">Feito = atividades concluídas. Núcleo = quanto das questões esperadas você já cobriu (é o número que importa). Acerto = média ponderada das questões registradas (card “Questões do dia” e registros avulsos).</div>');
   const pw=document.createElement("div");pw.className="tablewrap";const pt=document.createElement("table");pt.className="panel";
   pt.innerHTML="<tr><th>Matéria</th><th>Feito</th><th>Núcleo</th><th>Acerto</th><th></th></tr>";
+  const regsPorMat={};qRegistros().forEach(r=>{(regsPorMat[r.mat]=regsPorMat[r.mat]||[]).push(r)});
   MATLIST.forEach(m=>{
     const bl=allBlocks.filter(b=>b.mat===m&&!b.opt);
     let t=0,d=0,pt2=0,pd=0;const seen=new Set();
     bl.forEach(b=>unitsOf(b).forEach(u=>{if(seen.has(u.key))return;seen.add(u.key);t++;const p=pesoOf(u);pt2+=p;if(unitDone(u)){d++;pd+=p}}));
     (MATJURIS[m]||[]).forEach(()=>{});
-    const pcts=[];allBlocks.filter(b=>b.tipo==="QUEST"&&b.mat===m).forEach(b=>{const p=G("pct:"+b.id);if(p!=null)pcts.push(p)});
-    const avg=pcts.length?Math.round(pcts.reduce((a,c)=>a+c,0)/pcts.length):null;
+    const rg=regsPorMat[m]||[],nq=rg.reduce((a,r)=>a+(+r.n||0),0);
+    const avg=nq?Math.round(rg.reduce((a,r)=>a+r.pct*(+r.n||0),0)/nq):null;
     const fp=t?Math.round(d/t*100):0,np=pt2?Math.round(pd/pt2*100):0;
     const sinal=np>=80&&(avg==null||avg>=70)?"✓":(np<40?"!":"·");
     const tr=document.createElement("tr");
-    tr.innerHTML="<td>"+esc(m)+"</td><td>"+fp+"%</td><td><b>"+np+"%</b></td><td>"+(avg==null?"—":avg+"%")+"</td><td>"+sinal+"</td>";
+    tr.innerHTML="<td>"+esc(m)+"</td><td>"+fp+"%</td><td><b>"+np+"%</b></td><td title='"+nq+" questões registradas'>"+(avg==null?"—":avg+"%")+"</td><td>"+sinal+"</td>";
     tr.style.cursor="pointer";tr.addEventListener("click",()=>{curTab="mats";matSel=m;render()});
     pt.appendChild(tr);
   });
@@ -2224,7 +2263,7 @@ function vProg(root){
     line.addEventListener("click",()=>{curTab="mats";matSel=m;render()});
     root.appendChild(line);
   });
-  root.insertAdjacentHTML("beforeend",'<div class="note">A média % vem dos blocos de questões com acerto registrado. Média &lt; 60%: o tópico volta no Ciclo 2 — priorize nas próximas baterias de questões, sempre fora do teto diário.</div>');
+  root.insertAdjacentHTML("beforeend",'<div class="note">O acerto por matéria vem das questões registradas, ponderado pelo número de questões. É só leitura: não muda a ordem do plano.</div>');
   root.insertAdjacentHTML("beforeend",'<h2 class="sec">Leitura dos e-books (CPJuris)</h2><div class="note">Lido = blocos de e-book concluídos + capítulos ticados por você. Plano = quanto o cronograma prevê ler. Toque num livro para abrir os capítulos e registrar leitura feita fora do cronograma.</div>');
   (DATA.ebooks||[]).forEach(bk=>{
     const readIv=planIv(bk.k,true).concat(capsTicked(bk));
