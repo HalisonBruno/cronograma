@@ -2461,26 +2461,85 @@ function pitem(key,titulo,extra,score,linkHtml,onTick){
   return el;
 }
 let ordModo=localStorage.getItem("ordModo")||"rend";   // "rend" = prioridade (q/h) | "mat" = ordem do material
+let ferrAberto="";   // matéria cujas "ferramentas da matéria" estão abertas (recolhidas por padrão)
 // REGRA DO USUARIO: ticar NUNCA move o item de lugar - a posicao e sempre a mesma, muda so o visual.
+// ---------- ordem do material na lei seca ----------
+// Três defeitos corrigidos em 16/09/2026: (1) bloco com um único grupo usa a chave st:<bloco> e era
+// ordenado pelo id do bloco, antes de todos os códigos; (2) a mesma lei aparece com rótulos diferentes
+// (LSA/Lei 6.404, LEF/Lei 6.830, DL/Lei 3.365) e se partia em dois trechos; (3) frações do mesmo artigo
+// (1/2, 2/2) e artigos com sufixo (121-A) não tinham desempate. O código agora é identificado pela
+// página oficial da lei, o artigo considera o sufixo e, no mesmo artigo, vale a posição do primeiro
+// dispositivo da fração (caput < incisos < parágrafos).
+function lawSigOf(g){return String((g&&(g.sub||g.readTitle))||"").split(" · ")[0].trim()}
+function lawIdOf(g){
+  const u=String((g&&g.u)||"").toLowerCase(),seg=(u.split("/").pop()||"").replace(/\.html?$/,"").replace(/compilad[oa]$/,"");
+  return (seg||"sub:"+lawSigOf(g))+(/\bADCT\b/.test((g&&g.sub)||"")?":adct":"");
+}
+let _LAWNAME=null;
+function lawNameOf(id){
+  if(!_LAWNAME){
+    const labels={};
+    for(const bid in LG)for(const g of LG[bid]){if(g.x)continue;const i=lawIdOf(g),s=lawSigOf(g);(labels[i]=labels[i]||{})[s]=(labels[i][s]||0)+1}
+    _LAWNAME={};
+    for(const i in labels)_LAWNAME[i]=Object.entries(labels[i]).sort((p,q)=>q[1]-p[1]||p[0].localeCompare(q[0],"pt"))[0][0];
+  }
+  return _LAWNAME[id]||id;
+}
+function artRank(label){
+  const m=String(label||"").match(/^(\d+)(?:-([A-Z]+))?/);if(!m)return 1e12;
+  let r=0;for(const ch of m[2]||"")r=r*27+(ch.charCodeAt(0)-64);
+  return +m[1]*1000+r;
+}
+function romanValue(s){const v={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};let t=0;for(let i=0;i<s.length;i++){const a=v[s[i]]||0,b=v[s[i+1]]||0;t+=a<b?-a:a}return t}
+// Posição do primeiro dispositivo de um trecho do artigo: caput = 0; inciso do caput = número romano;
+// § n = 1000 + n (com sufixo e inciso do parágrafo como frações); parágrafo único = 1000. Lê a fração
+// "(k/n: primeiro–último)" ou o trecho depois de "art. N," no título de leitura, que traz o parágrafo
+// quando o sub só mostra o inciso (CF art. 155 "(2/3: VIII–I)" = § 2º, VIII).
+function devicePos(text){
+  const t=String(text||"");
+  const f=t.match(/\(\d+\/\d+:\s*([^)]*)\)/),a=f?null:t.match(/arts?\.\s*[\dA-Z.º°-]+\s*,\s*(.*)$/i);
+  const s=(f?f[1]:a?a[1]:"").trim();if(!s)return null;
+  if(/^caput/i.test(s))return 0;
+  let p=s.match(/^§\s*(\d+)[º°o]?(?:-([A-Z]))?(?:\s*,\s*(?:incisos?\s*)?([IVXLCDM]+)\b)?/);
+  if(p)return 1000+(+p[1])*30+(p[2]?p[2].charCodeAt(0)-64:0)+(p[3]?romanValue(p[3])/1000:0);
+  p=s.match(/^(?:§\s*único|par[áa]grafo\s+único)(?:\s*,\s*(?:incisos?\s*)?([IVXLCDM]+)\b)?/i);
+  if(p)return 1000+(p[1]?romanValue(p[1])/1000:0);
+  p=s.match(/^(?:incisos?\s*)?([IVXLCDM]+)\b/);if(p)return romanValue(p[1]);
+  return null;
+}
+function fractionRank(g){
+  const k=String((g&&g.sub)||"").match(/\((\d+)\/\d+/);
+  let r=devicePos(g&&g.readTitle);if(r==null)r=devicePos(g&&g.sub);
+  return [r==null?0:r,k?+k[1]:0];
+}
+function lawOrderKey(g){
+  const id=lawIdOf(g),fr=fractionRank(g);
+  return [2,lawNameOf(id),id,artRank((g.a||[])[0]),fr[0],fr[1]];
+}
 function ordChave(x){
   // ordem natural do material: capitulo 1,2,3... / aula 1,2,3... / artigos crescentes / juris por citacao
   const k=x.k||"";
   let m=k.match(/^eb:(.+):(\d+)$/);   if(m)return [0,m[1],+m[2],0];
   m=k.match(/^au:(.+):(\d+)$/);       if(m)return [1,m[1],+m[2],0];
   m=k.match(/^lg2:([^:]+):([0-9a-f]{6})$/);
-  if(m){const g=(LG[m[1]]||[]).find(y=>y.id===m[2]);
-    const sig=((g&&g.sub)||"").split(" · ")[0]||"";
-    const a1=(g&&g.a&&g.a.length)?parseInt(String(g.a[0]).match(/\d+/)||0,10)||0:0;
-    return [2,sig,a1,0]}
-  m=k.match(/^st:(.+)$/); if(m)return [2,m[1],0,0];
+  if(m){const g=(LG[m[1]]||[]).find(y=>y.id===m[2]);return g?lawOrderKey(g):[2,"￿",m[1],0,0,0]}
+  m=k.match(/^st:(.+)$/);
+  if(m){const vis=(LG[m[1]]||[]).filter(g=>!g.x);return vis.length===1?lawOrderKey(vis[0]):[2,"￿",m[1],0,0,0]}
   m=k.match(/^inf:(.+)$/); if(m)return [3,"",0,0];
   return [4,"",0,0];
+}
+function ordCmp(A,B){
+  for(let i=0;i<Math.max(A.length,B.length);i++){
+    const a=A[i],b=B[i];if(a===b)continue;if(a===undefined)return -1;if(b===undefined)return 1;
+    if(typeof a==="number"&&typeof b==="number")return a-b;
+    const c=String(a).localeCompare(String(b),"pt",{numeric:true});if(c)return c;
+  }
+  return 0;
 }
 function ord(list){
   const arr=list.slice();
   if(ordModo==="mat"){
-    return arr.sort((a,b)=>{const A=ordChave(a),B=ordChave(b);
-      return A[0]-B[0]||String(A[1]).localeCompare(String(B[1]))||A[2]-B[2]||(b.s-a.s)});
+    return arr.sort((a,b)=>ordCmp(ordChave(a),ordChave(b))||(b.s-a.s));
   }
   return arr.sort((a,b)=>((b.r||0)-(a.r||0))||b.s-a.s);   // prioridade: feito NAO vai para o fim
 }
@@ -2534,8 +2593,11 @@ function vMats(root){
   const ferr=document.createElement("details");ferr.className="mais";ferr.style.display="block";ferr.style.margin="6px 0";
   ferr.innerHTML='<summary>🧰 ferramentas da matéria ▾</summary>';
   ferr.insertAdjacentHTML("beforeend",'<div class="note" style="margin:6px 0">q/h = questões esperadas na prova por hora de estudo (peso total = 80). Atividades sem dado de incidência aparecem por último, mas não são necessariamente dispensáveis. "semana N" = a semana do cronograma em que a atividade está agendada.</div>');
+  // O caderno TEC fica DENTRO de "ferramentas da matéria" e recolhe com ele (pedido de 16/09/2026).
+  // O estado aberto/fechado sobrevive ao redesenho da página enquanto a matéria for a mesma.
+  ferr.appendChild(tecNotebookPanel(m));
+  ferr.open=ferrAberto===m;ferr.addEventListener("toggle",()=>{ferrAberto=ferr.open?m:""});
   root.appendChild(ferr);
-  root.appendChild(tecNotebookPanel(m));
   // (barra de atalhos antiga removida: o indice fixo .secidx cumpre o papel)
   // e-books da matéria: cadastro de link direto (só aparece se não houver links por capítulo)
   const ebs=Object.keys(EB2MAT).filter(k=>EB2MAT[k]===m&&EBK[k]);
