@@ -49,7 +49,20 @@ for (const k in a.EBK) for (const c of a.EBK[k].caps) {
 const b2 = blocks.find(b => b.id === '2026-09-17-e0');
 assert(b2 && b2.eb === 'penal-geral' && b2.pg[0] === 25 && b2.pg[1] === 34 && b2.min === 20, 'bloco do cap. 2');
 assert.equal(JSON.stringify(a.unitsOf(b2).map(u => u.key)), JSON.stringify(['eb:penal-geral:2']));
-assert.deepEqual(['1', '3', '4', '16'].filter(n => a.EBK['penal-geral'].caps.find(c => c.n === +n).out), ['1', '3', '4', '16'], 'caps. de nota baixa seguem fora');
+// A pedido (17/09/2026), toda a Parte Geral entra no plano, e também Constitucional cap. 17 e Tributário caps. 11 e 17
+// (nota 8). Páginas conferidas no sumário dos PDFs.
+const incluidos = {'2026-09-17-e1': ['penal-geral', 14, 24], '2026-09-17-e2': ['penal-geral', 35, 39], '2026-09-17-e3': ['penal-geral', 40, 42],
+  '2026-09-17-e4': ['penal-geral', 180, 187], '2026-09-17-e5': ['constitucional', 404, 422], '2026-09-17-e6': ['tributario', 201, 229], '2026-09-17-e7': ['tributario', 290, 299]};
+for (const [id, [eb, pi, pf]] of Object.entries(incluidos)) {
+  const b = blocks.find(x => x.id === id);
+  assert(b && b.eb === eb && b.pg[0] === pi && b.pg[1] === pf && b.min === (pf - pi + 1) * 2, id + ': bloco de leitura');
+  const cap = a.EBK[eb].caps.find(c => c.pi === pi && c.pf === pf);
+  assert(cap && !cap.out, id + ': capítulo inteiro, sem selo "fora do plano"');
+  assert.equal(JSON.stringify(a.unitsOf(b).map(u => u.key)), JSON.stringify(['eb:' + eb + ':' + cap.n]));
+}
+assert.equal(a.EBK['penal-geral'].caps.filter(c => c.out).length, 0, 'Parte Geral inteira no plano');
+for (const [eb, n] of [['constitucional', 17], ['tributario', 11], ['tributario', 17]]) assert(!a.EBK[eb].caps.find(c => c.n === n).out);
+assert(a.DATA.prio.versao >= 7, 'blocos novos reaplicam o plano');
 
 // Textos de sugestão de vídeo coerentes com a correspondência.
 const acao = blocks.find(b => b.id === '2026-09-03-2');
