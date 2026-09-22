@@ -10,7 +10,9 @@ const harness = fs.readFileSync(path.join(__dirname, 'study-minutes.js'), 'utf8'
   .replace('return { app: context.app, nodes, storage, document };', 'return { app: context.app, nodes, storage, document, setClock: value => { clock = value; } };');
 const {loadApp} = new Function('require', '__dirname', harness + '\nreturn {loadApp};')(require, __dirname);
 const DAY = '2026-09-22', noon = d => new Date(d + 'T12:00:00').getTime();
-const fresh = () => { const t = loadApp({'profile:120-weekdays:v1': [1, noon(DAY)], 'profile:90-weekdays:v1': [1, noon(DAY)], 'cfg:cap': [120, noon(DAY)], 'profile:prio-bancas:v1': [8, noon(DAY)]}); t.setClock(noon(DAY)); return t; };
+// versão atual da régua (sobe quando o plano é reaplicado): semear com ela evita reaplicar o plano ao abrir
+const PRIO_V = +(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8').match(/"versao":([0-9]+)/) || [0, 1])[1];
+const fresh = () => { const t = loadApp({'profile:120-weekdays:v1': [1, noon(DAY)], 'profile:90-weekdays:v1': [1, noon(DAY)], 'cfg:cap': [120, noon(DAY)], 'profile:prio-bancas:v1': [PRIO_V, noon(DAY)]}); t.setClock(noon(DAY)); return t; };
 const t = fresh(), a = t.app;
 const units = new Map(a.planningUnits(true).map(u => [u.key, u]));
 const subj = m => a.pedSubject(units.get(m.key));

@@ -2,8 +2,8 @@
   "generatedAt": "2026-09-11T18:39:26.804792+00:00",
   "checkedAt": "2026-09-11",
   "files": 155,
-  "groups": 638,
-  "articleOccurrences": 4927,
+  "groups": 642,
+  "articleOccurrences": 4932,
   "sources": 84,
   "changedArticles": 2745,
   "unresolved": [],
@@ -791,6 +791,14 @@
       "groupsSplit": 20,
       "newGroups": 40,
       "capDevices": 30
+    },
+    {
+      "checkedAt": "2026-09-22",
+      "kind": "dedup-overlapping-groups",
+      "script": "scripts/dedup-overlapping-groups.py",
+      "hidden": 5,
+      "newGroups": 4,
+      "minutesSaved": 186
     }
   ]
 }

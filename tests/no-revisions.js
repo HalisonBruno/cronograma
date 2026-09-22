@@ -33,10 +33,16 @@ const at = new Date(DAY + 'T12:00:00').getTime();
   assert(!day.some(u => u.key.startsWith('rv:')), 'nenhum card "Revisar (D+n)" aparece no dia');
   // as seis "revisões" que eram a única leitura do artigo continuam no plano como leitura simples
   const removed = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'scripts', 'revisions-removed-2026-09-16.json'), 'utf8'));
+  // 22/09/2026: a leitura convertida que repetia o art. 103 do CDC (lido com o 104 em Civil) virou um recorte sem ele;
+  // o recorte continua com todos os artigos que só ela lia (scripts/law-overlaps-2026-09-22.json).
+  const overlaps = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'scripts', 'law-overlaps-2026-09-22.json'), 'utf8'));
   for (const c of removed.convertedGroups) {
     const b = a.allBlocks.find(x => x.id === c.block);
     assert(b, 'bloco da leitura convertida existe: ' + c.block);
-    assert(a.unitsOf(b).some(u => u.key.endsWith(':' + c.id) || u.key === 'st:' + c.block), 'a leitura convertida aparece como atividade: ' + c.sub);
+    const recut = overlaps.created.filter(n => n.block === c.block && n.from === c.id).map(n => n.id), ids = [c.id, ...recut];
+    assert(a.unitsOf(b).some(u => ids.some(id => u.key.endsWith(':' + id)) || u.key === 'st:' + c.block), 'a leitura convertida aparece como atividade: ' + c.sub);
+    const arts = recut.flatMap(id => [...a.DATA.leigroups[c.block].find(g => g.id === id).a]);
+    if (recut.length) assert((c.onlyReadingOf || []).every(n => arts.includes(n)), 'o recorte mantém os artigos que só essa leitura tinha: ' + c.sub);
   }
   assert.equal(removed.summary.deletedBlocks, 84);
 }

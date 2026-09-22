@@ -1,0 +1,216 @@
+{
+ "checkedAt": "2026-09-22",
+ "script": "scripts/dedup-overlapping-groups.py",
+ "rule": "Cada dispositivo visivel fica em um unico grupo visivel; o grupo que repetia leitura fica oculto (x) e o que so ele tinha vira grupo recortado do proprio texto, sem edicao.",
+ "hidden": [
+  {
+   "block": "2026-08-28-0",
+   "id": "24d17a",
+   "sub": "Lei 14.133 · art. 6 (1/2: caput–XXIX)",
+   "m": 69,
+   "reason": "caput–XXII repetia 323683 e d75476 (~93 min lidos duas vezes)"
+  },
+  {
+   "block": "2026-09-04-0",
+   "id": "919931",
+   "sub": "CF · art. 7 (1/2: caput e I–XXIV)",
+   "m": 75,
+   "reason": "recortado em caput–XVII e XVIII–XXIV para que cada leitura antiga do art. 7 corresponda a grupos inteiros"
+  },
+  {
+   "block": "2026-09-28-0",
+   "id": "2a34bf",
+   "sub": "CF · art. 7 (1/2: caput e I–XVII)",
+   "m": 54,
+   "reason": "art. 7 inteiro já está no bloco de Const. Trabalho (2026-09-04-0)"
+  },
+  {
+   "block": "2026-09-28-0",
+   "id": "a8537d",
+   "sub": "CF · art. 7 (2/2: XVIII–XXXIV e § único)",
+   "m": 60,
+   "reason": "art. 7 inteiro já está no bloco de Const. Trabalho (2026-09-04-0)"
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "a49af4",
+   "sub": "CDC · arts. 81–82, 103",
+   "m": 63,
+   "reason": "art. 103 já está com o art. 104 no bloco de Civil (28bfae)"
+  }
+ ],
+ "created": [
+  {
+   "block": "2026-08-28-0",
+   "id": "44eebe",
+   "from": "24d17a",
+   "sub": "Lei 14.133 · art. 6 (3/5: XXIII–XXIX)",
+   "d": 7,
+   "m": 21,
+   "source": {
+    "group": "24d17a",
+    "lines": [
+     36,
+     72
+    ]
+   },
+   "inc": 8
+  },
+  {
+   "block": "2026-09-04-0",
+   "id": "5a4453",
+   "from": "919931",
+   "sub": "CF · art. 7 (1/3: caput e I–XVII)",
+   "d": 18,
+   "m": 54,
+   "source": {
+    "group": "919931",
+    "lines": [
+     0,
+     18
+    ]
+   },
+   "inc": 10
+  },
+  {
+   "block": "2026-09-04-0",
+   "id": "4b89be",
+   "from": "919931",
+   "sub": "CF · art. 7 (2/3: XVIII–XXIV)",
+   "d": 7,
+   "m": 21,
+   "source": {
+    "group": "919931",
+    "lines": [
+     18,
+     25
+    ]
+   },
+   "inc": 10
+  },
+  {
+   "block": "2026-10-07-0~2",
+   "id": "e6e6f3",
+   "from": "a49af4",
+   "sub": "CDC · arts. 81–82",
+   "d": 13,
+   "m": 39,
+   "source": {
+    "group": "a49af4",
+    "articles": [
+     "81",
+     "82"
+    ]
+   },
+   "inc": 4
+  }
+ ],
+ "relabeled": [
+  {
+   "block": "2026-08-28-0",
+   "id": "323683",
+   "sub": [
+    "Lei 14.133 · art. 6 (1/2: caput–XV)",
+    "Lei 14.133 · art. 6 (1/5: caput–XV)"
+   ]
+  },
+  {
+   "block": "2026-08-28-0",
+   "id": "d75476",
+   "sub": [
+    "Lei 14.133 · art. 6 (2/2: XVI–XXII)",
+    "Lei 14.133 · art. 6 (2/5: XVI–XXII)"
+   ]
+  },
+  {
+   "block": "2026-08-28-0",
+   "id": "8810fa",
+   "sub": [
+    "Lei 14.133 · art. 6 (2/2: XXX–XXXVII)",
+    "Lei 14.133 · art. 6 (4/5: XXX–XXXVII)"
+   ]
+  },
+  {
+   "block": "2026-08-28-0",
+   "id": "982575",
+   "sub": [
+    "Lei 14.133 · art. 6 (3/3: XXXVIII–LX)",
+    "Lei 14.133 · art. 6 (5/5: XXXVIII–LX)"
+   ]
+  },
+  {
+   "block": "2026-09-04-0",
+   "id": "b61e3d",
+   "sub": [
+    "CF · art. 7 (2/2: XXV–Parágrafo único)",
+    "CF · art. 7 (3/3: XXV–Parágrafo único)"
+   ],
+   "r": [
+    "Direitos Sociais — art. 7 (2/2: XXV–Parágrafo único)",
+    "Direitos Sociais — art. 7 (3/3: XXV–Parágrafo único)"
+   ]
+  }
+ ],
+ "lgmig": {
+  "added": {
+   "2026-08-28-0": {
+    "d:24d17a": [
+     "323683",
+     "d75476",
+     "44eebe"
+    ]
+   },
+   "2026-09-04-0": {
+    "d:919931": [
+     "5a4453",
+     "4b89be"
+    ]
+   },
+   "2026-09-28-0": {
+    "d:2a34bf": [
+     "2026-09-04-0:5a4453"
+    ],
+    "d:a8537d": [
+     "2026-09-04-0:4b89be",
+     "2026-09-04-0:b61e3d"
+    ]
+   },
+   "2026-10-07-0~2": {
+    "d:a49af4": [
+     "e6e6f3"
+    ]
+   }
+  },
+  "removed": {
+   "2026-09-04-0": {
+    "g:919931": [
+     "919931",
+     "b61e3d"
+    ],
+    "g:b61e3d": [
+     "919931",
+     "b61e3d"
+    ]
+   }
+  }
+ },
+ "blockMinutes": {
+  "2026-08-28-0": [
+   273,
+   225
+  ],
+  "2026-09-28-0": [
+   291,
+   177
+  ],
+  "2026-10-07-0~2": [
+   207,
+   183
+  ]
+ },
+ "prioVersao": [
+  8,
+  9
+ ],
+ "minutesSaved": 186
+}

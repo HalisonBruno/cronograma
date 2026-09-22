@@ -15,7 +15,8 @@ GROUPS={g['id']:g for j in FILES.values() for g in j['g']}
 class PublishedLawTests(unittest.TestCase):
     def test_all_exact_files_and_scopes_exist(self):
         self.assertEqual(set(DATA['leigroups']),set(FILES))
-        self.assertEqual(len(GROUPS),638)
+        # 638 + 4 recortes de 22/09/2026 (scripts/law-overlaps-2026-09-22.json); os grupos ocultados continuam no arquivo
+        self.assertEqual(len(GROUPS),642)
         for bid,gs in DATA['leigroups'].items():
             self.assertEqual(FILES[bid]['id'],bid)
             self.assertEqual([g['id'] for g in gs],[g['id'] for g in FILES[bid]['g']])
@@ -36,6 +37,23 @@ class PublishedLawTests(unittest.TestCase):
         removed=json.loads((ROOT/'scripts/revisions-removed-2026-09-16.json').read_text(encoding='utf8'))
         converted={c['id'] for c in removed['convertedGroups']}
         self.assertEqual(len(converted),6)
+        # 22/09/2026: recortes sobrepostos (o mesmo dispositivo em dois grupos visiveis) ficaram ocultos (x), os
+        # rotulos de fracao foram renumerados e os grupos recortados sao novos; nada mais pode ter mudado.
+        overlaps=json.loads((ROOT/'scripts/law-overlaps-2026-09-22.json').read_text(encoding='utf8'))
+        created={(c['block'],c['id']) for c in overlaps['created']}
+        hidden={(h['block'],h['id']) for h in overlaps['hidden']}
+        relabeled={(r['block'],r['id']):r for r in overlaps['relabeled']}
+        self.assertEqual((len(created),len(hidden),len(relabeled)),(4,5,5))
+        for bid,gs in current['leigroups'].items():
+            gs[:]=[g for g in gs if (bid,g['id']) not in created]
+            for g in gs:
+                if (bid,g['id']) in hidden:
+                    self.assertEqual(g.pop('x'),1)
+                r=relabeled.get((bid,g['id']))
+                if r:
+                    self.assertEqual(g['sub'],r['sub'][1]);g['sub']=r['sub'][0]
+                    if 'r' in r:
+                        self.assertEqual(g['r'],r['r'][1]);g['r']=r['r'][0]
         for gs in current['leigroups'].values():
             for g in gs:
                 g.pop('readTitle',None)
@@ -97,7 +115,7 @@ class PublishedLawTests(unittest.TestCase):
         self.assertIn('cancelad',json.dumps(tst,ensure_ascii=False).lower())
         report=json.loads((ROOT/'auditoria-lei-seca.json').read_text(encoding='utf8'))
         self.assertEqual(report['unresolved'],[])
-        self.assertEqual(report['groups'],638)
+        self.assertEqual(report['groups'],642)
         self.assertEqual(len(report['sourceManifest']),84)
 
     def test_groups_fit_the_daily_cap(self):
