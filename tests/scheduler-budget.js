@@ -50,8 +50,11 @@ assert(plan.days.includes('2027-03-04'), 'missing calendar weeks restored withou
 assert(plan.days.every(app.isStudyDay));
 assertBudget(plan);
 assert.equal(plan.info.total, infoCount);
-assert.equal(plan.info.scheduled + plan.info.equivalent, infoCount, 'every informativo has a date or a proven twin scheduled');
-assert.equal(plan.info.unscheduled, 0);
+// Pedagogia de 22/09/2026: informativos fecham os dias da própria matéria, no ritmo dela; os que não cabem até
+// a prova ficam na fila com o motivo (nenhum some).
+assert.equal(plan.info.scheduled + plan.info.equivalent + plan.info.unscheduled, infoCount, 'every informativo has a date, a proven twin or an explicit queue reason');
+assert(plan.info.scheduled > 0);
+assert(plan.fila.filter(m => m.tipo === 'INFO').every(m => /própria matéria/.test(m.reason)));
 assert.equal(new Set(plan.moves.map(m => m.key)).size, plan.moves.length);
 assert.equal(plan.moves.filter(m => m.tipo === 'INFO').length, plan.info.scheduled);
 const equivalentInfos = plan.library.filter(m => m.tipo === 'INFO');
@@ -125,7 +128,7 @@ const deadline = app.planRegen({includeToday:true});
 assert(deadline.info.unscheduled > 0, 'insufficient capacity is not hidden');
 assert.equal(deadline.info.scheduled + deadline.info.equivalent + deadline.info.unscheduled,
   app.planningUnits().filter(u => u.b.tipo === 'INFO' && !app.unitDone(u)).length);
-assert(deadline.fila.filter(m => m.tipo === 'INFO').every(m => /obrigatório/.test(m.reason)));
+assert(deadline.fila.filter(m => m.tipo === 'INFO').every(m => /própria matéria/.test(m.reason)));
 assertBudget(deadline);
 cases++;
 

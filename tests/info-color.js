@@ -14,7 +14,7 @@ const a = loadApp({'profile:120-weekdays:v1': [1, at]}).app;
 const info = 'inf:' + a.INFOS[0].id;
 assert.equal(a.prioCorDe(info), 'var(--juris)', 'informativo usa a cor própria');
 assert.notEqual(a.prioCorDe(info), a.prioColor(0), 'e não a cor da menor prioridade');
-assert.match(a.prioDot(info), /reserva obrigatória do plano/, 'o ponto explica que informativo é reserva obrigatória');
+assert.match(a.prioDot(info), /fecha os dias da própria matéria/, 'o ponto explica que o informativo fecha os dias da própria matéria');
 const weighted = Object.keys(a.DATA.peso).find(k => !k.startsWith('inf:'));
 assert.equal(a.prioCorDe(weighted), a.prioColor(a.prioAbs(weighted)), 'as demais atividades seguem a escala de incidência');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');

@@ -51,7 +51,8 @@ function assertFuture(a, days, expectDaily) {
 }
 
 // All future dates are disposable; today's pending tasks and completed cards
-// keep their dates. First-fit must not pack 180 tasks into only the first weeks.
+// keep their dates. Pedagogy of 22/09/2026: one subject per day, filled up to the cap, on consecutive weekdays
+// from tomorrow without gaps (the old rule spread 1-2 tasks over every weekday until the exam).
 {
   const {app:a, document} = isolated();
   const curriculum = JSON.stringify(a.DATA);
@@ -65,12 +66,13 @@ function assertFuture(a, days, expectDaily) {
   assert(plan.days.length > 100 && plan.days.every(d => d > DAY && a.isStudyDay(d)));
   assert(!plan.moves.some(m => m.key === todayKey), 'reorganizing tomorrow does not move today');
   assert(plan.moves.some(m => m.key === overdueKey), 'overdue work is rescued into the future');
-  assert(plan.days.every(d => plan.moves.some(m => m.to === d)), 'enough eligible tasks fill every future weekday');
+  const used = plan.days.filter(d => plan.moves.some(m => m.to === d));
+  assert(used.length > 0 && used.every((d, i) => d === plan.days[i]), 'work fills consecutive weekdays from tomorrow, without gaps');
   a.applyRegen(plan);
   assert.equal(a.G('mvu:' + todayKey), DAY, 'today is preserved');
   assert(a.G('mvu:' + completedKey) <= DAY, 'completed future item moves back to its completion day (never a future day)');
   assert.equal(JSON.stringify(a.S.kv[completedKey]), completion);
-  assertFuture(a, plan.days, true);
+  assertFuture(a, used, true);
   assert.equal(JSON.stringify(a.DATA), curriculum, 'curriculum and researched priorities are unchanged');
   cases++;
 
@@ -88,7 +90,7 @@ function assertFuture(a, days, expectDaily) {
   a.S.kv['qd:' + DAY + ':regression'] = [JSON.stringify({mat:'Extra', banca:'FGV', n:90, ac:60}), at(DAY)];
   const after = a.planRegen();
   assert.equal(JSON.stringify(after.moves), JSON.stringify(before.moves), 'questions outside the budget do not consume future capacity');
-  assertFuture(a, after.days, true);
+  assertFuture(a, after.days.filter(d => after.moves.some(m => m.to === d)), true);
   cases++;
 }
 
@@ -125,18 +127,20 @@ function assertFuture(a, days, expectDaily) {
   const {app:a} = isolated();
   for (let i = 0; i < 180; i++) extra(a, 'race-' + i, '2027-04-16');
   const preview = a.planRegen();
-  const targetDate = preview.days.find(d => preview.moves.filter(m => m.to === d).length === 1);
-  assert(targetDate, 'balanced preview has a one-task date for the race regression');
-  const completed = preview.moves.find(m => m.to === targetDate);
-  a.S.kv[completed.key] = [1, at(DAY)];
+  const targetDate = preview.days[0];
+  const onTarget = preview.moves.filter(m => m.to === targetDate);
+  assert(onTarget.length > 0, 'the preview dates tomorrow');
+  const completed = onTarget[0];
+  // The whole preview date is studied while the preview is open.
+  onTarget.forEach(m => { a.S.kv[m.key] = [1, at(DAY)]; });
   const stamp = JSON.stringify(a.S.kv[completed.key]);
   const oldDate = a.G('mvu:' + completed.key);
   a.applyRegen(preview);
-  assert(pendingOn(a, targetDate).length > 0, 'apply refreshes stale preview rather than leaving a one-task date empty');
+  assert(pendingOn(a, targetDate).length > 0, 'apply refreshes the stale preview rather than leaving the studied date empty');
   assert.equal(JSON.stringify(a.S.kv[completed.key]), stamp);
   assert.equal(a.G('mvu:' + completed.key), DAY, 'activity completed while the preview was open is recorded on its completion day, never left in a future day');
   assert.notEqual(a.G('mvu:' + completed.key), oldDate);
-  assertFuture(a, preview.days, true);
+  assertFuture(a, preview.days.filter(d => pendingOn(a, d).length), true);
   a.undoRegen();
   assert.equal(JSON.stringify(a.S.kv[completed.key]), stamp, 'undo does not undo actual study');
   assert.equal(a.G('mvu:xdone:race-0'), '2027-04-16', 'undo restores pending assignments from before apply');
@@ -144,14 +148,14 @@ function assertFuture(a, days, expectDaily) {
 }
 
 // If there are fewer tasks than remaining days, finish at the start of the
-// window. No fake repetition, duplicate task, weekend task, or internal gap.
+// window (same subject, so the first weekday holds both). No fake repetition, duplicate task, weekend task, or internal gap.
 {
   const {app:a} = isolated();
   const keys = [extra(a, 'last-a', '2027-04-16'), extra(a, 'last-b', '2027-04-16')];
   const plan = a.planRegen();
   assert.equal(plan.moves.length, 2);
   assert.equal(new Set(plan.moves.map(m => m.key)).size, 2);
-  assert.deepEqual([...plan.moves.map(m => m.to).sort()], [...plan.days.slice(0, 2)]);
+  assert.deepEqual([...plan.moves.map(m => m.to)], [plan.days[0], plan.days[0]], 'both fit in the first weekday of their subject');
   a.applyRegen(plan);
   assert.equal(plan.days.flatMap(d => pendingOn(a, d)).length, keys.length);
   cases++;
